@@ -1,0 +1,43 @@
+<div class="sound-board">
+  <div class="word-row">
+    <div class="ear" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="58" height="58">
+        <path
+          d="M40 47c-3 8-15 7-15-2 0-7 9-8 9-16 0-6-4-10-10-10-7 0-12 5-12 13"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="5"
+          stroke-linecap="round"
+        />
+        <path
+          d="M31 36c5-3 6-7 5-11"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="5"
+          stroke-linecap="round"
+        />
+      </svg>
+    </div>
+    <p>{{ question().displayText }}</p>
+    @if (question().image; as image) {
+      <span class="word-image" role="img" [attr.aria-label]="image.alt">{{ image.emoji }}</span>
+    }
+  </div>
+
+  <div class="sound-options" aria-label="Odaberi koji glas čuješ">
+    @for (option of question().answers; track option.id; let index = $index) {
+      <button
+        type="button"
+        [class.option-a]="index === 0"
+        [class.option-b]="index === 1"
+        [class.option-c]="index > 1"
+        [class.selected]="selectedId() === option.id"
+        [disabled]="disabled()"
+        (click)="answer.emit(option.id)"
+      >
+        <span class="sound-mark" aria-hidden="true">{{ index < 2 ? '♪' : '–' }}</span>
+        {{ option.label }}
+      </button>
+    }
+  </div>
+</div>

@@ -1,0 +1,116 @@
+<div class="page-shell progress-shell">
+  <header class="progress-header">
+    <div>
+      <p class="eyebrow">Pregled za roditelje</p>
+      <h1>Napredak kroz redovitu vježbu</h1>
+    </div>
+    <p>
+      Ovdje se prikazuju samo aktivnosti završene u ovom pregledniku. Podaci se ne šalju na
+      poslužitelj.
+    </p>
+  </header>
+
+  @if (progress.results().length) {
+    <section class="summary" aria-label="Sažetak napretka">
+      <article>
+        <span>Odigrane vježbe</span><strong>{{ progress.totalSessions() }}</strong>
+      </article>
+      <article>
+        <span>Ukupni bodovi</span><strong>{{ progress.totalPoints() }}</strong>
+      </article>
+      <article>
+        <span>Točnost</span><strong>{{ accuracy() }}%</strong>
+      </article>
+      <article>
+        <span>Vrijeme vježbe</span><strong>{{ minutes() }} min</strong>
+      </article>
+    </section>
+
+    <div class="progress-layout">
+      <section class="surface activity" aria-labelledby="activity-title">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">Aktivnosti</p>
+            <h2 id="activity-title">Posljednje vježbe</h2>
+          </div>
+          <span>{{ progress.results().length }} zapisa</span>
+        </div>
+        <div class="activity-list">
+          @for (result of progress.results(); track result.id) {
+            <article>
+              <div
+                class="activity-mark"
+                [attr.data-game]="result.gameType"
+                aria-hidden="true"
+              ></div>
+              <div class="activity-main">
+                <h3>{{ result.packageName }}</h3>
+                <p>
+                  {{ gameTypeLabels[result.gameType] }} · glas {{ result.targetSound }} ·
+                  {{ result.theme }}
+                </p>
+                <time [attr.datetime]="result.completedAt">{{
+                  result.completedAt | date: 'd. M. y., HH:mm'
+                }}</time>
+              </div>
+              <dl>
+                <div>
+                  <dt>Točno</dt>
+                  <dd>{{ result.correctAnswers }}/{{ result.questionCount }}</dd>
+                </div>
+                <div>
+                  <dt>Bodovi</dt>
+                  <dd>{{ result.totalPoints }}</dd>
+                </div>
+                <div>
+                  <dt>Razina</dt>
+                  <dd>{{ difficultyLabels[result.difficulty] }}</dd>
+                </div>
+              </dl>
+            </article>
+          }
+        </div>
+      </section>
+
+      <aside class="side-column">
+        <section class="recommendation">
+          <p class="eyebrow">Sljedeći korak</p>
+          <h2>Nastavite kratko i redovito</h2>
+          <p>
+            Odaberite novu temu s poznatim glasom ili ponovite paket u kojem je bilo više pokušaja.
+          </p>
+          <a class="button button--primary" routerLink="/igre">Odaberi vježbu</a>
+        </section>
+        <section class="clinical-note">
+          <strong>Informativni podaci</strong>
+          <p>
+            Ovi rezultati prate korištenje aplikacije. Ne predstavljaju dijagnozu ni stručnu
+            procjenu izgovora.
+          </p>
+        </section>
+      </aside>
+    </div>
+  } @else {
+    <section class="surface empty-progress">
+      <div aria-hidden="true">☆</div>
+      <h2>Prvi rezultat tek čeka</h2>
+      <p>Završite jednu kratku igru i ovdje će se prikazati bodovi, točnost i aktivnost.</p>
+      <a class="button button--primary" routerLink="/igre/slusaj-hrana-s-lagano"
+        >Započni prvu igru</a
+      >
+    </section>
+  }
+
+  <section class="privacy-strip">
+    <div>
+      <strong>Privatnost u MVP-u</strong>
+      <p>
+        Napredak je spremljen samo u lokalnoj pohrani preglednika. Audiosnimke se ne spremaju u ovaj
+        pregled.
+      </p>
+    </div>
+    @if (progress.results().length) {
+      <button type="button" (click)="progress.clear()">Izbriši lokalni napredak</button>
+    }
+  </section>
+</div>

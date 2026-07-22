@@ -1,0 +1,94 @@
+.sound-board {
+  text-align: center;
+}
+
+.word-row {
+  min-height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.word-row p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 7vw, 4.5rem);
+  font-weight: 900;
+}
+
+.ear {
+  width: 4.25rem;
+  height: 4.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff1cf;
+  color: #a76400;
+}
+
+.word-image {
+  font-size: 3.5rem;
+}
+
+.sound-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+button {
+  min-width: min(100%, 13rem);
+  min-height: 5.5rem;
+  flex: 1 1 12rem;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  padding: 1rem 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease;
+}
+
+.option-a {
+  background: #dff2ff;
+}
+
+.option-b {
+  background: #e0f8ef;
+}
+
+.option-c {
+  background: #fff2d1;
+}
+
+button:not(:disabled):hover,
+button.selected {
+  transform: scale(1.025);
+  border-color: var(--color-navy-900);
+}
+
+.sound-mark {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 1.5rem;
+}
+
+@media (max-width: 34rem) {
+  .word-row {
+    gap: 0.5rem;
+  }
+
+  .ear {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .word-image {
+    font-size: 2.5rem;
+  }
+}

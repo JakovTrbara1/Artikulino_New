@@ -1,0 +1,25 @@
+<div class="listen-board">
+  @if (question().image; as image) {
+    <div class="prompt-image" role="img" [attr.aria-label]="image.alt">
+      @if (image.src) {
+        <img [src]="image.src" [alt]="image.alt" />
+      } @else {
+        <span aria-hidden="true">{{ image.emoji }}</span>
+      }
+    </div>
+  }
+
+  <p class="spoken-text">{{ question().displayText }}</p>
+  <div class="category-options" aria-label="Ponuđene kategorije">
+    @for (option of question().answers; track option.id) {
+      <button
+        type="button"
+        [class.selected]="selectedId() === option.id"
+        [disabled]="disabled()"
+        (click)="answer.emit(option.id)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+</div>

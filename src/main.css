@@ -1,0 +1,240 @@
+:root {
+  color-scheme: light;
+  --color-sky-50: #f4fbff;
+  --color-sky-100: #eaf7ff;
+  --color-sky-200: #cfeeff;
+  --color-sky-500: #278be8;
+  --color-navy-900: #0d315f;
+  --color-navy-700: #24496f;
+  --color-muted: #607993;
+  --color-white: #ffffff;
+  --color-coral: #f45f57;
+  --color-coral-dark: #d94743;
+  --color-yellow: #ffbd2e;
+  --color-mint: #55c8a7;
+  --color-mint-dark: #237f6a;
+  --color-danger: #b53d3d;
+  --color-border: #cfe0ef;
+  --shadow-sm: 0 0.25rem 0.75rem rgb(13 49 95 / 8%);
+  --shadow-md: 0 0.9rem 2.5rem rgb(13 49 95 / 12%);
+  --radius-sm: 0.75rem;
+  --radius-md: 1.25rem;
+  --radius-lg: 2rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --content-width: 76rem;
+  --font-display: 'Arial Rounded MT Bold', 'Trebuchet MS', system-ui, sans-serif;
+  --font-body: 'Trebuchet MS', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-body);
+  color: var(--color-navy-900);
+  background: var(--color-sky-100);
+  font-synthesis: none;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 20rem;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 8% 18%, rgb(255 255 255 / 72%) 0 4rem, transparent 4.1rem),
+    linear-gradient(180deg, var(--color-sky-100), var(--color-sky-50));
+  color: var(--color-navy-900);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  color: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-block-start: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(2.25rem, 6vw, 4.75rem);
+}
+
+h2 {
+  font-size: clamp(1.75rem, 4vw, 2.8rem);
+}
+
+h3 {
+  font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+}
+
+p {
+  line-height: 1.65;
+}
+
+:focus-visible {
+  outline: 0.25rem solid var(--color-yellow);
+  outline-offset: 0.2rem;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 0.5rem;
+  left: 0.5rem;
+  transform: translateY(-160%);
+  border-radius: var(--radius-sm);
+  background: var(--color-navy-900);
+  color: var(--color-white);
+  padding: 0.75rem 1rem;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.page-shell {
+  width: min(calc(100% - 2rem), var(--content-width));
+  margin-inline: auto;
+  padding-block: clamp(2rem, 5vw, 4.5rem);
+}
+
+.surface {
+  border: 1px solid rgb(255 255 255 / 90%);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+}
+
+.button {
+  min-height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.85rem 1.35rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.button:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button--primary {
+  background: var(--color-coral);
+  color: var(--color-white);
+  box-shadow: 0 0.4rem 0 var(--color-coral-dark);
+}
+
+.button--primary:not(:disabled):active {
+  transform: translateY(0.25rem);
+  box-shadow: none;
+}
+
+.button--secondary {
+  border: 2px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-navy-900);
+}
+
+.button--quiet {
+  background: var(--color-sky-100);
+  color: var(--color-navy-900);
+}
+
+.eyebrow {
+  margin-bottom: var(--space-3);
+  color: var(--color-coral-dark);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 42rem) {
+  .page-shell {
+    width: min(calc(100% - 1rem), var(--content-width));
+    padding-block: 1.25rem 2.5rem;
+  }
+
+  .surface {
+    border-radius: var(--radius-md);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

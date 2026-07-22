@@ -1,0 +1,44 @@
+<header class="site-header">
+  <div class="header-inner">
+    <a
+      class="brand"
+      routerLink="/"
+      aria-label="Artikulino, povratak na naslovnicu"
+      (click)="closeMenu()"
+    >
+      Artikulino<span aria-hidden="true">●</span>
+    </a>
+
+    <button
+      class="menu-button"
+      type="button"
+      aria-label="Otvori ili zatvori glavni izbornik"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="main-navigation"
+      (click)="toggleMenu()"
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26">
+        <path
+          d="M4 7h16M4 12h16M4 17h16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+
+    <nav id="main-navigation" aria-label="Glavna navigacija" [class.is-open]="menuOpen()">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()"
+      >
+        Naslovnica
+      </a>
+      <a routerLink="/igre" routerLinkActive="active" (click)="closeMenu()">Igre</a>
+      <a routerLink="/napredak" routerLinkActive="active" (click)="closeMenu()">Napredak</a>
+    </nav>
+  </div>
+</header>

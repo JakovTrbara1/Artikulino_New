@@ -1,0 +1,166 @@
+<div class="page-shell player-shell">
+  @if (contentPackage(); as package) {
+    @if (session.isComplete()) {
+      <section class="surface result-screen" aria-labelledby="result-title">
+        <div class="result-star" aria-hidden="true">★</div>
+        <p class="eyebrow">Vježba je završena</p>
+        <h1 id="result-title">Bravo, stigao/la si do cilja!</h1>
+        <p>{{ package.name }} spremljen je u tvoj napredak.</p>
+
+        <dl class="result-stats">
+          <div>
+            <dt>Točno</dt>
+            <dd>{{ session.correctAnswers() }} / {{ package.questions.length }}</dd>
+          </div>
+          <div>
+            <dt>Bodovi</dt>
+            <dd>{{ session.totalPoints() }}</dd>
+          </div>
+          <div>
+            <dt>Najdulji niz</dt>
+            <dd>{{ session.longestStreak() }}</dd>
+          </div>
+          <div>
+            <dt>Ponovna slušanja</dt>
+            <dd>{{ session.replays() }}</dd>
+          </div>
+        </dl>
+
+        <div class="result-actions">
+          <button class="button button--primary" type="button" (click)="restart()">
+            Igraj ponovno
+          </button>
+          <a class="button button--secondary" routerLink="/igre">Odaberi drugu igru</a>
+          <a class="button button--quiet" routerLink="/napredak">Pogledaj napredak</a>
+        </div>
+      </section>
+    } @else if (session.currentQuestion(); as question) {
+      <section class="surface game-surface" aria-labelledby="game-title">
+        <div class="game-toolbar">
+          <div>
+            <span>Pitanje</span>
+            <strong>{{ session.currentIndex() + 1 }} od {{ package.questions.length }}</strong>
+          </div>
+          <div>
+            <span>Bodovi</span>
+            <strong>{{ session.totalPoints() }}</strong>
+          </div>
+          <div>
+            <span>Niz</span>
+            <strong>{{ session.currentStreak() }}</strong>
+          </div>
+        </div>
+
+        <div class="progress-track" aria-label="Napredak kroz igru">
+          <span [style.width.%]="session.progressPercent()"></span>
+        </div>
+
+        <div class="game-heading">
+          <a class="back-link" routerLink="/igre">← Sve igre</a>
+          <p>
+            {{ gameTypeLabels[package.gameType] }} · {{ difficultyLabels[package.difficulty] }} ·
+            {{ package.theme }}
+          </p>
+          <h1 id="game-title">{{ taskTitle() }}</h1>
+          <p class="goal">
+            Ciljni glas: <strong>{{ question.targetSound || package.targetSound }}</strong>
+          </p>
+        </div>
+
+        <button
+          class="listen-button"
+          type="button"
+          [disabled]="audio.isPlaying()"
+          (click)="playPrompt()"
+        >
+          <span class="speaker" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="34" height="34">
+              <path
+                d="M5 10v4h4l5 4V6L9 10H5Zm12-1a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          {{ audio.isPlaying() ? 'Slušaj…' : listenLabel() }}
+        </button>
+        @if (audioMessage()) {
+          <p class="audio-notice" role="status">{{ audioMessage() }}</p>
+        }
+
+        <div class="answer-region" [class.waiting]="!hasListened()">
+          @switch (package.gameType) {
+            @case ('listen-and-decide') {
+              <app-listen-decide-board
+                [question]="question"
+                [disabled]="!hasListened() || session.isAnswered()"
+                [selectedId]="selectedAnswer()"
+                (answer)="chooseAnswer($event)"
+              />
+            }
+            @case ('catch-the-sound') {
+              <app-catch-sound-board
+                [question]="question"
+                [disabled]="!hasListened() || session.isAnswered()"
+                [selectedId]="selectedAnswer()"
+                (answer)="chooseAnswer($event)"
+              />
+            }
+            @case ('sound-position') {
+              <app-sound-position-board
+                [question]="question"
+                [disabled]="!hasListened() || session.isAnswered()"
+                [selectedId]="selectedAnswer()"
+                (answer)="chooseAnswer($event)"
+              />
+            }
+          }
+          @if (!hasListened()) {
+            <p class="listen-hint">Najprije pritisni „Poslušaj”.</p>
+          }
+        </div>
+
+        @if (session.feedback(); as feedback) {
+          <div
+            class="feedback"
+            [class]="'feedback ' + feedback.kind"
+            role="status"
+            aria-live="polite"
+          >
+            <div>
+              <strong>{{ feedback.message }}</strong>
+              @if (feedback.explanation) {
+                <p>{{ feedback.explanation }}</p>
+              }
+            </div>
+            @if (feedback.earnedPoints !== undefined) {
+              <span>+{{ feedback.earnedPoints }} bodova</span>
+            }
+          </div>
+        }
+
+        @if (session.isAnswered()) {
+          <button class="button button--primary next-button" type="button" (click)="nextQuestion()">
+            {{
+              session.currentIndex() === package.questions.length - 1
+                ? 'Prikaži rezultat'
+                : 'Sljedeće pitanje'
+            }}
+            <span aria-hidden="true">→</span>
+          </button>
+        }
+
+        <app-microphone-practice />
+      </section>
+    }
+  } @else {
+    <section class="surface not-found">
+      <h1>Ovaj sadržajni paket ne postoji.</h1>
+      <p>Možda je uklonjen ili je poveznica nepotpuna.</p>
+      <a class="button button--primary" routerLink="/igre">Povratak na igre</a>
+    </section>
+  }
+</div>

@@ -1,0 +1,132 @@
+<div class="page-shell catalog-shell">
+  <header class="catalog-intro">
+    <div>
+      <p class="eyebrow">Odaberi vježbu</p>
+      <h1>Tri igre, mnogo novih paketa</h1>
+    </div>
+    <p>
+      Svaka igra ima drugačiji način igranja. Odaberi glas, temu i razinu koja danas najbolje
+      odgovara djetetu.
+    </p>
+  </header>
+
+  <section class="game-types" aria-labelledby="game-types-title">
+    <h2 id="game-types-title" class="sr-only">Vrste igara</h2>
+    <article class="type-listen">
+      <span aria-hidden="true">◉</span>
+      <div>
+        <h3>Slušaj i odluči</h3>
+        <p>Poslušaj pojam ili rečenicu i svrsti je u odgovarajuću kategoriju.</p>
+      </div>
+    </article>
+    <article class="type-catch">
+      <span aria-hidden="true">♪</span>
+      <div>
+        <h3>Uhvati glas</h3>
+        <p>Prepoznaj ciljni glas ili razlikuj dva akustički slična glasa.</p>
+      </div>
+    </article>
+    <article class="type-position">
+      <span aria-hidden="true">▰</span>
+      <div>
+        <h3>Gdje je glas?</h3>
+        <p>Odredi nalazi li se glas na početku, u sredini ili na kraju riječi.</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="surface package-browser" aria-labelledby="packages-title">
+    <div class="browser-heading">
+      <div>
+        <p class="eyebrow">Sadržajni paketi</p>
+        <h2 id="packages-title">Pronađi pravi izazov</h2>
+      </div>
+      <p>{{ packages().length }} dostupnih paketa</p>
+    </div>
+
+    <div class="filters" aria-label="Filtriraj sadržajne pakete">
+      <label>
+        Igra
+        <select [value]="gameType()" (change)="setTypedFilter('gameType', $event)">
+          <option value="">Sve igre</option>
+          @for (type of gameTypes; track type) {
+            <option [value]="type">{{ gameTypeLabels[type] }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Glas
+        <select [value]="sound()" (change)="setTextFilter('sound', $event)">
+          <option value="">Svi glasovi</option>
+          @for (item of content.sounds(); track item) {
+            <option [value]="item">{{ item }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Tema
+        <select [value]="theme()" (change)="setTextFilter('theme', $event)">
+          <option value="">Sve teme</option>
+          @for (item of content.themes(); track item) {
+            <option [value]="item">{{ item }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Razina
+        <select [value]="difficulty()" (change)="setTypedFilter('difficulty', $event)">
+          <option value="">Sve razine</option>
+          @for (item of difficulties; track item) {
+            <option [value]="item">{{ difficultyLabels[item] }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    @if (packages().length) {
+      <div class="package-grid">
+        @for (package of packages(); track package.id) {
+          <article class="package-card" [attr.data-type]="package.gameType">
+            <div class="package-topline">
+              <span>{{ gameTypeLabels[package.gameType] }}</span>
+              <span>{{ difficultyLabels[package.difficulty] }}</span>
+            </div>
+            <h3>{{ package.name }}</h3>
+            <p>{{ package.description }}</p>
+            <dl>
+              <div>
+                <dt>Glas</dt>
+                <dd>
+                  {{
+                    package.soundPair
+                      ? package.soundPair.primary + ' / ' + package.soundPair.contrast
+                      : package.targetSound
+                  }}
+                </dd>
+              </div>
+              <div>
+                <dt>Tema</dt>
+                <dd>{{ package.theme }}</dd>
+              </div>
+              <div>
+                <dt>Pitanja</dt>
+                <dd>{{ package.questions.length }}</dd>
+              </div>
+            </dl>
+            <a class="button button--secondary" [routerLink]="['/igre', package.id]">
+              Pokreni igru <span aria-hidden="true">→</span>
+            </a>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="empty-results">
+        <h3>Nema paketa s tim odabirom.</h3>
+        <p>Promijeni jedan od filtara i pokušaj ponovno.</p>
+        <button class="button button--secondary" type="button" (click)="resetFilters()">
+          Očisti filtre
+        </button>
+      </div>
+    }
+  </section>
+</div>

@@ -1,0 +1,36 @@
+<div class="position-board">
+  <div class="word-row">
+    <p>{{ question().displayText }}</p>
+    @if (question().image; as image) {
+      <span role="img" [attr.aria-label]="image.alt">{{ image.emoji }}</span>
+    }
+  </div>
+
+  <div class="train-stage">
+    <picture>
+      <source media="(max-width: 38rem)" srcset="/assets/games/sound-position-train-mobile.png" />
+      <img
+        src="/assets/games/sound-position-train.png"
+        alt="Vlak s lokomotivom, srednjim i zadnjim vagonom"
+      />
+    </picture>
+    <div class="train-options" aria-label="Odaberi položaj glasa u riječi">
+      @for (position of ['start', 'middle', 'end']; track position) {
+        @if (answerFor(position); as option) {
+          <button
+            type="button"
+            [class]="position"
+            [class.selected]="selectedId() === option.id"
+            [disabled]="disabled()"
+            (click)="answer.emit(option.id)"
+          >
+            {{ option.label }}
+          </button>
+        } @else {
+          <span class="empty" aria-hidden="true"></span>
+        }
+      }
+    </div>
+  </div>
+  <p class="train-help">Odaberi dio vlaka.</p>
+</div>
