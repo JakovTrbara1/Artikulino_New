@@ -63,6 +63,7 @@ npx prettier . --check
 - Microphone recording for practice replay only, without upload or automatic speech scoring.
 - Speech Synthesis fallback when an audio file is missing or fails.
 - Demo content packages for required sounds, pairs, themes, and difficulty levels.
+- Reusable test-time content validation with stable issue codes, paths, and Croatian messages.
 - Responsive train visual assets for the sound-position game.
 
 ## Important Folders and Files
@@ -73,6 +74,7 @@ npx prettier . --check
 - `src/app/features/home/`: home page.
 - `src/app/features/games/games.routes.ts`: lazy game routes.
 - `src/app/features/games/models/content-package.model.ts`: content package contract.
+- `src/app/features/games/models/content-package.validation.ts`: pure content validation utility.
 - `src/app/features/games/data/demo-content-packages.ts`: demo packages.
 - `src/app/features/games/services/game-session.service.ts`: shared session state and game flow.
 - `src/app/features/games/services/scoring.service.ts`: scoring rules.
@@ -89,6 +91,10 @@ npx prettier . --check
 The game engine is content-driven. Games should not be hard-coded for one sound, one theme, or one fixed question set. A `ContentPackage` defines the game type, target sound, optional contrast sound, sound pair, theme, difficulty, questions, media, answer options, correct answers, explanation, and scoring.
 
 `GamePlayerPage` selects a package by route id and delegates answer UI to the correct board component. Shared services handle session state, scoring, replay counts, attempts, streaks, and completion. Progress is saved locally after completed sessions.
+
+`validateContentPackages` provides a pure content-authoring and test gate for identifiers, required
+fields, answers, sounds, sound pairs, scoring, image descriptions, and target-sound occurrences.
+It reports all issues without mutating packages or changing runtime game behavior.
 
 Pages are standalone and lazy-loaded. Component-specific visual rules stay with components, while common design tokens and app-wide defaults stay in `src/main.css`.
 
@@ -118,13 +124,12 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Add a content validation utility for duplicate ids, missing answers, invalid scoring, unsupported sounds, and repeated target positions.
-2. Improve accessibility: keyboard flow, focus states, ARIA labels, and reduced-motion handling.
-3. Review demo content with a Croatian speech therapist and mark packages as validated/unvalidated.
-4. Replace emoji/demo imagery with curated image assets through `image.src`.
-5. Add real audio files for priority packages and keep Speech Synthesis as fallback.
-6. Design the future ASR boundary as a separate service interface before adding any cloud API.
-7. Define privacy, consent, retention, and account model before storing child data outside the browser.
+1. Improve accessibility: keyboard flow, focus states, ARIA labels, and reduced-motion handling.
+2. Review demo content with a Croatian speech therapist and mark packages as validated/unvalidated.
+3. Replace emoji/demo imagery with curated image assets through `image.src`.
+4. Add real audio files for priority packages and keep Speech Synthesis as fallback.
+5. Design the future ASR boundary as a separate service interface before adding any cloud API.
+6. Define privacy, consent, retention, and account model before storing child data outside the browser.
 
 ## Do Not Change Without Asking
 
