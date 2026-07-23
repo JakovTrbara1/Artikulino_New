@@ -6,7 +6,7 @@
   services, and local-only progress.
 - Milestones 0–3, professional-review status tracking, priority food illustrations, the disabled
   ASR boundary, and privacy requirements are merged into `main`.
-- The latest `main` baseline production build, all 34 tests, and Prettier checks pass.
+- The latest baseline production build, all 38 tests, and Prettier checks pass.
 - Accessibility coverage includes skip navigation, focus styling and transitions, answer-state
   semantics, progress semantics, live status messages, and reduced-motion CSS.
 - Reusable content-package validation is enforced by the demo-data tests.
