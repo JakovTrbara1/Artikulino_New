@@ -101,7 +101,10 @@ const packageExample: ContentPackage = {
 };
 ```
 
-Ako `audioSrc` ne postoji ili se zapis ne može učitati, aplikacija koristi lokalni Speech Synthesis preglednika s jezikom `hr-HR`. Dostupnost i kvaliteta hrvatskog glasa ovise o uređaju.
+Ako `audioSrc` ne postoji ili se zapis ne može učitati, aplikacija koristi lokalni Speech Synthesis
+preglednika s jezikom `hr-HR`. To je podržani način reprodukcije govora za MVP; zapakirani
+audiozapisi odgođeni su dok se ne potvrde prava distribucije i hrvatski izgovor. Dostupnost i
+kvaliteta hrvatskog glasa ovise o uređaju.
 
 ## Mikrofon i privatnost
 
@@ -161,6 +164,7 @@ Globalni design tokeni, reset i zajednički stilovi nalaze se u `src/main.css`. 
 - Svaki demo paket izričito je označen statusom `NOT_REVIEWED`; upute za dokumentiranje stručne
   provjere nalaze se u `docs/CONTENT_PACKAGES.md`.
 - Speech Synthesis glas i MediaRecorder format ovise o pregledniku i operacijskom sustavu.
+- Zapakirani audiozapisi nisu dio MVP-a; govorni poticaji trenutačno koriste Speech Synthesis.
 - Paket „Što jedemo?” koristi optimizirane lokalne ilustracije putem `image.src`; ostali emoji
   poticaji mogu se zamijeniti istim postupkom bez promjene logike igre.
 

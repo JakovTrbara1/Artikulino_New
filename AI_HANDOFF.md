@@ -61,7 +61,8 @@ npx prettier . --check
 - Configurable scoring per content package.
 - Local progress storage.
 - Microphone recording for practice replay only, without upload or automatic speech scoring.
-- Speech Synthesis fallback when an audio file is missing or fails.
+- Browser Speech Synthesis as the supported MVP path for spoken prompts when no approved local
+  recording is available.
 - Demo content packages for required sounds, pairs, themes, and difficulty levels.
 - Reusable test-time content validation with stable issue codes, paths, and Croatian messages.
 - Explicit professional-review metadata; all current demo packages are marked `NOT_REVIEWED`.
@@ -116,7 +117,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 - Keep the app frontend-only for the MVP.
 - Keep all exercises configurable through content packages.
-- Use browser Speech Synthesis as a fallback, not as the primary content quality source.
+- Use browser Speech Synthesis for MVP spoken prompts. Packaged recordings remain optional and are
+  deferred until their distribution rights and Croatian pronunciation are confirmed.
 - Use the microphone only for child self-listening practice in the MVP.
 - Do not make clinical claims or automatic pronunciation judgments.
 - Keep progress local until privacy, accounts, consent, and backend requirements are defined.
@@ -136,6 +138,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
   Croatian speech therapist.
 - Speech Synthesis voice quality varies by browser and OS.
+- The experimental `codex/priority-food-audio` branch contains unreviewed Windows OneCore-generated
+  WAV files and must not be merged. Packaged audio is deferred and does not block the MVP.
 - MediaRecorder availability and output format vary by browser.
 - Audio and image fields are supported, but only the priority food package has curated local
   illustrations; most demo packages still use fallback/generated or simple visual content.
@@ -144,11 +148,12 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Have a Croatian speech therapist review priority demo packages, then record the reviewer and
+1. Run the documented MVP readiness pass across routes, all game types, keyboard interaction,
+   Speech Synthesis, microphone states, responsive layouts, and local progress.
+2. Have a Croatian speech therapist review priority demo packages, then record the reviewer and
    date before changing their status to `PROFESSIONALLY_REVIEWED`.
-2. Expand curated local imagery through `image.src`, one priority package at a time, while updating
-   the provenance log.
-3. Review and merge the existing priority food audio branch, keeping Speech Synthesis as fallback.
+3. Expand curated local imagery through `image.src`, one priority package at a time, while updating
+   the provenance log. Keep packaged audio deferred.
 4. Assign an owner and obtain product, legal/privacy, security, and professional review of
    `docs/PRIVACY_AND_CONSENT.md`; resolve every open release gate.
 5. Only after explicit approval, split consent UI, token service, and provider adapter into separate

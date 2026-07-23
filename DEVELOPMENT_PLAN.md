@@ -4,24 +4,26 @@
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
   services, and local-only progress.
-- The repository is clean on `main`, synchronized with `origin/main`.
-- The baseline production build, all 16 tests, and Prettier checks pass.
-- Existing accessibility foundations include skip navigation, focus styling, ARIA status messages,
-  and reduced-motion CSS.
-- Content integrity is currently checked only through demo-data tests; there is no reusable
-  validator.
+- Milestones 0–3, professional-review status tracking, priority food illustrations, the disabled
+  ASR boundary, and privacy requirements are merged into `main`.
+- The latest `main` baseline production build, all 34 tests, and Prettier checks pass.
+- Accessibility coverage includes skip navigation, focus styling and transitions, answer-state
+  semantics, progress semantics, live status messages, and reduced-motion CSS.
+- Reusable content-package validation is enforced by the demo-data tests.
 
 ## 2. Main development goal
 
-Establish a reliable quality and content-validation foundation, then complete a focused
-accessibility pass before expanding professionally reviewed content, audio, or imagery.
+The quality, content-validation, and focused accessibility foundations are complete. The next goal
+is to verify that the current frontend-only application is a coherent, functioning MVP before
+expanding professionally reviewed content or licensed media.
 
 ## 3. Prioritized roadmap
 
-1. Standardize the repository quality command.
-2. Add reusable content-package validation.
-3. Improve game accessibility and keyboard focus flow.
-4. Only afterward begin clinically reviewed content and licensed media work.
+1. Completed: standardize the repository quality command.
+2. Completed: add reusable content-package validation.
+3. Completed: improve game accessibility and keyboard focus flow.
+4. Next: run an MVP readiness pass and record the results.
+5. Later: expand professionally reviewed content and licensed media one package at a time.
 
 ## 4. Milestones and task breakdown
 
@@ -76,6 +78,22 @@ accessibility pass before expanding professionally reviewed content, audio, or i
   narrow and desktop widths, and confirmation that feedback, audio failure, and completion states
   are announced coherently.
 
+### Milestone 4 — MVP readiness pass
+
+- Branch: `codex/mvp-readiness-pass`
+- Create `docs/MVP_READINESS.md` as a concise verification record.
+- Run `npm run check` and `git diff --check`.
+- Manually verify `/`, `/igre`, one package of each game type, an invalid package route, and
+  `/napredak`.
+- Verify keyboard-only game completion, narrow and desktop layouts, Speech Synthesis fallback,
+  microphone success/denial/unsupported states where available, local progress persistence, and
+  progress deletion.
+- Record browser, viewport, result, and any reproducible blocker. Fix only confirmed MVP blockers;
+  keep unrelated polish in later milestones.
+- Do not add packaged WAV audio. Speech Synthesis is the supported MVP spoken-prompt path.
+- Likely files: `docs/MVP_READINESS.md` and only source/test files required by confirmed blockers.
+- Validate any fix with focused regression coverage plus `npm run check`.
+
 ## 5. Risks and unknowns
 
 - Structural validation cannot establish phonetic, age, or clinical correctness; a Croatian speech
@@ -85,7 +103,8 @@ accessibility pass before expanding professionally reviewed content, audio, or i
 - Speech Synthesis and MediaRecorder behavior remains browser-dependent.
 - Accessibility tests can prevent regressions but do not replace manual keyboard and screen-reader
   checks.
-- Curated media requires confirmed licensing, target packages, and an asset-size policy.
+- Curated media requires confirmed licensing and professional review. Packaged audio is deferred and
+  does not block the technical MVP.
 
 ## 6. Testing and validation strategy
 
@@ -101,8 +120,8 @@ Manually smoke-test `/`, `/igre`, one package of each game type, an invalid pack
 
 ## 7. Recommended first implementation task
 
-Implement Milestone 1 first. It creates the common quality gate used by every later branch without
-changing application behavior.
+Implement Milestone 4 next. It verifies the assembled application as an MVP before adding more
+content or infrastructure.
 
 ## 8. Things to avoid
 
@@ -110,7 +129,8 @@ changing application behavior.
 - No new dependencies during these milestones.
 - No hard-coded sound, theme, pair, or question logic.
 - No clinical claims or “validated” labels before documented professional review.
-- No bulk audio or image replacement or progress-storage schema change yet.
+- No packaged audio, bulk image replacement, or progress-storage schema change during the readiness
+  pass.
 - Do not commit generated build output.
 
 ## 9. Blocking questions
