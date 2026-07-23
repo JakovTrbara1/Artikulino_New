@@ -22,8 +22,9 @@ expanding professionally reviewed content or licensed media.
 1. Completed: standardize the repository quality command.
 2. Completed: add reusable content-package validation.
 3. Completed: improve game accessibility and keyboard focus flow.
-4. Next: run an MVP readiness pass and record the results.
-5. Later: expand professionally reviewed content and licensed media one package at a time.
+4. Completed: run an MVP readiness pass and record the results.
+5. Next: complete the remaining human-device checks, then expand professionally reviewed content
+   and licensed media one package at a time.
 
 ## 4. Milestones and task breakdown
 
@@ -120,8 +121,9 @@ Manually smoke-test `/`, `/igre`, one package of each game type, an invalid pack
 
 ## 7. Recommended first implementation task
 
-Implement Milestone 4 next. It verifies the assembled application as an MVP before adding more
-content or infrastructure.
+Complete the human-device checks recorded in `docs/MVP_READINESS.md`, beginning with a real
+keyboard-only play-through and microphone allow/deny/replay verification. Then obtain professional
+review of the priority Croatian content before expanding content or infrastructure.
 
 ## 8. Things to avoid
 
