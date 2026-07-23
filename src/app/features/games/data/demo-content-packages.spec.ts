@@ -1,4 +1,5 @@
 import { DEMO_CONTENT_PACKAGES } from './demo-content-packages';
+import { validateContentPackages } from '../models/content-package.validation';
 
 describe('demonstration content packages', () => {
   it('covers the requested sounds, pairs, themes and difficulty levels', () => {
@@ -30,42 +31,13 @@ describe('demonstration content packages', () => {
     expect(difficulties).toEqual(new Set(['EASY', 'MEDIUM', 'HARD']));
   });
 
-  it('contains valid configurable questions and scoring for every package', () => {
+  it('contains at least four questions in every demonstration package', () => {
     for (const contentPackage of DEMO_CONTENT_PACKAGES) {
-      expect(contentPackage.schemaVersion).toBe(1);
       expect(contentPackage.questions.length).toBeGreaterThanOrEqual(4);
-      expect(contentPackage.scoring.basePoints).toBeGreaterThan(0);
-      expect(contentPackage.scoring.maxAttempts).toBeGreaterThan(0);
-
-      for (const question of contentPackage.questions) {
-        expect(question.spokenText.length).toBeGreaterThan(0);
-        expect(question.answers.length).toBeGreaterThanOrEqual(2);
-        expect(question.correctAnswerIds.length).toBeGreaterThan(0);
-        expect(
-          question.correctAnswerIds.every((id) =>
-            question.answers.some((answer) => answer.id === id),
-          ),
-        ).toBe(true);
-      }
     }
   });
 
-  it('avoids repeated target sounds in position-game demo words', () => {
-    const positionPackages = DEMO_CONTENT_PACKAGES.filter(
-      (item) => item.gameType === 'sound-position',
-    );
-
-    for (const contentPackage of positionPackages) {
-      for (const question of contentPackage.questions) {
-        const target = (question.targetSound ?? contentPackage.targetSound).toLocaleLowerCase(
-          'hr-HR',
-        );
-        const occurrences = question.spokenText
-          .toLocaleLowerCase('hr-HR')
-          .split('')
-          .filter((character) => character === target).length;
-        expect(occurrences, `${question.spokenText} treba sadržavati jedan glas ${target}`).toBe(1);
-      }
-    }
+  it('passes reusable content validation', () => {
+    expect(validateContentPackages(DEMO_CONTENT_PACKAGES)).toEqual([]);
   });
 });
