@@ -45,6 +45,14 @@ export interface ScoringRules {
   readonly maxAttempts: number;
 }
 
+export type ProfessionalReviewStatus = 'NOT_REVIEWED' | 'PROFESSIONALLY_REVIEWED';
+
+export interface ProfessionalReview {
+  readonly status: ProfessionalReviewStatus;
+  readonly reviewerName?: string;
+  readonly reviewedAt?: string;
+}
+
 export interface ContentPackage {
   readonly schemaVersion: 1;
   readonly id: string;
@@ -58,6 +66,7 @@ export interface ContentPackage {
   readonly theme: string;
   readonly difficulty: Difficulty;
   readonly scoring: ScoringRules;
+  readonly professionalReview?: ProfessionalReview;
   readonly questions: readonly ContentQuestion[];
 }
 

@@ -1,5 +1,6 @@
 import {
   ContentPackage,
+  ProfessionalReview,
   ScoringRules,
   SUPPORTED_SOUND_PAIRS,
   SUPPORTED_TARGET_SOUNDS,
@@ -19,7 +20,10 @@ export type ContentValidationIssueCode =
   | 'invalid-sound-pair'
   | 'invalid-scoring'
   | 'missing-image-alt'
-  | 'invalid-target-occurrence';
+  | 'invalid-target-occurrence'
+  | 'missing-professional-review'
+  | 'invalid-review-status'
+  | 'invalid-review-metadata';
 
 export interface ContentValidationIssue {
   readonly code: ContentValidationIssueCode;
@@ -95,6 +99,11 @@ export function validateContentPackages(
     }
     validateSoundPair(issues, contentPackage, packagePath);
     validateScoring(issues, contentPackage.scoring, `${packagePath}.scoring`);
+    validateProfessionalReview(
+      issues,
+      contentPackage.professionalReview,
+      `${packagePath}.professionalReview`,
+    );
 
     if (contentPackage.questions.length === 0) {
       addIssue(
@@ -301,6 +310,71 @@ function validateScoring(
     `${scoringPath}.maxAttempts`,
     'Najveći broj pokušaja mora biti pozitivan cijeli broj.',
   );
+}
+
+function validateProfessionalReview(
+  issues: ContentValidationIssue[],
+  review: ProfessionalReview | undefined,
+  reviewPath: string,
+): void {
+  if (!review) {
+    addIssue(
+      issues,
+      'missing-professional-review',
+      reviewPath,
+      'Paket mora imati zabilježen status stručne provjere.',
+    );
+    return;
+  }
+
+  if (review.status === 'NOT_REVIEWED') {
+    if (review.reviewerName !== undefined || review.reviewedAt !== undefined) {
+      addIssue(
+        issues,
+        'invalid-review-metadata',
+        reviewPath,
+        'Paket bez stručne provjere ne smije sadržavati podatke o provjeri.',
+      );
+    }
+    return;
+  }
+
+  if (review.status !== 'PROFESSIONALLY_REVIEWED') {
+    addIssue(
+      issues,
+      'invalid-review-status',
+      `${reviewPath}.status`,
+      `Status stručne provjere "${String(review.status)}" nije podržan.`,
+    );
+    return;
+  }
+
+  if (!review.reviewerName?.trim()) {
+    addIssue(
+      issues,
+      'invalid-review-metadata',
+      `${reviewPath}.reviewerName`,
+      'Stručno pregledan paket mora sadržavati ime pregledavatelja.',
+    );
+  }
+
+  if (!isIsoDate(review.reviewedAt)) {
+    addIssue(
+      issues,
+      'invalid-review-metadata',
+      `${reviewPath}.reviewedAt`,
+      'Stručno pregledan paket mora sadržavati valjani datum u obliku GGGG-MM-DD.',
+    );
+  }
+}
+
+function isIsoDate(value: string | undefined): boolean {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  const parsedDate = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(parsedDate.valueOf()) && parsedDate.toISOString().slice(0, 10) === value;
 }
 
 function validateScoringValue(

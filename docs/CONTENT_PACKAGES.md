@@ -5,6 +5,7 @@ Ovaj dokument služi kao kratka kontrolna lista pri dodavanju sadržaja.
 ## Obavezna pravila
 
 - `schemaVersion` mora biti `1`.
+- `professionalReview` mora izričito bilježiti status stručne provjere.
 - `id` paketa i pitanja mora biti jedinstven u cijeloj kolekciji i stabilan.
 - `answers.id` mora biti jedinstven unutar pitanja, a svako pitanje mora imati najmanje dva
   ponuđena odgovora.
@@ -46,4 +47,20 @@ ispravnost sadržaja.
 
 ## Stručna provjera
 
-Prije objave većeg sadržajnog skupa logoped treba provjeriti dobnu primjerenost, fonetsku točnost, položaj ciljnih glasova, značenje distraktora i redoslijed težine.
+Svi demonstracijski paketi imaju `professionalReview.status: 'NOT_REVIEWED'`. Taj status ne znači da
+je sadržaj netočan, nego da stručna provjera nije dokumentirana.
+
+Prije promjene statusa logoped treba provjeriti dobnu primjerenost, fonetsku točnost, položaj
+ciljnih glasova, značenje distraktora i redoslijed težine. Nakon dokumentirane provjere postaviti:
+
+```ts
+professionalReview: {
+  status: 'PROFESSIONALLY_REVIEWED',
+  reviewerName: 'Ime i prezime pregledavatelja',
+  reviewedAt: '2026-07-23',
+},
+```
+
+Datum se zapisuje u obliku `GGGG-MM-DD`. Nakon sadržajne izmjene pregledanog paketa status treba
+vratiti na `NOT_REVIEWED` i ukloniti `reviewerName` i `reviewedAt` dok se ponovna provjera ne dovrši.
+Validator provjerava potpunost zapisa, ali ne može potvrditi stručnu ispravnost sadržaja.

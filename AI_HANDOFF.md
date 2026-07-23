@@ -64,6 +64,7 @@ npx prettier . --check
 - Speech Synthesis fallback when an audio file is missing or fails.
 - Demo content packages for required sounds, pairs, themes, and difficulty levels.
 - Reusable test-time content validation with stable issue codes, paths, and Croatian messages.
+- Explicit professional-review metadata; all current demo packages are marked `NOT_REVIEWED`.
 - Accessible answer groups and selected states, semantic progress reporting, and focus transitions
   between questions and the result screen.
 - Responsive train visual assets for the sound-position game.
@@ -95,8 +96,9 @@ The game engine is content-driven. Games should not be hard-coded for one sound,
 `GamePlayerPage` selects a package by route id and delegates answer UI to the correct board component. Shared services handle session state, scoring, replay counts, attempts, streaks, and completion. Progress is saved locally after completed sessions.
 
 `validateContentPackages` provides a pure content-authoring and test gate for identifiers, required
-fields, answers, sounds, sound pairs, scoring, image descriptions, and target-sound occurrences.
-It reports all issues without mutating packages or changing runtime game behavior.
+fields, answers, sounds, sound pairs, scoring, image descriptions, target-sound occurrences, and
+professional-review metadata. It reports all issues without mutating packages or changing runtime
+game behavior.
 
 Pages are standalone and lazy-loaded. Component-specific visual rules stay with components, while common design tokens and app-wide defaults stay in `src/main.css`.
 
@@ -117,7 +119,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - No backend, authentication, user profiles, or device sync.
 - No ASR or automatic articulation error detection yet.
 - No consent flow, data retention policy, or role model for real parent/therapist accounts.
-- Demo content has not been clinically validated by a speech therapist.
+- Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
+  Croatian speech therapist.
 - Speech Synthesis voice quality varies by browser and OS.
 - MediaRecorder availability and output format vary by browser.
 - Audio and image fields are supported, but most demo packages use fallback/generated or simple visual content.
@@ -126,7 +129,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review demo content with a Croatian speech therapist and mark packages as validated/unvalidated.
+1. Have a Croatian speech therapist review priority demo packages, then record the reviewer and
+   date before changing their status to `PROFESSIONALLY_REVIEWED`.
 2. Replace emoji/demo imagery with curated image assets through `image.src`.
 3. Add real audio files for priority packages and keep Speech Synthesis as fallback.
 4. Design the future ASR boundary as a separate service interface before adding any cloud API.
