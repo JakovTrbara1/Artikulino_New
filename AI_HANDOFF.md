@@ -21,11 +21,18 @@ npm install
 npm start
 npm run build
 npm test
+npm run test:ci
+npm run check
 ```
 
 The dev server is expected at `http://localhost:4200`.
 
-There is no lint script currently defined in `package.json`. Prettier is installed and can be run manually with:
+`npm run check` is the standard repository quality gate. It runs the production build, the
+single-run test suite, and the Prettier check. `npm test` remains available for development, while
+`npm run test:ci` always runs once and exits.
+
+ESLint is intentionally deferred for the MVP. The current quality gate uses the Angular compiler,
+Vitest, and Prettier without adding another dependency. Prettier can also be run directly with:
 
 ```bash
 npx prettier . --check
@@ -106,19 +113,18 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Speech Synthesis voice quality varies by browser and OS.
 - MediaRecorder availability and output format vary by browser.
 - Audio and image fields are supported, but most demo packages use fallback/generated or simple visual content.
-- There is no lint script in `package.json`.
+- ESLint is not configured; the agreed MVP quality gate is build, tests, and Prettier.
 - README text may display mojibake in some terminal code pages, although the source should be treated as UTF-8 Croatian text.
 
 ## Exact Next Recommended Tasks
 
-1. Add a lint/check script or decide that Prettier plus tests are enough for the MVP.
-2. Review demo content with a Croatian speech therapist and mark packages as validated/unvalidated.
-3. Replace emoji/demo imagery with curated image assets through `image.src`.
-4. Add real audio files for priority packages and keep Speech Synthesis as fallback.
-5. Add a content validation utility for duplicate ids, missing answers, invalid scoring, unsupported sounds, and repeated target positions.
-6. Improve accessibility pass: keyboard flow, focus states, ARIA labels, and reduced-motion handling.
-7. Design the future ASR boundary as a separate service interface before adding any cloud API.
-8. Define privacy, consent, retention, and account model before storing child data outside the browser.
+1. Add a content validation utility for duplicate ids, missing answers, invalid scoring, unsupported sounds, and repeated target positions.
+2. Improve accessibility: keyboard flow, focus states, ARIA labels, and reduced-motion handling.
+3. Review demo content with a Croatian speech therapist and mark packages as validated/unvalidated.
+4. Replace emoji/demo imagery with curated image assets through `image.src`.
+5. Add real audio files for priority packages and keep Speech Synthesis as fallback.
+6. Design the future ASR boundary as a separate service interface before adding any cloud API.
+7. Define privacy, consent, retention, and account model before storing child data outside the browser.
 
 ## Do Not Change Without Asking
 
