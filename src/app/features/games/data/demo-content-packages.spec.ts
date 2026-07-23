@@ -43,7 +43,7 @@ describe('demonstration content packages', () => {
     }
   });
 
-  it('uses optimized local images with emoji fallbacks for the priority food package', () => {
+  it('uses local media with image and speech fallbacks for the priority food package', () => {
     const foodPackage = DEMO_CONTENT_PACKAGES.find(
       (contentPackage) => contentPackage.id === 'slusaj-hrana-s-lagano',
     );
@@ -69,6 +69,12 @@ describe('demonstration content packages', () => {
         emoji: '🥔',
         alt: 'Ilustracija za pojam Krumpir',
       },
+    ]);
+    expect(foodPackage?.questions.map((question) => question.audioSrc)).toEqual([
+      '/assets/games/audio/food/jabuka.wav',
+      '/assets/games/audio/food/mrkva.wav',
+      '/assets/games/audio/food/banana.wav',
+      '/assets/games/audio/food/krumpir.wav',
     ]);
   });
 

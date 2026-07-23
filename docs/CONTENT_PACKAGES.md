@@ -51,6 +51,18 @@ ispravnost sadržaja.
 - Prije javne objave potvrditi da način distribucije odgovara uvjetima izvora ili alata kojim je
   asset izrađen.
 
+## Pravila za audio
+
+- Lokalne audiozapise spremati pod `public/assets/games/audio/` i povezivati putem `audioSrc`.
+- `spokenText` mora ostati jednak izgovorenom sadržaju jer služi kao Speech Synthesis fallback ako
+  se datoteka ne može reproducirati.
+- Za svaki zapis evidentirati glas ili govornika, način izrade, format i status slušne provjere u
+  `docs/MEDIA_PROVENANCE.md`.
+- Sintetički zapis ne označavati kao profesionalno snimljen. Prije javne uporabe izvorni govornik
+  hrvatskog jezika treba provjeriti izgovor, naglasak, brzinu, glasnoću, tišinu i odsijecanje.
+- Nakon zamjene audiodatoteke ponovno provjeriti fallback tako da `audioSrc` privremeno pokazuje na
+  nepostojeću datoteku.
+
 ## Težine
 
 - `EASY`: poznate kratke riječi, jasne mogućnosti i vizualna pomoć.

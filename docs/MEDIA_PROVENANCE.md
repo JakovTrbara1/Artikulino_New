@@ -19,3 +19,23 @@ sadržaja, ali nije pravno mišljenje o licenciranju.
 - Izvorni PNG smanjen je s 1536 × 1536 na 512 × 512 piksela i pretvoren u WebP pomoću Pillow 12.2.
 - Prije javne distribucije vlasnik projekta treba potvrditi primjenjive uvjete korištenja alata za
   generiranje.
+
+## Audiozapisi hrane
+
+| Datoteka                                     | Tekst   | Izvor                        | Format                    |
+| -------------------------------------------- | ------- | ---------------------------- | ------------------------- |
+| `public/assets/games/audio/food/jabuka.wav`  | Jabuka  | Microsoft Matej, lokalni TTS | WAV, mono, 16-bit, 16 kHz |
+| `public/assets/games/audio/food/mrkva.wav`   | Mrkva   | Microsoft Matej, lokalni TTS | WAV, mono, 16-bit, 16 kHz |
+| `public/assets/games/audio/food/banana.wav`  | Banana  | Microsoft Matej, lokalni TTS | WAV, mono, 16-bit, 16 kHz |
+| `public/assets/games/audio/food/krumpir.wav` | Krumpir | Microsoft Matej, lokalni TTS | WAV, mono, 16-bit, 16 kHz |
+
+- Datum izrade: 2026-07-23.
+- Zapisi su izrađeni offline glasom `Microsoft Matej` (`hr-HR`) iz Windows OneCore sustava, bez
+  slanja teksta vanjskom servisu.
+- Brzina govora postavljena je na `0.82` u odnosu na zadanu brzinu glasa.
+- Tehnička provjera potvrdila je valjani PCM WAV, jedan kanal, 16-bitni uzorak, 16 kHz i trajanje od
+  1,585 do 1,822 sekunde.
+- Status slušne provjere: **nije provedena**. Izvorni govornik hrvatskog jezika treba potvrditi
+  izgovor i naglasak prije javne uporabe ili zamijeniti zapise profesionalnim snimkama.
+- Prije javne distribucije vlasnik projekta treba potvrditi primjenjive uvjete korištenja glasa i
+  generiranih zapisa.

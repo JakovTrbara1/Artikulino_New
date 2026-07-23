@@ -67,6 +67,8 @@ npx prettier . --check
 - Explicit professional-review metadata; all current demo packages are marked `NOT_REVIEWED`.
 - Four optimized local food illustrations in the priority “Što jedemo?” package, with retained
   emoji fallbacks and documented provenance.
+- Four offline-generated Croatian WAV prompts in the same priority package, with browser Speech
+  Synthesis retained as fallback and listening review still required.
 - Accessible answer groups and selected states, semantic progress reporting, and focus transitions
   between questions and the result screen.
 - Responsive train visual assets for the sound-position game.
@@ -125,6 +127,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
   Croatian speech therapist.
 - Speech Synthesis voice quality varies by browser and OS.
+- Priority food audio uses the local Microsoft Matej `hr-HR` synthetic voice and has passed
+  technical format checks only; pronunciation, stress, and distribution terms remain unapproved.
 - MediaRecorder availability and output format vary by browser.
 - Audio and image fields are supported, but only the priority food package has curated local
   illustrations; most demo packages still use fallback/generated or simple visual content.
@@ -137,7 +141,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
    date before changing their status to `PROFESSIONALLY_REVIEWED`.
 2. Expand curated local imagery through `image.src`, one priority package at a time, while updating
    the provenance log.
-3. Add real audio files for priority packages and keep Speech Synthesis as fallback.
+3. Have a native Croatian speaker review the priority food audio, replace any rejected prompt, and
+   then expand approved local audio one package at a time while retaining Speech Synthesis fallback.
 4. Design the future ASR boundary as a separate service interface before adding any cloud API.
 5. Define privacy, consent, retention, and account model before storing child data outside the browser.
 

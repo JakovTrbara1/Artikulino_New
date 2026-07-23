@@ -57,11 +57,16 @@ const q = (
   explanation,
 });
 
-const withImageSrc = (question: ContentQuestion, src: string): ContentQuestion => ({
+const withLocalMedia = (
+  question: ContentQuestion,
+  imageSrc: string,
+  audioSrc: string,
+): ContentQuestion => ({
   ...question,
+  audioSrc,
   image: {
     ...question.image,
-    src,
+    src: imageSrc,
     alt: question.image?.alt ?? `Ilustracija za pojam ${question.spokenText}`,
   },
 });
@@ -82,19 +87,22 @@ const DEMO_CONTENT_PACKAGE_DEFINITIONS = [
     difficulty: 'EASY',
     scoring: rules('EASY'),
     questions: [
-      withImageSrc(
+      withLocalMedia(
         q('jabuka', 'Jabuka', categoryOptions('Voće', 'Povrće'), 'voće', 'Jabuka je voće.', '🍎'),
         '/assets/games/food/apple.webp',
+        '/assets/games/audio/food/jabuka.wav',
       ),
-      withImageSrc(
+      withLocalMedia(
         q('mrkva', 'Mrkva', categoryOptions('Voće', 'Povrće'), 'povrće', 'Mrkva je povrće.', '🥕'),
         '/assets/games/food/carrot.webp',
+        '/assets/games/audio/food/mrkva.wav',
       ),
-      withImageSrc(
+      withLocalMedia(
         q('banana', 'Banana', categoryOptions('Voće', 'Povrće'), 'voće', 'Banana je voće.', '🍌'),
         '/assets/games/food/banana.webp',
+        '/assets/games/audio/food/banana.wav',
       ),
-      withImageSrc(
+      withLocalMedia(
         q(
           'krumpir',
           'Krumpir',
@@ -104,6 +112,7 @@ const DEMO_CONTENT_PACKAGE_DEFINITIONS = [
           '🥔',
         ),
         '/assets/games/food/potato.webp',
+        '/assets/games/audio/food/krumpir.wav',
       ),
     ],
   },

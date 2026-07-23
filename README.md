@@ -103,6 +103,9 @@ const packageExample: ContentPackage = {
 
 Ako `audioSrc` ne postoji ili se zapis ne može učitati, aplikacija koristi lokalni Speech Synthesis preglednika s jezikom `hr-HR`. Dostupnost i kvaliteta hrvatskog glasa ovise o uređaju.
 
+Prioritetni paket „Što jedemo?” sadrži lokalne hrvatske WAV zapise. Trenutačni zapisi izrađeni su
+offline sintetičkim glasom i prije javne uporabe zahtijevaju slušnu provjeru izvornog govornika.
+
 ## Mikrofon i privatnost
 
 Mikrofon se aktivira isključivo nakon korisnikova klika. `MediaRecorder` omogućuje djetetu da snimi riječ i posluša vlastitu snimku.
@@ -159,5 +162,7 @@ Globalni design tokeni, reset i zajednički stilovi nalaze se u `src/main.css`. 
 - Speech Synthesis glas i MediaRecorder format ovise o pregledniku i operacijskom sustavu.
 - Paket „Što jedemo?” koristi optimizirane lokalne ilustracije putem `image.src`; ostali emoji
   poticaji mogu se zamijeniti istim postupkom bez promjene logike igre.
+- Lokalni WAV zapisi u paketu „Što jedemo?” tehnički su provjereni, ali izgovor i uvjete
+  distribucije još treba potvrditi.
 
 Vizualni koncept primarnog ekrana nalazi se u `docs/design/artikulino-game-concept.png`.
