@@ -69,6 +69,8 @@ npx prettier . --check
   emoji fallbacks and documented provenance.
 - Provider-neutral `SPEECH_TRANSCRIPTION` boundary with a default disabled adapter, no network
   transfer, and no pronunciation scoring.
+- Documented privacy, consent, retention, account, vendor, and security requirements that must be
+  approved before any external speech processing.
 - Accessible answer groups and selected states, semantic progress reporting, and focus transitions
   between questions and the result screen.
 - Responsive train visual assets for the sound-position game.
@@ -94,6 +96,7 @@ npx prettier . --check
 - `docs/CONTENT_PACKAGES.md`: guide for adding new packages.
 - `docs/MEDIA_PROVENANCE.md`: source and processing log for project media.
 - `docs/ASR_BOUNDARY.md`: privacy and architecture gates for any future ASR adapter.
+- `docs/PRIVACY_AND_CONSENT.md`: data inventory, required decisions, and ASR release checklist.
 - `docs/design/artikulino-game-concept.png`: visual concept reference.
 
 ## Architecture Overview
@@ -128,7 +131,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - No backend, authentication, user profiles, or device sync.
 - No ASR provider or automatic articulation error detection; the service boundary remains
   intentionally disabled.
-- No consent flow, data retention policy, or role model for real parent/therapist accounts.
+- No approved controller, legal basis, guardian verification, ASR provider, exact provider
+  retention, or consent flow. Requirements are documented, but all release gates remain open.
 - Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
   Croatian speech therapist.
 - Speech Synthesis voice quality varies by browser and OS.
@@ -144,11 +148,11 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
    date before changing their status to `PROFESSIONALLY_REVIEWED`.
 2. Expand curated local imagery through `image.src`, one priority package at a time, while updating
    the provenance log.
-3. Add real audio files for priority packages and keep Speech Synthesis as fallback.
-4. Define privacy, consent, retention, and account requirements before replacing the disabled ASR
-   adapter.
-5. Only after approval, implement a provider adapter behind the existing boundary without direct SDK
-   calls from components or automatic pronunciation scoring.
+3. Review and merge the existing priority food audio branch, keeping Speech Synthesis as fallback.
+4. Assign an owner and obtain product, legal/privacy, security, and professional review of
+   `docs/PRIVACY_AND_CONSENT.md`; resolve every open release gate.
+5. Only after explicit approval, split consent UI, token service, and provider adapter into separate
+   milestones without direct SDK calls from components or automatic pronunciation scoring.
 
 ## Do Not Change Without Asking
 

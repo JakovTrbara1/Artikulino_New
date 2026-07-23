@@ -37,3 +37,7 @@ Prije zamjene isključenog adaptera moraju biti definirani i odobreni:
 - stručna validacija svakog tumačenja prijepisa.
 
 Do tada `SPEECH_TRANSCRIPTION` mora ostati u stanju `not-configured`.
+
+Detaljni proizvodni i tehnički uvjeti, popis otvorenih odluka i izlazna kontrolna lista nalaze se u
+[`PRIVACY_AND_CONSENT.md`](PRIVACY_AND_CONSENT.md). Taj dokument ne odobrava vanjski prijenos:
+adapter ostaje isključen dok sve kontrolne točke nisu potvrđene.
