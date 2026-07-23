@@ -14,14 +14,16 @@
         alt="Vlak s lokomotivom, srednjim i zadnjim vagonom"
       />
     </picture>
-    <div class="train-options" aria-label="Odaberi položaj glasa u riječi">
+    <div class="train-options" role="group" aria-label="Odaberi položaj glasa u riječi">
       @for (position of ['start', 'middle', 'end']; track position) {
         @if (answerFor(position); as option) {
           <button
             type="button"
             [class]="position"
             [class.selected]="selectedId() === option.id"
-            [disabled]="disabled()"
+            [attr.aria-pressed]="selectedId() === option.id"
+            [attr.aria-disabled]="disabled()"
+            [disabled]="disabled() && selectedId() !== option.id"
             (click)="answer.emit(option.id)"
           >
             {{ option.label }}

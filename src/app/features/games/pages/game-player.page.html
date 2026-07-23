@@ -4,7 +4,7 @@
       <section class="surface result-screen" aria-labelledby="result-title">
         <div class="result-star" aria-hidden="true">★</div>
         <p class="eyebrow">Vježba je završena</p>
-        <h1 id="result-title">Bravo, stigao/la si do cilja!</h1>
+        <h1 #resultTitle id="result-title" tabindex="-1">Bravo, stigao/la si do cilja!</h1>
         <p>{{ package.name }} spremljen je u tvoj napredak.</p>
 
         <dl class="result-stats">
@@ -51,7 +51,17 @@
           </div>
         </div>
 
-        <div class="progress-track" aria-label="Napredak kroz igru">
+        <div
+          class="progress-track"
+          role="progressbar"
+          aria-label="Napredak kroz igru"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="session.progressPercent()"
+          [attr.aria-valuetext]="
+            'Pitanje ' + (session.currentIndex() + 1) + ' od ' + package.questions.length
+          "
+        >
           <span [style.width.%]="session.progressPercent()"></span>
         </div>
 
@@ -61,7 +71,7 @@
             {{ gameTypeLabels[package.gameType] }} · {{ difficultyLabels[package.difficulty] }} ·
             {{ package.theme }}
           </p>
-          <h1 id="game-title">{{ taskTitle() }}</h1>
+          <h1 #gameTitle id="game-title" tabindex="-1">{{ taskTitle() }}</h1>
           <p class="goal">
             Ciljni glas: <strong>{{ question.targetSound || package.targetSound }}</strong>
           </p>

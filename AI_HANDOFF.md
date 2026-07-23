@@ -64,6 +64,8 @@ npx prettier . --check
 - Speech Synthesis fallback when an audio file is missing or fails.
 - Demo content packages for required sounds, pairs, themes, and difficulty levels.
 - Reusable test-time content validation with stable issue codes, paths, and Croatian messages.
+- Accessible answer groups and selected states, semantic progress reporting, and focus transitions
+  between questions and the result screen.
 - Responsive train visual assets for the sound-position game.
 
 ## Important Folders and Files
@@ -124,12 +126,11 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Improve accessibility: keyboard flow, focus states, ARIA labels, and reduced-motion handling.
-2. Review demo content with a Croatian speech therapist and mark packages as validated/unvalidated.
-3. Replace emoji/demo imagery with curated image assets through `image.src`.
-4. Add real audio files for priority packages and keep Speech Synthesis as fallback.
-5. Design the future ASR boundary as a separate service interface before adding any cloud API.
-6. Define privacy, consent, retention, and account model before storing child data outside the browser.
+1. Review demo content with a Croatian speech therapist and mark packages as validated/unvalidated.
+2. Replace emoji/demo imagery with curated image assets through `image.src`.
+3. Add real audio files for priority packages and keep Speech Synthesis as fallback.
+4. Design the future ASR boundary as a separate service interface before adding any cloud API.
+5. Define privacy, consent, retention, and account model before storing child data outside the browser.
 
 ## Do Not Change Without Asking
 

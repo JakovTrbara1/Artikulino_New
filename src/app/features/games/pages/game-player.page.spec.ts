@@ -1,0 +1,101 @@
+import { signal } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { of } from 'rxjs';
+import { AudioPlaybackService } from '../../../shared/services/audio-playback.service';
+import { GameSessionService } from '../services/game-session.service';
+import { GamePlayerPage } from './game-player.page';
+
+describe('GamePlayerPage accessibility', () => {
+  let fixture: ComponentFixture<GamePlayerPage>;
+  let session: GameSessionService;
+
+  beforeEach(async () => {
+    localStorage.clear();
+    await TestBed.configureTestingModule({
+      imports: [GamePlayerPage],
+      providers: [
+        provideRouter([]),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            paramMap: of(convertToParamMap({ packageId: 'slusaj-hrana-s-lagano' })),
+          },
+        },
+        {
+          provide: AudioPlaybackService,
+          useValue: {
+            isPlaying: signal(false).asReadonly(),
+            play: vi.fn().mockResolvedValue(undefined),
+            stop: vi.fn(),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(GamePlayerPage);
+    session = fixture.debugElement.injector.get(GameSessionService);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  });
+
+  afterEach(() => TestBed.resetTestingModule());
+
+  it('exposes numeric and readable progress semantics', () => {
+    const progress = fixture.nativeElement.querySelector('[role="progressbar"]') as HTMLElement;
+
+    expect(progress.getAttribute('aria-valuemin')).toBe('0');
+    expect(progress.getAttribute('aria-valuemax')).toBe('100');
+    expect(progress.getAttribute('aria-valuenow')).toBe('0');
+    expect(progress.getAttribute('aria-valuetext')).toBe('Pitanje 1 od 4');
+  });
+
+  it('moves focus to the next question heading after advancing', async () => {
+    answerCurrentQuestion();
+    await clickNextButton();
+
+    const gameTitle = fixture.nativeElement.querySelector('#game-title') as HTMLHeadingElement;
+    expect(document.activeElement).toBe(gameTitle);
+    expect(gameTitle.textContent?.trim()).toBe('Poslušaj i odaberi odgovor.');
+  });
+
+  it('moves focus to the result heading after completion', async () => {
+    const questionCount = session.contentPackage()?.questions.length ?? 0;
+    for (let index = 0; index < questionCount - 1; index += 1) {
+      answerCurrentQuestion();
+      session.next();
+    }
+    fixture.detectChanges();
+
+    answerCurrentQuestion();
+    await clickNextButton();
+
+    const resultTitle = fixture.nativeElement.querySelector('#result-title') as HTMLHeadingElement;
+    expect(document.activeElement).toBe(resultTitle);
+    expect(resultTitle.textContent?.trim()).toBe('Bravo, stigao/la si do cilja!');
+  });
+
+  function answerCurrentQuestion(): void {
+    const answerId = session.currentQuestion()?.correctAnswerIds[0];
+    if (!answerId) {
+      throw new Error('Testno pitanje nema točan odgovor.');
+    }
+    session.submitAnswer(answerId);
+    fixture.detectChanges();
+  }
+
+  async function clickNextButton(): Promise<void> {
+    const nextButton = fixture.nativeElement.querySelector(
+      '.next-button',
+    ) as HTMLButtonElement | null;
+    if (!nextButton) {
+      throw new Error('Gumb za nastavak nije prikazan.');
+    }
+
+    nextButton.click();
+    fixture.detectChanges();
+    await fixture.whenRenderingDone();
+    fixture.detectChanges();
+  }
+});
