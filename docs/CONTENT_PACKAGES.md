@@ -39,6 +39,18 @@ npm run test:ci
 Validator provjerava strukturu i tehničku dosljednost. Ne potvrđuje fonetsku, dobnu ili kliničku
 ispravnost sadržaja.
 
+## Pravila za slike
+
+- Slike za pitanja spremati pod `public/assets/games/` i povezivati apsolutnom putanjom
+  `/assets/games/...`.
+- Za kvadratne ilustracije koristiti WebP do 512 × 512 piksela i ciljnu veličinu manju od 100 KB,
+  osim kada kvaliteta ili drugi prikaz opravdavaju veću datoteku.
+- Zadržati smislen `alt`; emoji se može zadržati kao podatkovna rezerva ako slika poslije bude
+  uklonjena iz paketa.
+- Podrijetlo, način izrade i naknadnu obradu evidentirati u `docs/MEDIA_PROVENANCE.md`.
+- Prije javne objave potvrditi da način distribucije odgovara uvjetima izvora ili alata kojim je
+  asset izrađen.
+
 ## Težine
 
 - `EASY`: poznate kratke riječi, jasne mogućnosti i vizualna pomoć.
