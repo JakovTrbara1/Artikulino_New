@@ -65,6 +65,8 @@ npx prettier . --check
 - Demo content packages for required sounds, pairs, themes, and difficulty levels.
 - Reusable test-time content validation with stable issue codes, paths, and Croatian messages.
 - Explicit professional-review metadata; all current demo packages are marked `NOT_REVIEWED`.
+- Four optimized local food illustrations in the priority “Što jedemo?” package, with retained
+  emoji fallbacks and documented provenance.
 - Accessible answer groups and selected states, semantic progress reporting, and focus transitions
   between questions and the result screen.
 - Responsive train visual assets for the sound-position game.
@@ -87,6 +89,7 @@ npx prettier . --check
 - `src/main.css`: global styles, tokens, colors, typography, reset.
 - `public/assets/games/`: generated game assets.
 - `docs/CONTENT_PACKAGES.md`: guide for adding new packages.
+- `docs/MEDIA_PROVENANCE.md`: source and processing log for project media.
 - `docs/design/artikulino-game-concept.png`: visual concept reference.
 
 ## Architecture Overview
@@ -123,7 +126,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   Croatian speech therapist.
 - Speech Synthesis voice quality varies by browser and OS.
 - MediaRecorder availability and output format vary by browser.
-- Audio and image fields are supported, but most demo packages use fallback/generated or simple visual content.
+- Audio and image fields are supported, but only the priority food package has curated local
+  illustrations; most demo packages still use fallback/generated or simple visual content.
 - ESLint is not configured; the agreed MVP quality gate is build, tests, and Prettier.
 - README text may display mojibake in some terminal code pages, although the source should be treated as UTF-8 Croatian text.
 
@@ -131,7 +135,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 1. Have a Croatian speech therapist review priority demo packages, then record the reviewer and
    date before changing their status to `PROFESSIONALLY_REVIEWED`.
-2. Replace emoji/demo imagery with curated image assets through `image.src`.
+2. Expand curated local imagery through `image.src`, one priority package at a time, while updating
+   the provenance log.
 3. Add real audio files for priority packages and keep Speech Synthesis as fallback.
 4. Design the future ASR boundary as a separate service interface before adding any cloud API.
 5. Define privacy, consent, retention, and account model before storing child data outside the browser.

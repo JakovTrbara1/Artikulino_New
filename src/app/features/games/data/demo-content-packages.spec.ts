@@ -43,6 +43,35 @@ describe('demonstration content packages', () => {
     }
   });
 
+  it('uses optimized local images with emoji fallbacks for the priority food package', () => {
+    const foodPackage = DEMO_CONTENT_PACKAGES.find(
+      (contentPackage) => contentPackage.id === 'slusaj-hrana-s-lagano',
+    );
+
+    expect(foodPackage?.questions.map((question) => question.image)).toEqual([
+      {
+        src: '/assets/games/food/apple.webp',
+        emoji: '🍎',
+        alt: 'Ilustracija za pojam Jabuka',
+      },
+      {
+        src: '/assets/games/food/carrot.webp',
+        emoji: '🥕',
+        alt: 'Ilustracija za pojam Mrkva',
+      },
+      {
+        src: '/assets/games/food/banana.webp',
+        emoji: '🍌',
+        alt: 'Ilustracija za pojam Banana',
+      },
+      {
+        src: '/assets/games/food/potato.webp',
+        emoji: '🥔',
+        alt: 'Ilustracija za pojam Krumpir',
+      },
+    ]);
+  });
+
   it('passes reusable content validation', () => {
     expect(validateContentPackages(DEMO_CONTENT_PACKAGES)).toEqual([]);
   });

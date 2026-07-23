@@ -157,6 +157,7 @@ Globalni design tokeni, reset i zajednički stilovi nalaze se u `src/main.css`. 
 - Svaki demo paket izričito je označen statusom `NOT_REVIEWED`; upute za dokumentiranje stručne
   provjere nalaze se u `docs/CONTENT_PACKAGES.md`.
 - Speech Synthesis glas i MediaRecorder format ovise o pregledniku i operacijskom sustavu.
-- Emoji vizualni poticaji u demo paketima mogu se zamijeniti vlastitim slikama putem `image.src` bez promjene logike igre.
+- Paket „Što jedemo?” koristi optimizirane lokalne ilustracije putem `image.src`; ostali emoji
+  poticaji mogu se zamijeniti istim postupkom bez promjene logike igre.
 
 Vizualni koncept primarnog ekrana nalazi se u `docs/design/artikulino-game-concept.png`.

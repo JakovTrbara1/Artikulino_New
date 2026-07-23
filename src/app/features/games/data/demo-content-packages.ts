@@ -57,6 +57,15 @@ const q = (
   explanation,
 });
 
+const withImageSrc = (question: ContentQuestion, src: string): ContentQuestion => ({
+  ...question,
+  image: {
+    ...question.image,
+    src,
+    alt: question.image?.alt ?? `Ilustracija za pojam ${question.spokenText}`,
+  },
+});
+
 const categoryOptions = (...labels: string[]): readonly AnswerOption[] =>
   labels.map((label) => ({ id: label.toLocaleLowerCase('hr-HR'), label }));
 
@@ -73,16 +82,28 @@ const DEMO_CONTENT_PACKAGE_DEFINITIONS = [
     difficulty: 'EASY',
     scoring: rules('EASY'),
     questions: [
-      q('jabuka', 'Jabuka', categoryOptions('Voće', 'Povrće'), 'voće', 'Jabuka je voće.', '🍎'),
-      q('mrkva', 'Mrkva', categoryOptions('Voće', 'Povrće'), 'povrće', 'Mrkva je povrće.', '🥕'),
-      q('banana', 'Banana', categoryOptions('Voće', 'Povrće'), 'voće', 'Banana je voće.', '🍌'),
-      q(
-        'krumpir',
-        'Krumpir',
-        categoryOptions('Voće', 'Povrće'),
-        'povrće',
-        'Krumpir je povrće.',
-        '🥔',
+      withImageSrc(
+        q('jabuka', 'Jabuka', categoryOptions('Voće', 'Povrće'), 'voće', 'Jabuka je voće.', '🍎'),
+        '/assets/games/food/apple.webp',
+      ),
+      withImageSrc(
+        q('mrkva', 'Mrkva', categoryOptions('Voće', 'Povrće'), 'povrće', 'Mrkva je povrće.', '🥕'),
+        '/assets/games/food/carrot.webp',
+      ),
+      withImageSrc(
+        q('banana', 'Banana', categoryOptions('Voće', 'Povrće'), 'voće', 'Banana je voće.', '🍌'),
+        '/assets/games/food/banana.webp',
+      ),
+      withImageSrc(
+        q(
+          'krumpir',
+          'Krumpir',
+          categoryOptions('Voće', 'Povrće'),
+          'povrće',
+          'Krumpir je povrće.',
+          '🥔',
+        ),
+        '/assets/games/food/potato.webp',
       ),
     ],
   },
