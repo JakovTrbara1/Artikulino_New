@@ -67,6 +67,8 @@ npx prettier . --check
 - Explicit professional-review metadata; all current demo packages are marked `NOT_REVIEWED`.
 - Four optimized local food illustrations in the priority “Što jedemo?” package, with retained
   emoji fallbacks and documented provenance.
+- Provider-neutral `SPEECH_TRANSCRIPTION` boundary with a default disabled adapter, no network
+  transfer, and no pronunciation scoring.
 - Accessible answer groups and selected states, semantic progress reporting, and focus transitions
   between questions and the result screen.
 - Responsive train visual assets for the sound-position game.
@@ -75,6 +77,7 @@ npx prettier . --check
 
 - `src/app/app.routes.ts`: top-level lazy routes.
 - `src/app/core/layout/`: shared app layout/header.
+- `src/app/core/services/speech-transcription.service.ts`: disabled-by-default future ASR boundary.
 - `src/app/shared/`: shared components and services.
 - `src/app/features/home/`: home page.
 - `src/app/features/games/games.routes.ts`: lazy game routes.
@@ -90,6 +93,7 @@ npx prettier . --check
 - `public/assets/games/`: generated game assets.
 - `docs/CONTENT_PACKAGES.md`: guide for adding new packages.
 - `docs/MEDIA_PROVENANCE.md`: source and processing log for project media.
+- `docs/ASR_BOUNDARY.md`: privacy and architecture gates for any future ASR adapter.
 - `docs/design/artikulino-game-concept.png`: visual concept reference.
 
 ## Architecture Overview
@@ -113,6 +117,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Use the microphone only for child self-listening practice in the MVP.
 - Do not make clinical claims or automatic pronunciation judgments.
 - Keep progress local until privacy, accounts, consent, and backend requirements are defined.
+- Keep recordings outside ASR by default; a provider adapter may be injected only after privacy and
+  consent requirements are approved.
 - Prefer small, explicit services over a global state library.
 - Preserve Croatian UI/content wording.
 - Keep the interface visually friendly for children while the progress page remains clearer and calmer for adults.
@@ -120,7 +126,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 ## Known Bugs, Risks, and Unfinished Work
 
 - No backend, authentication, user profiles, or device sync.
-- No ASR or automatic articulation error detection yet.
+- No ASR provider or automatic articulation error detection; the service boundary remains
+  intentionally disabled.
 - No consent flow, data retention policy, or role model for real parent/therapist accounts.
 - Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
   Croatian speech therapist.
@@ -138,8 +145,10 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 2. Expand curated local imagery through `image.src`, one priority package at a time, while updating
    the provenance log.
 3. Add real audio files for priority packages and keep Speech Synthesis as fallback.
-4. Design the future ASR boundary as a separate service interface before adding any cloud API.
-5. Define privacy, consent, retention, and account model before storing child data outside the browser.
+4. Define privacy, consent, retention, and account requirements before replacing the disabled ASR
+   adapter.
+5. Only after approval, implement a provider adapter behind the existing boundary without direct SDK
+   calls from components or automatic pronunciation scoring.
 
 ## Do Not Change Without Asking
 
