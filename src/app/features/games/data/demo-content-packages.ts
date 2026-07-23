@@ -60,7 +60,7 @@ const q = (
 const categoryOptions = (...labels: string[]): readonly AnswerOption[] =>
   labels.map((label) => ({ id: label.toLocaleLowerCase('hr-HR'), label }));
 
-export const DEMO_CONTENT_PACKAGES: readonly ContentPackage[] = [
+const DEMO_CONTENT_PACKAGE_DEFINITIONS = [
   {
     schemaVersion: 1,
     id: 'slusaj-hrana-s-lagano',
@@ -502,4 +502,10 @@ export const DEMO_CONTENT_PACKAGES: readonly ContentPackage[] = [
       ),
     ],
   },
-];
+] satisfies readonly Omit<ContentPackage, 'professionalReview'>[];
+
+export const DEMO_CONTENT_PACKAGES: readonly ContentPackage[] =
+  DEMO_CONTENT_PACKAGE_DEFINITIONS.map((contentPackage) => ({
+    ...contentPackage,
+    professionalReview: { status: 'NOT_REVIEWED' },
+  }));

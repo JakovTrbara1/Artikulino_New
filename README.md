@@ -74,6 +74,7 @@ const packageExample: ContentPackage = {
   targetSound: 'C',
   theme: 'odjeća',
   difficulty: 'EASY',
+  professionalReview: { status: 'NOT_REVIEWED' },
   scoring: {
     basePoints: 10,
     secondAttemptMultiplier: 0.6,
@@ -153,6 +154,8 @@ Globalni design tokeni, reset i zajednički stilovi nalaze se u `src/main.css`. 
 - Nema korisničkih računa, backend API-ja ni sinkronizacije između uređaja.
 - Nema automatske procjene pravilnosti izgovora ni ASR integracije.
 - Demo sadržaj služi tehničkoj demonstraciji i prije stručne uporabe treba ga pregledati logoped.
+- Svaki demo paket izričito je označen statusom `NOT_REVIEWED`; upute za dokumentiranje stručne
+  provjere nalaze se u `docs/CONTENT_PACKAGES.md`.
 - Speech Synthesis glas i MediaRecorder format ovise o pregledniku i operacijskom sustavu.
 - Emoji vizualni poticaji u demo paketima mogu se zamijeniti vlastitim slikama putem `image.src` bez promjene logike igre.
 

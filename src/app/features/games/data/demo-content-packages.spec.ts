@@ -37,6 +37,12 @@ describe('demonstration content packages', () => {
     }
   });
 
+  it('marks every demonstration package as not professionally reviewed', () => {
+    for (const contentPackage of DEMO_CONTENT_PACKAGES) {
+      expect(contentPackage.professionalReview).toEqual({ status: 'NOT_REVIEWED' });
+    }
+  });
+
   it('passes reusable content validation', () => {
     expect(validateContentPackages(DEMO_CONTENT_PACKAGES)).toEqual([]);
   });

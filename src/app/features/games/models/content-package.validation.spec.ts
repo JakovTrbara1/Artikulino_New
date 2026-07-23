@@ -41,6 +41,7 @@ const createPackage = (overrides: Partial<ContentPackage> = {}): ContentPackage 
   theme: 'hrana',
   difficulty: 'EASY',
   scoring: defaultScoring,
+  professionalReview: { status: 'NOT_REVIEWED' },
   questions: [createQuestion()],
   ...overrides,
 });
@@ -207,6 +208,85 @@ describe('content package validation', () => {
       'packages[0].scoring.replayPenalty',
       'packages[0].scoring.maxAttempts',
     ]);
+  });
+
+  it('requires traceable professional review metadata', () => {
+    const { professionalReview: _professionalReview, ...packageWithoutReview } = createPackage();
+    const packages = [
+      packageWithoutReview as ContentPackage,
+      createPackage({
+        id: 'package-2',
+        professionalReview: {
+          status: 'PROFESSIONALLY_REVIEWED',
+        },
+      }),
+      createPackage({
+        id: 'package-3',
+        professionalReview: {
+          status: 'NOT_REVIEWED',
+          reviewerName: 'Primjer pregledavatelja',
+        },
+      }),
+      createPackage({
+        id: 'package-4',
+        professionalReview: {
+          status: 'UNKNOWN',
+        } as unknown as ContentPackage['professionalReview'],
+      }),
+      createPackage({
+        id: 'package-5',
+        professionalReview: {
+          status: 'PROFESSIONALLY_REVIEWED',
+          reviewerName: 'Primjer pregledavatelja',
+          reviewedAt: '2026-02-30',
+        },
+      }),
+    ];
+
+    const reviewIssues = validateContentPackages(packages).filter((issue) =>
+      ['missing-professional-review', 'invalid-review-status', 'invalid-review-metadata'].includes(
+        issue.code,
+      ),
+    );
+
+    expect(reviewIssues).toEqual([
+      expect.objectContaining({
+        code: 'missing-professional-review',
+        path: 'packages[0].professionalReview',
+      }),
+      expect.objectContaining({
+        code: 'invalid-review-metadata',
+        path: 'packages[1].professionalReview.reviewerName',
+      }),
+      expect.objectContaining({
+        code: 'invalid-review-metadata',
+        path: 'packages[1].professionalReview.reviewedAt',
+      }),
+      expect.objectContaining({
+        code: 'invalid-review-metadata',
+        path: 'packages[2].professionalReview',
+      }),
+      expect.objectContaining({
+        code: 'invalid-review-status',
+        path: 'packages[3].professionalReview.status',
+      }),
+      expect.objectContaining({
+        code: 'invalid-review-metadata',
+        path: 'packages[4].professionalReview.reviewedAt',
+      }),
+    ]);
+  });
+
+  it('accepts a professionally reviewed package with reviewer and ISO date', () => {
+    const contentPackage = createPackage({
+      professionalReview: {
+        status: 'PROFESSIONALLY_REVIEWED',
+        reviewerName: 'Primjer pregledavatelja',
+        reviewedAt: '2026-07-23',
+      },
+    });
+
+    expect(validateContentPackages([contentPackage])).toEqual([]);
   });
 
   it('reports missing and repeated target sounds in position questions', () => {
