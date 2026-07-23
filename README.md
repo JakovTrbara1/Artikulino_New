@@ -112,7 +112,7 @@ Mikrofon se aktivira isključivo nakon korisnikova klika. `MediaRecorder` omogu�
 - briše se ručno ili pri napuštanju komponente;
 - aplikacija ne tvrdi da automatski ocjenjuje izgovor.
 
-Za mikrofon je potreban podržani preglednik i siguran kontekst (`https` ili `localhost`). Budući ASR treba ostati iza zasebnog servisnog sučelja i zahtijeva roditeljsku privolu, politiku čuvanja podataka i stručnu validaciju.
+Za mikrofon je potreban podržani preglednik i siguran kontekst (`https` ili `localhost`). Servisna granica `SPEECH_TRANSCRIPTION` postoji, ali je zadano isključena i ne šalje snimke izvan preglednika. Uvjeti za eventualni budući adapter opisani su u [`docs/ASR_BOUNDARY.md`](docs/ASR_BOUNDARY.md).
 
 ## Praćenje napretka
 
