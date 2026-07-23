@@ -10,12 +10,14 @@
   }
 
   <p class="spoken-text">{{ question().displayText }}</p>
-  <div class="category-options" aria-label="Ponuđene kategorije">
+  <div class="category-options" role="group" aria-label="Ponuđene kategorije">
     @for (option of question().answers; track option.id) {
       <button
         type="button"
         [class.selected]="selectedId() === option.id"
-        [disabled]="disabled()"
+        [attr.aria-pressed]="selectedId() === option.id"
+        [attr.aria-disabled]="disabled()"
+        [disabled]="disabled() && selectedId() !== option.id"
         (click)="answer.emit(option.id)"
       >
         {{ option.label }}

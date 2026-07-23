@@ -5,6 +5,12 @@ import { CatchSoundBoard } from './catch-sound-board/catch-sound-board';
 import { ListenDecideBoard } from './listen-decide-board/listen-decide-board';
 import { SoundPositionBoard } from './sound-position-board/sound-position-board';
 
+const boardCases: readonly { readonly name: string; readonly component: Type<unknown> }[] = [
+  { name: 'Slušaj i odluči', component: ListenDecideBoard },
+  { name: 'Uhvati glas', component: CatchSoundBoard },
+  { name: 'Gdje je glas', component: SoundPositionBoard },
+];
+
 const question: ContentQuestion = {
   id: 'test',
   taskText: 'Poslušaj.',
@@ -58,5 +64,24 @@ describe('configurable game boards', () => {
     (fixture.nativeElement.querySelector('button') as HTMLButtonElement).click();
 
     expect(emitted).toEqual(['start']);
+  });
+
+  it.each(boardCases)('exposes selected and disabled states in $name', async ({ component }) => {
+    const fixture = await setup(component);
+    fixture.componentRef.setInput('selectedId', 'start');
+    fixture.componentRef.setInput('disabled', true);
+    fixture.detectChanges();
+
+    const group = fixture.nativeElement.querySelector('[role="group"]') as HTMLElement;
+    const buttons = [...group.querySelectorAll('button')] as HTMLButtonElement[];
+
+    expect(group.getAttribute('aria-label')).toBeTruthy();
+    expect(buttons[0].getAttribute('aria-pressed')).toBe('true');
+    expect(
+      buttons.slice(1).every((button) => button.getAttribute('aria-pressed') === 'false'),
+    ).toBe(true);
+    expect(buttons.every((button) => button.getAttribute('aria-disabled') === 'true')).toBe(true);
+    expect(buttons[0].disabled).toBe(false);
+    expect(buttons.slice(1).every((button) => button.disabled)).toBe(true);
   });
 });

@@ -24,7 +24,7 @@
     }
   </div>
 
-  <div class="sound-options" aria-label="Odaberi koji glas čuješ">
+  <div class="sound-options" role="group" aria-label="Odaberi koji glas čuješ">
     @for (option of question().answers; track option.id; let index = $index) {
       <button
         type="button"
@@ -32,7 +32,9 @@
         [class.option-b]="index === 1"
         [class.option-c]="index > 1"
         [class.selected]="selectedId() === option.id"
-        [disabled]="disabled()"
+        [attr.aria-pressed]="selectedId() === option.id"
+        [attr.aria-disabled]="disabled()"
+        [disabled]="disabled() && selectedId() !== option.id"
         (click)="answer.emit(option.id)"
       >
         <span class="sound-mark" aria-hidden="true">{{ index < 2 ? '♪' : '–' }}</span>

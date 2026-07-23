@@ -1,11 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
+  Injector,
   OnDestroy,
+  afterNextRender,
   computed,
   effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -29,10 +33,13 @@ import { GameSessionService } from '../services/game-session.service';
 })
 export class GamePlayerPage implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
+  private readonly injector = inject(Injector);
   private readonly packageId = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('packageId'))),
     { initialValue: null },
   );
+  private readonly gameTitle = viewChild<ElementRef<HTMLHeadingElement>>('gameTitle');
+  private readonly resultTitle = viewChild<ElementRef<HTMLHeadingElement>>('resultTitle');
   private initializedPackageId?: string;
 
   protected readonly difficultyLabels = DIFFICULTY_LABELS;
@@ -109,8 +116,11 @@ export class GamePlayerPage implements OnDestroy {
   protected nextQuestion(): void {
     this.audio.stop();
     this.session.next();
-    if (!this.session.isComplete()) {
+    if (this.session.isComplete()) {
+      this.focusHeadingAfterRender('result');
+    } else {
       this.resetQuestionUi();
+      this.focusHeadingAfterRender('game');
     }
   }
 
@@ -119,6 +129,7 @@ export class GamePlayerPage implements OnDestroy {
     if (contentPackage) {
       this.session.start(contentPackage);
       this.resetQuestionUi();
+      this.focusHeadingAfterRender('game');
     }
   }
 
@@ -127,5 +138,17 @@ export class GamePlayerPage implements OnDestroy {
     this.hasListened.set(false);
     this.selectedAnswer.set(null);
     this.audioMessage.set('');
+  }
+
+  private focusHeadingAfterRender(target: 'game' | 'result'): void {
+    afterNextRender(
+      {
+        write: () => {
+          const heading = target === 'result' ? this.resultTitle() : this.gameTitle();
+          heading?.nativeElement.focus();
+        },
+      },
+      { injector: this.injector },
+    );
   }
 }
