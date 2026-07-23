@@ -16,9 +16,15 @@ Aplikacija je zatim dostupna na `http://localhost:4200`.
 Provjere kvalitete:
 
 ```bash
-npm run build
-npm test
+npm run check
 ```
+
+Ova naredba izrađuje produkcijsku verziju aplikacije, pokreće testove jednokratno i provjerava
+formatiranje Prettierom. Pojedinačne provjere dostupne su kroz `npm run build`, `npm run test:ci` i
+`npx prettier . --check`. `npm test` ostaje dostupan za rad tijekom razvoja.
+
+ESLint trenutačno nije uveden. Za MVP su dogovoreni Angular build, testovi i Prettier kao zajednička
+provjera bez dodavanja nove ovisnosti.
 
 ## Rute
 
