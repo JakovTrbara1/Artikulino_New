@@ -37,5 +37,9 @@ sadržaja, ali nije pravno mišljenje o licenciranju.
   1,585 do 1,822 sekunde.
 - Status slušne provjere: **nije provedena**. Izvorni govornik hrvatskog jezika treba potvrditi
   izgovor i naglasak prije javne uporabe ili zamijeniti zapise profesionalnim snimkama.
-- Prije javne distribucije vlasnik projekta treba potvrditi primjenjive uvjete korištenja glasa i
-  generiranih zapisa.
+- Status distribucije: **nije odobrena**. [Microsoftovi uvjeti za Azure
+  TTS](https://www.microsoft.com/licensing/terms/productoffering/MicrosoftAzureServices/MCA) izričito
+  daju pravo uporabe izlaza korisnicima plaćene Azure TTS razine, ali ovi su zapisi izrađeni lokalnim
+  Windows OneCore glasom, a ne Azure uslugom. Ta se odredba zato ne primjenjuje kao dokaz prava za
+  ove datoteke. Vlasnik projekta treba potvrditi primjenjive Windows uvjete ili zamijeniti zapise
+  licenciranim/profesionalnim snimkama prije spajanja u `main`.

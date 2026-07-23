@@ -69,6 +69,10 @@ npx prettier . --check
   emoji fallbacks and documented provenance.
 - Four offline-generated Croatian WAV prompts in the same priority package, with browser Speech
   Synthesis retained as fallback and listening review still required.
+- Provider-neutral `SPEECH_TRANSCRIPTION` boundary with a default disabled adapter, no network
+  transfer, and no pronunciation scoring.
+- Documented privacy, consent, retention, account, vendor, and security requirements that must be
+  approved before any external speech processing.
 - Accessible answer groups and selected states, semantic progress reporting, and focus transitions
   between questions and the result screen.
 - Responsive train visual assets for the sound-position game.
@@ -77,6 +81,7 @@ npx prettier . --check
 
 - `src/app/app.routes.ts`: top-level lazy routes.
 - `src/app/core/layout/`: shared app layout/header.
+- `src/app/core/services/speech-transcription.service.ts`: disabled-by-default future ASR boundary.
 - `src/app/shared/`: shared components and services.
 - `src/app/features/home/`: home page.
 - `src/app/features/games/games.routes.ts`: lazy game routes.
@@ -92,6 +97,8 @@ npx prettier . --check
 - `public/assets/games/`: generated game assets.
 - `docs/CONTENT_PACKAGES.md`: guide for adding new packages.
 - `docs/MEDIA_PROVENANCE.md`: source and processing log for project media.
+- `docs/ASR_BOUNDARY.md`: privacy and architecture gates for any future ASR adapter.
+- `docs/PRIVACY_AND_CONSENT.md`: data inventory, required decisions, and ASR release checklist.
 - `docs/design/artikulino-game-concept.png`: visual concept reference.
 
 ## Architecture Overview
@@ -115,6 +122,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Use the microphone only for child self-listening practice in the MVP.
 - Do not make clinical claims or automatic pronunciation judgments.
 - Keep progress local until privacy, accounts, consent, and backend requirements are defined.
+- Keep recordings outside ASR by default; a provider adapter may be injected only after privacy and
+  consent requirements are approved.
 - Prefer small, explicit services over a global state library.
 - Preserve Croatian UI/content wording.
 - Keep the interface visually friendly for children while the progress page remains clearer and calmer for adults.
@@ -122,8 +131,10 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 ## Known Bugs, Risks, and Unfinished Work
 
 - No backend, authentication, user profiles, or device sync.
-- No ASR or automatic articulation error detection yet.
-- No consent flow, data retention policy, or role model for real parent/therapist accounts.
+- No ASR provider or automatic articulation error detection; the service boundary remains
+  intentionally disabled.
+- No approved controller, legal basis, guardian verification, ASR provider, exact provider
+  retention, or consent flow. Requirements are documented, but all release gates remain open.
 - Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
   Croatian speech therapist.
 - Speech Synthesis voice quality varies by browser and OS.
@@ -141,10 +152,12 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
    date before changing their status to `PROFESSIONALLY_REVIEWED`.
 2. Expand curated local imagery through `image.src`, one priority package at a time, while updating
    the provenance log.
-3. Have a native Croatian speaker review the priority food audio, replace any rejected prompt, and
-   then expand approved local audio one package at a time while retaining Speech Synthesis fallback.
-4. Design the future ASR boundary as a separate service interface before adding any cloud API.
-5. Define privacy, consent, retention, and account model before storing child data outside the browser.
+3. Have a native Croatian speaker review the priority food audio, confirm the distribution terms,
+   replace any rejected prompt, and then merge it while retaining Speech Synthesis fallback.
+4. Assign an owner and obtain product, legal/privacy, security, and professional review of
+   `docs/PRIVACY_AND_CONSENT.md`; resolve every open release gate.
+5. Only after explicit approval, split consent UI, token service, and provider adapter into separate
+   milestones without direct SDK calls from components or automatic pronunciation scoring.
 
 ## Do Not Change Without Asking
 
