@@ -98,6 +98,7 @@ npx prettier . --check
 - `docs/MEDIA_PROVENANCE.md`: source and processing log for project media.
 - `docs/ASR_BOUNDARY.md`: privacy and architecture gates for any future ASR adapter.
 - `docs/PRIVACY_AND_CONSENT.md`: data inventory, required decisions, and ASR release checklist.
+- `docs/MVP_READINESS.md`: dated MVP smoke-test results and remaining human-device checks.
 - `docs/design/artikulino-game-concept.png`: visual concept reference.
 
 ## Architecture Overview
@@ -138,6 +139,9 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
   Croatian speech therapist.
 - Speech Synthesis voice quality varies by browser and OS.
+- The MVP readiness pass found no confirmed technical blocker. Real keyboard activation,
+  microphone permission/recording, Croatian voice quality, and screen-reader behavior still need
+  human verification on target devices.
 - The experimental `codex/priority-food-audio` branch contains unreviewed Windows OneCore-generated
   WAV files and must not be merged. Packaged audio is deferred and does not block the MVP.
 - MediaRecorder availability and output format vary by browser.
@@ -148,8 +152,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Run the documented MVP readiness pass across routes, all game types, keyboard interaction,
-   Speech Synthesis, microphone states, responsive layouts, and local progress.
+1. Complete the remaining human-device checks in `docs/MVP_READINESS.md`: keyboard-only completion,
+   microphone allow/deny/replay/removal, Croatian voice quality, and a short screen-reader pass.
 2. Have a Croatian speech therapist review priority demo packages, then record the reviewer and
    date before changing their status to `PROFESSIONALLY_REVIEWED`.
 3. Expand curated local imagery through `image.src`, one priority package at a time, while updating
