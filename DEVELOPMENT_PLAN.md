@@ -4,144 +4,296 @@
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
   services, and local-only progress.
-- Milestones 0–3, professional-review status tracking, priority food illustrations, the disabled
-  ASR boundary, and privacy requirements are merged into `main`.
-- The latest baseline production build, all 38 tests, and Prettier checks pass.
-- Accessibility coverage includes skip navigation, focus styling and transitions, answer-state
-  semantics, progress semantics, live status messages, and reduced-motion CSS.
-- Reusable content-package validation is enforced by the demo-data tests.
+- Milestones 0–4 and the microphone state-coverage follow-up are complete and merged into `main`.
+- The current production build, all 38 tests, and Prettier checks pass.
+- The frontend-only MVP has no confirmed technical blocker, but real-device accessibility,
+  microphone, and Croatian voice checks remain documented in `docs/MVP_READINESS.md`.
+- The next phase is a local master’s-thesis prototype. It may add demo accounts, a local backend,
+  retained fictional recordings, and local Croatian transcription under the boundaries below.
 
 ## 2. Main development goal
 
-The quality, content-validation, and focused accessibility foundations are complete. The next goal
-is to verify that the current frontend-only application is a coherent, functioning MVP before
-expanding professionally reviewed content or licensed media.
+Build a clearly labeled, localhost-only thesis prototype with two coordinated tracks:
 
-## 3. Prioritized roadmap
+1. redesign the catalog and gameplay experience using the approved soft-toy 3D direction;
+2. add a local prototype backend, fictional parent/child profiles, saved recording attempts,
+   Croatian transcription, adult progress, and therapist review.
 
-1. Completed: standardize the repository quality command.
-2. Completed: add reusable content-package validation.
-3. Completed: improve game accessibility and keyboard focus flow.
-4. Completed: run an MVP readiness pass and record the results.
-5. Next: complete the remaining human-device checks, then expand professionally reviewed content
-   and licensed media one package at a time.
+`Podudarnost` measures normalized expected-text versus recognized-text similarity. It is not
+pronunciation quality, a clinical score, a diagnosis, or a therapist conclusion.
 
-## 4. Milestones and task breakdown
+## 3. Approved design references
 
-### Milestone 0 — Publish this plan
+The following concepts define visual direction, hierarchy, component treatment, and responsive
+behavior. Visible production copy remains code-native Croatian and sample data in the concepts is
+not authoritative.
 
-- Branch: `codex/development-plan`
-- Create `DEVELOPMENT_PLAN.md` with this plan only.
-- Validate with `npx prettier DEVELOPMENT_PLAN.md --check` and `git diff --check`.
-- Commit as `Add development plan`.
-- Push the new branch to `origin`; do not push directly to `main`.
+- `docs/design/catalog-soft-toy-desktop.png`
+- `docs/design/catalog-soft-toy-mobile.png`
+- `docs/design/gameplay-recording-desktop.png`
+- `docs/design/gameplay-recording-mobile.png`
+- `docs/design/therapist-review-desktop.png`
 
-### Milestone 1 — One repeatable quality gate
+## 4. Prioritized roadmap
 
-- Branch: `codex/quality-check-command`
-- Add `test:ci` using `ng test --watch=false`.
-- Add `check` running build, `test:ci`, and Prettier.
-- Record that ESLint is intentionally deferred; do not add a dependency solely to create a lint
-  script.
-- Update setup and workflow documentation.
-- Likely files: `package.json`, `README.md`, `AI_HANDOFF.md`.
-- Validate with `npm run check` and `git diff --check`.
+1. Completed: repository quality gate, content validation, accessibility pass, MVP readiness, and
+   microphone state coverage.
+2. Current: lock this revised roadmap and the approved design references.
+3. Next: create the soft-toy theme asset pack.
+4. Then: redesign catalog filtering and game tiles.
+5. Then: improve recording UX and reset it for every question.
+6. Then: add the local prototype backend, demo login, and demo child profiles.
+7. Then: persist sessions and recording attempts.
+8. Then: add local Croatian transcription and text matching.
+9. Then: move parent progress to the prototype backend.
+10. Then: add therapist recording review.
+11. Last: run integrated thesis-prototype QA and document the demonstration workflow.
 
-### Milestone 2 — Content-package validator
+## 5. Milestones
 
-- Branch: `codex/content-package-validation`
-- Add a pure validator adjacent to the content model:
-  - `ContentValidationIssue` containing stable `code`, `path`, and Croatian `message`.
-  - `validateContentPackages(packages)` returning all issues without mutating or throwing.
-- Validate duplicate package, question, and answer IDs; required text and answers; missing or
-  unknown correct answers; supported sounds and consistent sound pairs; finite nonnegative scoring
-  with a positive base, positive integer attempt and streak limits, and a multiplier between 0 and
-  1; meaningful image alternative text; and repeated or missing target positions in
-  `sound-position`.
-- Make the demo-content test require zero validation issues. Add focused invalid fixtures for every
-  validation category.
-- Keep validation as a test-time and content-authoring gate; do not change runtime game flow yet.
-- Likely files: `content-package.validation.ts`, its spec, `demo-content-packages.spec.ts`, and
-  `docs/CONTENT_PACKAGES.md`.
-- Validate with `npm run test:ci`, `npm run build`, and `npx prettier . --check`.
+### Milestone 5 — Lock the revised roadmap
 
-### Milestone 3 — Focused accessibility pass
-
-- Branch: `codex/game-accessibility-pass`
-- Give answer collections group semantics and selected buttons `aria-pressed`.
-- Expose game progress as a proper progress bar with current, minimum, and maximum values.
-- Move focus to the new question heading after advancing and to the result heading after
-  completion; do not steal focus when feedback is already announced by the live region.
-- Add component tests for disabled and selected answer states and relevant ARIA attributes.
-- Preserve the existing visual design and reduced-motion behavior.
-- Likely files: game-player page files, the three board templates, and `game-boards.spec.ts`.
-- Validate with `npm run check`, a keyboard-only play-through of all three games, manual checks at
-  narrow and desktop widths, and confirmation that feedback, audio failure, and completion states
-  are announced coherently.
-
-### Milestone 4 — MVP readiness pass
-
-- Branch: `codex/mvp-readiness-pass`
-- Create `docs/MVP_READINESS.md` as a concise verification record.
-- Run `npm run check` and `git diff --check`.
-- Manually verify `/`, `/igre`, one package of each game type, an invalid package route, and
-  `/napredak`.
-- Verify keyboard-only game completion, narrow and desktop layouts, Speech Synthesis fallback,
-  microphone success/denial/unsupported states where available, local progress persistence, and
-  progress deletion.
-- Record browser, viewport, result, and any reproducible blocker. Fix only confirmed MVP blockers;
-  keep unrelated polish in later milestones.
-- Do not add packaged WAV audio. Speech Synthesis is the supported MVP spoken-prompt path.
-- Likely files: `docs/MVP_READINESS.md` and only source/test files required by confirmed blockers.
-- Validate any fix with focused regression coverage plus `npm run check`.
-
-## 5. Risks and unknowns
-
-- Structural validation cannot establish phonetic, age, or clinical correctness; a Croatian speech
-  therapist remains required.
-- Croatian Unicode must be read and written as UTF-8; terminal mojibake must not trigger bulk text
-  replacement.
-- Speech Synthesis and MediaRecorder behavior remains browser-dependent.
-- Accessibility tests can prevent regressions but do not replace manual keyboard and screen-reader
-  checks.
-- Curated media requires confirmed licensing and professional review. Packaged audio is deferred and
-  does not block the technical MVP.
-
-## 6. Testing and validation strategy
-
-Every milestone must pass its local validation before review. Before merging the phase, run:
+- Branch: `codex/revise-thesis-prototype-plan`
+- Replace the outdated post-MVP roadmap.
+- Update `AI_HANDOFF.md` and `README.md` with the thesis-prototype boundary.
+- Preserve the five approved concepts in `docs/design/`.
+- State explicitly that only fictional/test profiles and recordings may be used.
+- Validate with:
 
 ```bash
-npm run check
+npx prettier DEVELOPMENT_PLAN.md AI_HANDOFF.md README.md --check
 git diff --check
 ```
 
-Manually smoke-test `/`, `/igre`, one package of each game type, an invalid package route,
-`/napredak`, microphone denial, and audio fallback.
+### Milestone 6 — Soft-toy visual asset pack
 
-## 7. Recommended first implementation task
+- Branch: `codex/soft-toy-theme-assets`
+- Generate optimized transparent WebP artwork for food, home, nature, animals, transport, clothing,
+  school, and toys.
+- Add four restrained decorative edge assets for catalog and gameplay backgrounds.
+- Hide or simplify decorative assets on narrow screens.
+- Update `docs/MEDIA_PROVENANCE.md`.
+- Do not add packaged spoken audio.
+- Validate asset dimensions, transparency, file size, narrow-screen behavior, Prettier, and
+  `git diff --check`.
 
-Complete the human-device checks recorded in `docs/MVP_READINESS.md`, beginning with a real
-keyboard-only play-through and microphone allow/deny/replay verification. Then obtain professional
-review of the priority Croatian content before expanding content or infrastructure.
+### Milestone 7 — Catalog filtering and game-tile redesign
 
-## 8. Things to avoid
+- Branch: `codex/catalog-game-tile-redesign`
+- Convert the three game-type introductions into accessible toggle buttons with `aria-pressed`.
+- Clicking the selected type again clears the filter.
+- Remove the `Igra` select and retain `Glas`, `Tema`, and `Razina`.
+- Use consistent type colors:
+  - `listen-and-decide`: warm yellow/coral;
+  - `catch-the-sound`: mint;
+  - `sound-position`: sky blue.
+- Give tiles rounded edges, restrained 3D depth, hover/focus lift, pressed state, and
+  reduced-motion support.
+- Keep only theme artwork, title, and subtitle in the tile body.
+- Make the tile body the start-game link.
+- Add a separate top-right information button. Click, tap, or keyboard activation opens one
+  popover containing target sound/pair, difficulty, and the game-type explanation. Escape, outside
+  click, or a second activation closes it.
+- Add optional `catalogImage` to `ContentPackage`; update validation and demo packages.
+- Add focused tests for toggle filtering, clearing, popover accessibility, card links, and empty
+  results.
+- Validate at desktop and 390 px widths plus `npm run check` and `git diff --check`.
 
-- No architecture rewrite, backend, accounts, analytics, cloud ASR, or external data transfer.
-- No new dependencies during these milestones.
-- No hard-coded sound, theme, pair, or question logic.
-- No clinical claims or “validated” labels before documented professional review.
-- No packaged audio, bulk image replacement, or progress-storage schema change during the readiness
-  pass.
-- Do not commit generated build output.
+### Milestone 8 — Recording UX and per-question reset
 
-## 9. Blocking questions
+- Branch: `codex/game-recording-ux`
+- Replace the collapsed microphone disclosure with the approved visible recording panel.
+- Place it after the prompt/media and before the answers in mobile reading order.
+- Keep recording optional and independent from game scoring or progression.
+- Pass a required question/reset identifier to the microphone component.
+- Clear the current local recording and return to idle whenever the question changes.
+- Support idle, permission request, recording, stopped, replay, delete, saving, saved, and retry
+  states.
+- Emit a typed `RecordedAttempt` containing the blob, MIME type, duration, question ID, and attempt
+  number for later backend integration.
+- Never show transcript or `podudarnost` on the child gameplay screen.
+- Validate component states, question reset, cleanup, keyboard/touch behavior, responsive layout,
+  `npm run check`, and `git diff --check`.
 
-None. Media selection, licensing, and professional content review are intentionally deferred and do
-not block the first three milestones.
+### Milestone 9 — Local backend, demo login, and child profiles
 
-## 10. Assumptions
+- Branch: `codex/prototype-backend-foundation`
+- Add a separate TypeScript Node/Express service under `server/` using SQLite.
+- Store the database and recordings under ignored `server/runtime/`.
+- Seed these fictional demo accounts:
+  - `parent@artikulino.test` / `ParentDemo123!`;
+  - `therapist@artikulino.test` / `TherapistDemo123!`.
+- Hash seeded passwords and issue random eight-hour bearer sessions stored in SQLite. Store the
+  browser token in `sessionStorage`.
+- Keep home and catalog public. Starting a game requires the parent login and a selected demo
+  child. Therapist pages require the therapist role.
+- Demo child profiles contain only an ID and display name.
+- Therapist accounts may view all demo profiles in this local prototype.
+- Add an always-visible notice that the system is a non-production thesis prototype for fictional
+  test data only.
+- Provide a reset-and-reseed command.
+- Validate authentication, roles, profile CRUD, expiry, reset behavior, build, server tests, and
+  `git diff --check`.
 
-- Croatian remains the UI and documentation language where user-facing copy is involved.
-- Existing public content-package and progress interfaces remain compatible.
-- The development-plan commit is delivered separately before application implementation begins.
+### Milestone 10 — Session and recording persistence
+
+- Branch: `codex/prototype-session-recordings`
+- Add SQLite tables for users, authentication sessions, demo children, game sessions, recording
+  attempts, and therapist reviews.
+- Save game sessions under the selected demo child.
+- Upload every stopped recording as multipart audio; preserve multiple attempts per question.
+- Limit recordings to 15 seconds and 10 MB. Reject empty or unsupported files with Croatian error
+  text.
+- Store audio on local disk and metadata in SQLite.
+- Keep uploads asynchronous and independent from points or question progression.
+- If upload fails, retain the local recording long enough to retry or delete it.
+- Deleting a session or profile must cascade through database records and physical audio files.
+- The reset command clears runtime data and reseeds demo accounts.
+- Do not migrate existing `localStorage` progress. Authenticated progress reads the backend; its
+  delete action also clears the old local key.
+- Validate upload limits, multiple attempts, failure/retry, deletion, filesystem cleanup, and role
+  restrictions.
+
+### Milestone 11 — Local Croatian transcription and podudarnost
+
+- Branch: `codex/local-croatian-transcription`
+- Add a local Python FastAPI worker under `transcription/`.
+- Use `faster-whisper` with model `small`, language `hr`, CPU device, and `int8` compute. Permit an
+  environment override.
+- Document Python 3.11/3.12, FFmpeg, virtual-environment setup, and initial model download.
+- The browser never calls the worker directly. Express submits stored demo audio to localhost.
+- Process one transcription at a time on the CPU-only development machine.
+- Track attempts as `PENDING`, `COMPLETED`, or `FAILED`. Failure must not remove audio or invalidate
+  the game session.
+- Calculate integer `podudarnost` using normalized Levenshtein similarity:
+  - lowercase;
+  - trim and collapse whitespace;
+  - remove punctuation;
+  - preserve Croatian diacritics;
+  - exact match is 100;
+  - an empty transcript is 0.
+- Store expected text, transcript, percentage, and transcription status.
+- Label the value `Podudarnost teksta`, never an error or pronunciation score.
+- Validate normalization, similarity, queue behavior, worker failures, model-health reporting, and
+  a fictional adult-generated Croatian smoke sample.
+
+### Milestone 12 — Parent progress and privacy update
+
+- Branch: `codex/parent-prototype-progress`
+- Load progress for the active demo child from the backend.
+- Show sessions and attempts with expected text, transcript, `podudarnost`, transcription state,
+  playback, therapist review state, and the full therapist comment.
+- Keep automated results adult-facing.
+- Replace the MVP privacy strip with concise prototype wording:
+  - results and recordings are stored on the local demonstration server;
+  - only fictional test data may be used;
+  - data can be deleted.
+- Provide session deletion and profile/data deletion with confirmation.
+- Validate empty, loading, success, partial transcription, error, feedback, and deletion states.
+
+### Milestone 13 — Therapist review interface
+
+- Branch: `codex/therapist-recording-review`
+- Add `/pregled-terapeuta`, guarded by therapist role.
+- Implement the approved calm master-detail view for demo children, completed sessions, and all
+  attempts.
+- Stream audio through an authenticated endpoint without exposing filesystem paths.
+- Support `NOT_REVIEWED`, `LOOKS_GOOD`, and `PRACTICE_AGAIN`.
+- Allow an optional therapist comment up to 400 characters and store reviewer/timestamp.
+- Show the complete saved review to the parent.
+- Do not add exports, downloads, settings, age data, analytics, or clinical conclusions.
+- Validate authorization, playback, all review states, comment limits, persistence, parent
+  visibility, responsive layout, and accessibility.
+
+### Milestone 14 — Integrated thesis-prototype QA
+
+- Branch: `codex/thesis-prototype-qa`
+- Add one repeatable quality command covering Angular, Express, and Python tests.
+- Verify the complete parent flow:
+  login → child profile → game → multiple recordings → completion → progress.
+- Verify the complete therapist flow:
+  login → session → playback → transcript/match → rating/comment → parent visibility.
+- Verify unavailable ASR, failed ASR, denied microphone, invalid audio, deletion, expired login,
+  and role restrictions.
+- Perform visual fidelity checks against the approved concepts at 1440 × 1000 and 390 × 844.
+- Use fictional adult-generated Croatian recordings only.
+- Document IntelliJ run configurations for Angular, Express, and the Python worker.
+- Update the handoff with credentials, reset procedure, limitations, and final validation results.
+
+## 6. Interfaces and API
+
+Frontend contracts should include:
+
+- `DemoUser`;
+- `DemoChildProfile`;
+- `PrototypeGameSession`;
+- `RecordedAttempt`;
+- `RecordingAttempt`;
+- `TranscriptionStatus`;
+- `TherapistReviewStatus`;
+- `TherapistReview`.
+
+Minimum local API:
+
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET|POST|DELETE /api/children`
+- `GET|POST|DELETE /api/sessions`
+- `POST /api/sessions/:id/complete`
+- `POST /api/sessions/:id/attempts`
+- `DELETE /api/attempts/:id`
+- `GET /api/attempts/:id/audio`
+- `GET /api/therapist/sessions`
+- `GET /api/therapist/sessions/:id`
+- `PUT /api/attempts/:id/review`
+- `GET /api/health`
+
+Recording upload receives question ID, attempt number, expected text, MIME type, and audio. API
+responses must never expose physical audio paths.
+
+## 7. Validation strategy
+
+Until all services exist, each milestone runs the checks applicable to its scope. The complete
+prototype gate will be:
+
+```bash
+npm run check
+npm --prefix server test
+python -m pytest transcription
+git diff --check
+```
+
+Milestone 14 consolidates them as `npm run prototype:check`.
+
+## 8. Explicit boundaries
+
+- Localhost demonstration only; no public deployment or production-security claim.
+- Use only fictional profiles and fictional/adult-generated recordings.
+- No diagnosis, phoneme-level error detection, clinical scoring, or automated therapist conclusion.
+- `Podudarnost` never affects game points.
+- No external ASR provider or cloud storage.
+- No packaged WAV prompts, analytics, email, password recovery, exports, downloads, medical data,
+  or account administration.
+- Runtime databases, session tokens, models, and recordings remain Git-ignored.
+- Preserve Angular standalone components, lazy routes, content packages, and shared game
+  session/scoring services.
+
+## 9. Risks
+
+- The development machine currently has no Python installation; Milestone 11 must document and
+  verify Python and FFmpeg setup before local Whisper validation.
+- CPU-only `small` Whisper inference may be slow; recordings remain short and transcription is
+  serialized.
+- Generated visual assets need consistent art direction, transparency validation, optimization,
+  and provenance.
+- A transcript match does not establish articulation quality.
+- Prototype credentials and local storage are intentionally unsuitable for production.
+
+## 10. Things to avoid
+
+- Do not merge `codex/priority-food-audio`.
+- Do not use real children’s names, profiles, or recordings.
+- Do not send recordings outside localhost.
+- Do not expose database paths, recording paths, passwords, or session tokens in UI or logs.
+- Do not let recording, transcription, or therapist feedback change game scoring.
+- Do not begin a later milestone before its dependency is merged and validated.

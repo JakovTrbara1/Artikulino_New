@@ -2,7 +2,11 @@
 
 ## Project Purpose
 
-Artikulino is an Angular MVP for kid-friendly speech and articulation practice for preschool and school-age children. It supports children through gamified exercises, while giving parents and speech therapists a simple local view of progress. The app is a practice aid only; it does not diagnose, clinically evaluate speech, or replace a speech therapist.
+Artikulino is an Angular application for kid-friendly speech and articulation practice for
+preschool and school-age children. The completed frontend-only MVP supports gamified exercises and
+a local progress view. The approved next phase is a localhost-only master’s-thesis prototype using
+fictional profiles and recordings. The app remains a practice and research prototype only; it does
+not diagnose, clinically evaluate speech, or replace a speech therapist.
 
 ## Current Tech Stack
 
@@ -99,7 +103,13 @@ npx prettier . --check
 - `docs/ASR_BOUNDARY.md`: privacy and architecture gates for any future ASR adapter.
 - `docs/PRIVACY_AND_CONSENT.md`: data inventory, required decisions, and ASR release checklist.
 - `docs/MVP_READINESS.md`: dated MVP smoke-test results and remaining human-device checks.
+- `DEVELOPMENT_PLAN.md`: approved thesis-prototype roadmap and milestone boundaries.
 - `docs/design/artikulino-game-concept.png`: visual concept reference.
+- `docs/design/catalog-soft-toy-desktop.png`: approved desktop catalog direction.
+- `docs/design/catalog-soft-toy-mobile.png`: approved mobile catalog direction.
+- `docs/design/gameplay-recording-desktop.png`: approved desktop gameplay/recording direction.
+- `docs/design/gameplay-recording-mobile.png`: approved mobile gameplay/recording direction.
+- `docs/design/therapist-review-desktop.png`: approved therapist-review direction.
 
 ## Architecture Overview
 
@@ -125,15 +135,22 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Keep progress local until privacy, accounts, consent, and backend requirements are defined.
 - Keep recordings outside ASR by default; a provider adapter may be injected only after privacy and
   consent requirements are approved.
+- For the approved thesis-prototype phase only, a local Express/SQLite service and local
+  faster-whisper worker may process fictional/adult-generated recordings on localhost.
+- Label normalized expected-text versus transcript similarity only as `Podudarnost teksta`. It must
+  not affect points or be presented as pronunciation quality, an error score, or a clinical result.
+- The thesis prototype may use predefined demo parent/therapist credentials and fictional child
+  display names. It must not claim production security or accept real children’s data.
 - Prefer small, explicit services over a global state library.
 - Preserve Croatian UI/content wording.
 - Keep the interface visually friendly for children while the progress page remains clearer and calmer for adults.
 
 ## Known Bugs, Risks, and Unfinished Work
 
-- No backend, authentication, user profiles, or device sync.
-- No ASR provider or automatic articulation error detection; the service boundary remains
-  intentionally disabled.
+- No backend, authentication, or demo profiles are implemented yet; they begin in Milestone 9.
+- No ASR provider or automatic articulation error detection is implemented. The current service
+  boundary remains disabled. A local, non-clinical transcript-matching worker is approved only for
+  the later thesis-prototype milestone.
 - No approved controller, legal basis, guardian verification, ASR provider, exact provider
   retention, or consent flow. Requirements are documented, but all release gates remain open.
 - Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
@@ -145,6 +162,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - The experimental `codex/priority-food-audio` branch contains unreviewed Windows OneCore-generated
   WAV files and must not be merged. Packaged audio is deferred and does not block the MVP.
 - MediaRecorder availability and output format vary by browser.
+- Python is not installed on the current development machine. Local Whisper work requires
+  documented Python 3.11/3.12 and FFmpeg setup.
 - Audio and image fields are supported, but only the priority food package has curated local
   illustrations; most demo packages still use fallback/generated or simple visual content.
 - ESLint is not configured; the agreed MVP quality gate is build, tests, and Prettier.
@@ -152,26 +171,25 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Complete the remaining human-device checks in `docs/MVP_READINESS.md`: keyboard-only completion,
-   microphone allow/deny/replay/removal, Croatian voice quality, and a short screen-reader pass.
-2. Have a Croatian speech therapist review priority demo packages, then record the reviewer and
-   date before changing their status to `PROFESSIONALLY_REVIEWED`.
-3. Expand curated local imagery through `image.src`, one priority package at a time, while updating
-   the provenance log. Keep packaged audio deferred.
-4. Assign an owner and obtain product, legal/privacy, security, and professional review of
-   `docs/PRIVACY_AND_CONSENT.md`; resolve every open release gate.
-5. Only after explicit approval, split consent UI, token service, and provider adapter into separate
-   milestones without direct SDK calls from components or automatic pronunciation scoring.
+1. Merge the revised thesis-prototype roadmap and approved concepts.
+2. Create the soft-toy theme/background asset pack with provenance.
+3. Implement the catalog filter/tile redesign.
+4. Implement the visible per-question recording panel and reset behavior.
+5. Continue through backend, local transcription, parent progress, therapist review, and integrated
+   QA exactly in the dependency order documented in `DEVELOPMENT_PLAN.md`.
 
 ## Do Not Change Without Asking
 
 - Do not rewrite the content-package-first architecture.
 - Do not hard-code game logic to a single sound, pair, theme, or fixed question list.
-- Do not add backend persistence, accounts, analytics, or cloud ASR without explicit approval.
+- Do not add production accounts, analytics, cloud ASR, public hosting, or external data transfer.
+  The only approved backend/account scope is the localhost thesis prototype in
+  `DEVELOPMENT_PLAN.md`.
 - Do not add dependencies unless the benefit is clear and documented.
 - Do not replace standalone components or lazy-loaded feature pages with a different structure.
 - Do not remove Croatian text/content or change the app's target audience without direction.
 - Do not make clinical or diagnostic claims in UI copy.
+- Do not use real children’s profiles or recordings in the thesis prototype.
 
 ## Assumptions to Preserve
 
