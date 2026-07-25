@@ -169,3 +169,34 @@ Globalni design tokeni, reset i zajednički stilovi nalaze se u `src/main.css`. 
   poticaji mogu se zamijeniti istim postupkom bez promjene logike igre.
 
 Vizualni koncept primarnog ekrana nalazi se u `docs/design/artikulino-game-concept.png`.
+
+## Odobrena sljedeća faza: prototip za diplomski rad
+
+Frontend-only MVP je dovršen. Sljedeća faza razvija se kao lokalni demonstracijski prototip za
+diplomski rad, prema redoslijedu u [`DEVELOPMENT_PLAN.md`](DEVELOPMENT_PLAN.md).
+
+Planirana faza uključuje:
+
+- razigraniji katalog i ekran igre prema odobrenim soft-toy 3D konceptima;
+- unaprijed definirane testne račune roditelja i terapeuta;
+- izmišljene dječje profile koji sadrže samo prikazno ime;
+- lokalni Express/SQLite servis za testne sesije i snimke;
+- lokalni Croatian Whisper prijepis bez slanja snimki u oblak;
+- prikaz očekivanog teksta, prijepisa i tekstualne `Podudarnosti`;
+- lokalni terapeutski pregled snimki s jednostavnim osvrtom i komentarom.
+
+Ova faza nije produkcijski ni klinički sustav:
+
+- smiju se koristiti samo izmišljeni profili i izmišljene ili odrasle testne snimke;
+- `Podudarnost` uspoređuje očekivani i prepoznati tekst te ne procjenjuje kvalitetu izgovora;
+- nema dijagnoze, automatske logopedske ocjene ni kliničkog zaključka;
+- nema javne objave, vanjskog ASR pružatelja, pohrane u oblaku ni stvarnih korisničkih podataka.
+
+Odobrene vizualne reference nalaze se u `docs/design/`:
+
+- `catalog-soft-toy-desktop.png` i `catalog-soft-toy-mobile.png`;
+- `gameplay-recording-desktop.png` i `gameplay-recording-mobile.png`;
+- `therapist-review-desktop.png`.
+
+Navedene funkcije još nisu implementirane. Trenutačno ponašanje aplikacije ostaje opisano u
+prethodnim odjeljcima ovog dokumenta.
