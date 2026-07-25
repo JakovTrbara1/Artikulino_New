@@ -72,6 +72,9 @@ npx prettier . --check
 - Explicit professional-review metadata; all current demo packages are marked `NOT_REVIEWED`.
 - Four optimized local food illustrations in the priority “Što jedemo?” package, with retained
   emoji fallbacks and documented provenance.
+- Eight optimized transparent soft-toy theme illustrations plus four restrained catalog/gameplay
+  edge decorations. The decorations are hidden on narrow screens; theme-to-package mapping is
+  reserved for the catalog redesign milestone.
 - Provider-neutral `SPEECH_TRANSCRIPTION` boundary with a default disabled adapter, no network
   transfer, and no pronunciation scoring.
 - Documented privacy, consent, retention, account, vendor, and security requirements that must be
@@ -98,6 +101,8 @@ npx prettier . --check
 - `src/app/features/progress/`: local parent/progress view.
 - `src/main.css`: global styles, tokens, colors, typography, reset.
 - `public/assets/games/`: generated game assets.
+- `public/assets/games/themes/`: transparent soft-toy artwork for all eight supported themes.
+- `public/assets/games/decorations/`: decorative catalog/gameplay edge artwork.
 - `docs/CONTENT_PACKAGES.md`: guide for adding new packages.
 - `docs/MEDIA_PROVENANCE.md`: source and processing log for project media.
 - `docs/ASR_BOUNDARY.md`: privacy and architecture gates for any future ASR adapter.
@@ -164,18 +169,17 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - MediaRecorder availability and output format vary by browser.
 - Python is not installed on the current development machine. Local Whisper work requires
   documented Python 3.11/3.12 and FFmpeg setup.
-- Audio and image fields are supported, but only the priority food package has curated local
-  illustrations; most demo packages still use fallback/generated or simple visual content.
+- All eight catalog themes now have curated local soft-toy illustrations, but they are not yet
+  connected to content packages. That mapping belongs to Milestone 7.
 - ESLint is not configured; the agreed MVP quality gate is build, tests, and Prettier.
 - README text may display mojibake in some terminal code pages, although the source should be treated as UTF-8 Croatian text.
 
 ## Exact Next Recommended Tasks
 
-1. Merge the revised thesis-prototype roadmap and approved concepts.
-2. Create the soft-toy theme/background asset pack with provenance.
-3. Implement the catalog filter/tile redesign.
-4. Implement the visible per-question recording panel and reset behavior.
-5. Continue through backend, local transcription, parent progress, therapist review, and integrated
+1. Merge the soft-toy theme/background asset pack with provenance.
+2. Implement the catalog filter/tile redesign and connect theme assets through `catalogImage`.
+3. Implement the visible per-question recording panel and reset behavior.
+4. Continue through backend, local transcription, parent progress, therapist review, and integrated
    QA exactly in the dependency order documented in `DEVELOPMENT_PLAN.md`.
 
 ## Do Not Change Without Asking

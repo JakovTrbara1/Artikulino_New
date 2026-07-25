@@ -1,3 +1,26 @@
+.catalog-shell {
+  position: relative;
+}
+
+.catalog-shell > :not(.edge-decoration) {
+  position: relative;
+  z-index: 1;
+}
+
+.edge-decoration {
+  width: clamp(5rem, 8vw, 7rem);
+}
+
+.edge-decoration--left {
+  top: 9rem;
+  left: clamp(-6rem, -5vw, -3.5rem);
+}
+
+.edge-decoration--right {
+  top: 18rem;
+  right: clamp(-6rem, -5vw, -3.5rem);
+}
+
 .catalog-intro {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.75fr);

@@ -198,5 +198,10 @@ Odobrene vizualne reference nalaze se u `docs/design/`:
 - `gameplay-recording-desktop.png` i `gameplay-recording-mobile.png`;
 - `therapist-review-desktop.png`.
 
+Optimizirane transparentne soft-toy ilustracije za osam tema nalaze se u
+`public/assets/games/themes/`, a nenametljive rubne dekoracije u
+`public/assets/games/decorations/`. Povezivanje tematskih ilustracija s karticama igara dio je
+sljedeće etape redizajna kataloga.
+
 Navedene funkcije još nisu implementirane. Trenutačno ponašanje aplikacije ostaje opisano u
 prethodnim odjeljcima ovog dokumenta.

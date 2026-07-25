@@ -36,3 +36,39 @@ sadržaja, ali nije pravno mišljenje o licenciranju.
 - Tekst i primjeri podataka prikazani u konceptima nisu izvor produkcijskog sadržaja. Stvarno
   sučelje mora koristiti code-native hrvatski tekst iz aplikacije i izmišljene testne podatke.
 - Koncepti nisu namijenjeni izravnom prikazu kao statične snimke sučelja.
+
+## Soft-toy tematske ilustracije
+
+| Datoteka                                    | Tema      | Podrijetlo                                      |
+| ------------------------------------------- | --------- | ----------------------------------------------- |
+| `public/assets/games/themes/food.webp`      | Hrana     | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/themes/home.webp`      | Kuća      | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/themes/nature.webp`    | Priroda   | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/themes/animals.webp`   | Životinje | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/themes/transport.webp` | Prijevoz  | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/themes/clothing.webp`  | Odjeća    | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/themes/school.webp`    | Škola     | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/themes/toys.webp`      | Igračke   | Generirano za Artikulino alatom OpenAI imagegen |
+
+## Dekoracije rubova
+
+| Datoteka                                              | Namjena                | Podrijetlo                                      |
+| ----------------------------------------------------- | ---------------------- | ----------------------------------------------- |
+| `public/assets/games/decorations/catalog-left.webp`   | Lijevi rub kataloga    | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/decorations/catalog-right.webp`  | Desni rub kataloga     | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/decorations/gameplay-left.webp`  | Lijevi rub ekrana igre | Generirano za Artikulino alatom OpenAI imagegen |
+| `public/assets/games/decorations/gameplay-right.webp` | Desni rub ekrana igre  | Generirano za Artikulino alatom OpenAI imagegen |
+
+- Datum izrade: 2026-07-25.
+- Svaka je ilustracija generirana zasebnim pozivom ugrađenom alatu OpenAI imagegen. Odobreni
+  koncept kataloga ili igre korišten je samo kao stilska referenca.
+- Zajednički opis: kompaktna dječja soft-toy 3D ilustracija, zaobljeni oblici, meko raspršeno
+  svjetlo, bez teksta, logotipa, sučelja i vodenog žiga.
+- Izvori su generirani na jednobojnoj chroma-key pozadini. Pozadina je uklonjena lokalnim
+  `remove_chroma_key.py` alatom uz soft matte i despill obradu.
+- Završne datoteke centrirane su na prozirno platno veličine 512 × 512 piksela te spremljene kao
+  WebP kvalitete 82. Nijedna završna datoteka nije veća od 50 KB.
+- Dekoracije su označene kao prezentacijske (`alt=""`, `aria-hidden="true`) i skrivene na užim
+  prikazima kako ne bi ometale sadržaj.
+- Izvorni PNG zapisi i privremene datoteke obrade nisu dio repozitorija. Nisu dodani govorni ni
+  drugi audiozapisi.

@@ -81,6 +81,14 @@ svg {
   max-width: 100%;
 }
 
+.edge-decoration {
+  position: absolute;
+  z-index: 0;
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 0.65rem 0.75rem rgb(13 49 95 / 12%));
+}
+
 h1,
 h2,
 h3,
@@ -225,6 +233,12 @@ p {
 
   .surface {
     border-radius: var(--radius-md);
+  }
+}
+
+@media (max-width: 58rem) {
+  .edge-decoration {
+    display: none;
   }
 }
 
