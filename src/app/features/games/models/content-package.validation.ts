@@ -1,4 +1,5 @@
 import {
+  ContentImage,
   ContentPackage,
   ProfessionalReview,
   ScoringRules,
@@ -19,6 +20,7 @@ export type ContentValidationIssueCode =
   | 'unsupported-sound'
   | 'invalid-sound-pair'
   | 'invalid-scoring'
+  | 'missing-image-source'
   | 'missing-image-alt'
   | 'invalid-target-occurrence'
   | 'missing-professional-review'
@@ -74,6 +76,14 @@ export function validateContentPackages(
       'Ciljni glas',
     );
     validateRequiredText(issues, contentPackage.theme, `${packagePath}.theme`, 'Tema paketa');
+    if (contentPackage.catalogImage) {
+      validateImage(
+        issues,
+        contentPackage.catalogImage,
+        `${packagePath}.catalogImage`,
+        'Ilustracija kataloga',
+      );
+    }
 
     if (contentPackage.id.trim()) {
       if (packageIds.has(contentPackage.id)) {
@@ -154,13 +164,8 @@ export function validateContentPackages(
         validateSound(issues, question.targetSound, `${questionPath}.targetSound`);
       }
 
-      if (question.image && !question.image.alt.trim()) {
-        addIssue(
-          issues,
-          'missing-image-alt',
-          `${questionPath}.image.alt`,
-          'Slika pitanja mora imati smislen alternativni opis.',
-        );
+      if (question.image) {
+        validateImage(issues, question.image, `${questionPath}.image`, 'Slika pitanja');
       }
 
       if (question.answers.length < 2) {
@@ -223,6 +228,31 @@ export function validateContentPackages(
   });
 
   return issues;
+}
+
+function validateImage(
+  issues: ContentValidationIssue[],
+  image: ContentImage,
+  imagePath: string,
+  label: string,
+): void {
+  if (!image.src?.trim() && !image.emoji?.trim()) {
+    addIssue(
+      issues,
+      'missing-image-source',
+      imagePath,
+      `${label} mora sadržavati putanju ili zamjenski emoji.`,
+    );
+  }
+
+  if (!image.alt.trim()) {
+    addIssue(
+      issues,
+      'missing-image-alt',
+      `${imagePath}.alt`,
+      `${label} mora imati smislen alternativni opis.`,
+    );
+  }
 }
 
 function validateRequiredText(

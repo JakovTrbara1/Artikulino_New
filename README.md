@@ -29,7 +29,7 @@ provjera bez dodavanja nove ovisnosti.
 ## Rute
 
 - `/` – naslovnica i najkraći put do prve igre
-- `/igre` – katalog i filtri sadržajnih paketa
+- `/igre` – katalog s preklopnim vrstama igara i filtrima sadržajnih paketa
 - `/igre/:packageId` – zajednički game engine s prikazom odabrane igre
 - `/napredak` – lokalni pregled aktivnosti za roditelje
 
@@ -57,7 +57,7 @@ Novi paket dodaje se kao novi `ContentPackage` objekt. Nije potrebno stvarati no
 - ciljni i opcionalni kontrastni glas;
 - par glasova, temu i razinu;
 - tekst zadatka i tekst koji se izgovara;
-- opcionalni `audioSrc` i sliku;
+- opcionalni `audioSrc`, ilustraciju pitanja i `catalogImage` za karticu kataloga;
 - ponuđene i točne odgovore, uključujući više točnih odgovora;
 - objašnjenje i sva pravila bodovanja.
 
@@ -74,6 +74,10 @@ const packageExample: ContentPackage = {
   targetSound: 'C',
   theme: 'odjeća',
   difficulty: 'EASY',
+  catalogImage: {
+    src: '/assets/games/themes/clothing.webp',
+    alt: 'Mekana 3D ilustracija odjeće',
+  },
   professionalReview: { status: 'NOT_REVIEWED' },
   scoring: {
     basePoints: 10,
@@ -165,7 +169,8 @@ Globalni design tokeni, reset i zajednički stilovi nalaze se u `src/main.css`. 
   provjere nalaze se u `docs/CONTENT_PACKAGES.md`.
 - Speech Synthesis glas i MediaRecorder format ovise o pregledniku i operacijskom sustavu.
 - Zapakirani audiozapisi nisu dio MVP-a; govorni poticaji trenutačno koriste Speech Synthesis.
-- Paket „Što jedemo?” koristi optimizirane lokalne ilustracije putem `image.src`; ostali emoji
+- Sve kartice kataloga koriste optimizirane lokalne tematske ilustracije putem `catalogImage`.
+  Paket „Što jedemo?” dodatno koristi lokalne ilustracije pitanja putem `image.src`; ostali emoji
   poticaji mogu se zamijeniti istim postupkom bez promjene logike igre.
 
 Vizualni koncept primarnog ekrana nalazi se u `docs/design/artikulino-game-concept.png`.
@@ -200,8 +205,8 @@ Odobrene vizualne reference nalaze se u `docs/design/`:
 
 Optimizirane transparentne soft-toy ilustracije za osam tema nalaze se u
 `public/assets/games/themes/`, a nenametljive rubne dekoracije u
-`public/assets/games/decorations/`. Povezivanje tematskih ilustracija s karticama igara dio je
-sljedeće etape redizajna kataloga.
+`public/assets/games/decorations/`. Katalog povezuje tematske ilustracije s karticama, boji ih prema
+vrsti igre i koristi tri pristupačna preklopna gumba kao prvi filtar.
 
-Navedene funkcije još nisu implementirane. Trenutačno ponašanje aplikacije ostaje opisano u
-prethodnim odjeljcima ovog dokumenta.
+Backend, prijepis, testni računi i terapeutski pregled još nisu implementirani. Trenutačno
+ponašanje aplikacije ostaje opisano u prethodnim odjeljcima ovog dokumenta.
