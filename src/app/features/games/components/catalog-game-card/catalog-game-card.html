@@ -1,0 +1,62 @@
+@if (contentPackage(); as package) {
+  <article
+    class="package-card"
+    [attr.data-type]="package.gameType"
+    [attr.data-package-id]="package.id"
+  >
+    <button
+      class="info-button"
+      type="button"
+      [attr.aria-label]="'Informacije o igri ' + package.name"
+      [attr.aria-expanded]="infoOpen()"
+      [attr.aria-controls]="'package-info-' + package.id"
+      (click)="toggleInfo($event)"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v6M12 7.5v.2" />
+      </svg>
+    </button>
+
+    @if (infoOpen()) {
+      <div
+        class="info-popover"
+        [id]="'package-info-' + package.id"
+        role="region"
+        [attr.aria-labelledby]="'package-info-title-' + package.id"
+        (click)="keepInfoOpen($event)"
+      >
+        <h3 [id]="'package-info-title-' + package.id">Vježba: {{ practiceTarget(package) }}</h3>
+        <dl>
+          <div>
+            <dt>Ciljni glas</dt>
+            <dd>{{ practiceTarget(package) }}</dd>
+          </div>
+          <div>
+            <dt>Razina</dt>
+            <dd>{{ difficultyLabels[package.difficulty] }}</dd>
+          </div>
+        </dl>
+        <p>{{ gameTypeDescriptions[package.gameType] }}</p>
+      </div>
+    }
+
+    <a
+      class="package-link"
+      [routerLink]="['/igre', package.id]"
+      [attr.aria-label]="'Pokreni igru ' + package.name"
+    >
+      <span class="package-art">
+        @if (package.catalogImage?.src; as imageSrc) {
+          <img [src]="imageSrc" [alt]="package.catalogImage?.alt ?? ''" width="512" height="512" />
+        } @else {
+          <span class="package-art-fallback" aria-hidden="true">🎲</span>
+        }
+      </span>
+      <span class="package-copy">
+        <h3>{{ package.name }}</h3>
+        <span>{{ package.description }}</span>
+      </span>
+    </a>
+  </article>
+}

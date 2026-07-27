@@ -43,6 +43,24 @@ describe('demonstration content packages', () => {
     }
   });
 
+  it('uses the optimized catalog illustration for every supported theme', () => {
+    const expectedSources = new Map([
+      ['hrana', '/assets/games/themes/food.webp'],
+      ['kuća', '/assets/games/themes/home.webp'],
+      ['priroda', '/assets/games/themes/nature.webp'],
+      ['životinje', '/assets/games/themes/animals.webp'],
+      ['prijevoz', '/assets/games/themes/transport.webp'],
+      ['odjeća', '/assets/games/themes/clothing.webp'],
+      ['škola', '/assets/games/themes/school.webp'],
+      ['igračke', '/assets/games/themes/toys.webp'],
+    ]);
+
+    for (const contentPackage of DEMO_CONTENT_PACKAGES) {
+      expect(contentPackage.catalogImage?.src).toBe(expectedSources.get(contentPackage.theme));
+      expect(contentPackage.catalogImage?.alt.trim()).toBeTruthy();
+    }
+  });
+
   it('uses optimized local images with emoji fallbacks for the priority food package', () => {
     const foodPackage = DEMO_CONTENT_PACKAGES.find(
       (contentPackage) => contentPackage.id === 'slusaj-hrana-s-lagano',

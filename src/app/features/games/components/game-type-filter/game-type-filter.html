@@ -1,0 +1,55 @@
+<section class="game-type-section" aria-labelledby="game-types-title">
+  <h2 id="game-types-title" class="sr-only">Vrste igara</h2>
+  <div class="game-types">
+    @for (type of gameTypes; track type) {
+      <button
+        class="game-type-toggle"
+        type="button"
+        [class.is-selected]="selectedType() === type"
+        [attr.data-type]="type"
+        [attr.aria-pressed]="selectedType() === type"
+        (click)="selectedTypeChange.emit(type)"
+      >
+        <span class="type-icon" aria-hidden="true">
+          @switch (type) {
+            @case ('listen-and-decide') {
+              <svg viewBox="0 0 48 48">
+                <path
+                  d="M28 8c-8.4 0-15 6.1-15 14 0 5.5 3 8.1 6.2 10.7 2.2 1.8 3.5 3.4 3.8 5.7.3 2.1 2.1 3.6 4.2 3.6 2.7 0 4.8-2.2 4.8-4.9"
+                />
+                <path d="M22 22.5c0-3.5 2.5-6.2 6-6.2s6 2.6 6 6.1c0 4.4-4 5-4 8.6" />
+                <path d="M37 16.5c2.4 2 3.8 4.6 3.8 7.5M39 10.5c4 3.3 6.3 8.2 6.3 13.5" />
+              </svg>
+            }
+            @case ('catch-the-sound') {
+              <svg viewBox="0 0 48 48">
+                <rect x="17" y="6" width="14" height="25" rx="7" />
+                <path d="M11 24v1a13 13 0 0 0 26 0v-1M24 38v6M17 44h14" />
+              </svg>
+            }
+            @case ('sound-position') {
+              <svg viewBox="0 0 48 48">
+                <path d="M24 44s14-13.2 14-25A14 14 0 1 0 10 19c0 11.8 14 25 14 25Z" />
+                <circle cx="24" cy="19" r="5" />
+              </svg>
+            }
+          }
+        </span>
+        <span class="type-copy">
+          <strong>{{ labels[type] }}</strong>
+          <span>{{ descriptions[type] }}</span>
+        </span>
+        @if (selectedType() === type) {
+          <span class="selected-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="m6 12 4 4 8-9" />
+            </svg>
+          </span>
+        }
+      </button>
+    }
+  </div>
+  @if (selectedType()) {
+    <p class="selection-hint">Odaberi istu vrstu ponovno za prikaz svih igara.</p>
+  }
+</section>

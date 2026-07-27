@@ -18,7 +18,8 @@ Ovaj dokument služi kao kratka kontrolna lista pri dodavanju sadržaja.
   konačni nenegativni brojevi.
 - Za igru `sound-position` `spokenText` mora sadržavati ciljni glas točno jednom. Riječi bez ciljnog
   glasa ili s ponovljenim ciljnim glasom treba razdvojiti u drugi tip zadatka.
-- Slika mora imati smislen, neprazan `alt`. Dekorativni sadržaj ne treba stavljati u paket pitanja.
+- `catalogImage` i slika pitanja moraju imati izvor (`src` ili emoji) te smislen, neprazan `alt`.
+  Dekorativni sadržaj ne treba stavljati u paket pitanja.
 - Audio i slika trebaju biti lokalni optimizirani asseti ili URL-ovi iz pouzdanog izvora s uređenim
   pravima korištenja.
 - Ne koristiti kliničke tvrdnje niti poruke koje kažnjavaju dijete.
@@ -41,6 +42,10 @@ ispravnost sadržaja.
 
 ## Pravila za slike
 
+- `catalogImage` je opcionalna ilustracija kartice u katalogu. Ako nije zadana, kartica prikazuje
+  neutralnu rezervnu ilustraciju.
+- Za podržane teme koristite lokalne ilustracije iz `public/assets/games/themes/`; ne povezujte
+  karticu izravno s vanjskim servisom.
 - Slike za pitanja spremati pod `public/assets/games/` i povezivati apsolutnom putanjom
   `/assets/games/...`.
 - Za kvadratne ilustracije koristiti WebP do 512 × 512 piksela i ciljnu veličinu manju od 100 KB,

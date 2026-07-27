@@ -53,7 +53,8 @@ npx prettier . --check
 ## Main Implemented Features
 
 - Home page at `/` with a short path into exercises.
-- Game catalog at `/igre` with filters for packages.
+- Game catalog at `/igre` with accessible toggle filtering by game type plus sound, theme, and
+  difficulty filters.
 - Game player at `/igre/:packageId`.
 - Parent/progress page at `/napredak`.
 - Shared header with logo and navigation.
@@ -72,9 +73,10 @@ npx prettier . --check
 - Explicit professional-review metadata; all current demo packages are marked `NOT_REVIEWED`.
 - Four optimized local food illustrations in the priority “Što jedemo?” package, with retained
   emoji fallbacks and documented provenance.
-- Eight optimized transparent soft-toy theme illustrations plus four restrained catalog/gameplay
-  edge decorations. The decorations are hidden on narrow screens; theme-to-package mapping is
-  reserved for the catalog redesign milestone.
+- Eight optimized transparent soft-toy theme illustrations mapped to demo packages through
+  `catalogImage`, plus four restrained catalog/gameplay edge decorations.
+- Rounded game cards use consistent type colors, theme artwork, gentle hover/focus depth, and a
+  separate accessible information popover.
 - Provider-neutral `SPEECH_TRANSCRIPTION` boundary with a default disabled adapter, no network
   transfer, and no pronunciation scoring.
 - Documented privacy, consent, retention, account, vendor, and security requirements that must be
@@ -97,7 +99,8 @@ npx prettier . --check
 - `src/app/features/games/services/game-session.service.ts`: shared session state and game flow.
 - `src/app/features/games/services/scoring.service.ts`: scoring rules.
 - `src/app/features/games/pages/`: catalog and player pages.
-- `src/app/features/games/components/`: the three game board renderers.
+- `src/app/features/games/components/`: game board renderers plus catalog card and type-filter
+  components.
 - `src/app/features/progress/`: local parent/progress view.
 - `src/main.css`: global styles, tokens, colors, typography, reset.
 - `public/assets/games/`: generated game assets.
@@ -118,7 +121,7 @@ npx prettier . --check
 
 ## Architecture Overview
 
-The game engine is content-driven. Games should not be hard-coded for one sound, one theme, or one fixed question set. A `ContentPackage` defines the game type, target sound, optional contrast sound, sound pair, theme, difficulty, questions, media, answer options, correct answers, explanation, and scoring.
+The game engine is content-driven. Games should not be hard-coded for one sound, one theme, or one fixed question set. A `ContentPackage` defines the game type, target sound, optional contrast sound, sound pair, theme, difficulty, optional catalog artwork, questions, media, answer options, correct answers, explanation, and scoring.
 
 `GamePlayerPage` selects a package by route id and delegates answer UI to the correct board component. Shared services handle session state, scoring, replay counts, attempts, streaks, and completion. Progress is saved locally after completed sessions.
 
@@ -169,17 +172,16 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - MediaRecorder availability and output format vary by browser.
 - Python is not installed on the current development machine. Local Whisper work requires
   documented Python 3.11/3.12 and FFmpeg setup.
-- All eight catalog themes now have curated local soft-toy illustrations, but they are not yet
-  connected to content packages. That mapping belongs to Milestone 7.
+- The catalog information control uses an in-page popover rather than a dialog. Escape, outside
+  activation, and a second activation close it; only one popover is open at a time.
 - ESLint is not configured; the agreed MVP quality gate is build, tests, and Prettier.
 - README text may display mojibake in some terminal code pages, although the source should be treated as UTF-8 Croatian text.
 
 ## Exact Next Recommended Tasks
 
-1. Merge the soft-toy theme/background asset pack with provenance.
-2. Implement the catalog filter/tile redesign and connect theme assets through `catalogImage`.
-3. Implement the visible per-question recording panel and reset behavior.
-4. Continue through backend, local transcription, parent progress, therapist review, and integrated
+1. Merge the catalog filter/tile redesign and theme-to-package mapping.
+2. Implement the visible per-question recording panel and reset behavior.
+3. Continue through backend, local transcription, parent progress, therapist review, and integrated
    QA exactly in the dependency order documented in `DEVELOPMENT_PLAN.md`.
 
 ## Do Not Change Without Asking

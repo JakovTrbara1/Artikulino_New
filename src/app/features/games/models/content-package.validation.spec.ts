@@ -105,7 +105,7 @@ describe('content package validation', () => {
     );
   });
 
-  it('reports missing text, questions, answers, correct answers and image alt text', () => {
+  it('reports missing text, questions, answers, correct answers and image metadata', () => {
     const incompleteQuestion = createQuestion({
       id: ' ',
       taskText: '',
@@ -129,6 +129,7 @@ describe('content package validation', () => {
         targetSound: '',
         contrastSound: '',
         theme: '',
+        catalogImage: { src: ' ', alt: ' ' },
         questions: [incompleteQuestion, noCorrectAnswer],
       }),
       createPackage({ id: 'package-2', questions: [] }),
@@ -142,7 +143,18 @@ describe('content package validation', () => {
     expect(codes).toContain('insufficient-answers');
     expect(codes).toContain('missing-correct-answer');
     expect(codes).toContain('unknown-correct-answer');
+    expect(codes).toContain('missing-image-source');
     expect(codes).toContain('missing-image-alt');
+    expect(issues).toContainEqual({
+      code: 'missing-image-source',
+      path: 'packages[0].catalogImage',
+      message: 'Ilustracija kataloga mora sadržavati putanju ili zamjenski emoji.',
+    });
+    expect(issues).toContainEqual({
+      code: 'missing-image-alt',
+      path: 'packages[0].catalogImage.alt',
+      message: 'Ilustracija kataloga mora imati smislen alternativni opis.',
+    });
     expect(issues).toContainEqual(
       expect.objectContaining({
         code: 'unknown-correct-answer',

@@ -1,10 +1,46 @@
 import {
   AnswerOption,
+  ContentImage,
   ContentPackage,
   ContentQuestion,
   Difficulty,
   ScoringRules,
 } from '../models/content-package.model';
+
+const CATALOG_IMAGES: Readonly<Record<string, ContentImage>> = {
+  hrana: {
+    src: '/assets/games/themes/food.webp',
+    alt: 'Košara s voćem, povrćem i kruhom',
+  },
+  kuća: {
+    src: '/assets/games/themes/home.webp',
+    alt: 'Mekana igračka u obliku kuće',
+  },
+  priroda: {
+    src: '/assets/games/themes/nature.webp',
+    alt: 'Stablo, sunce, oblaci i cvijeće',
+  },
+  životinje: {
+    src: '/assets/games/themes/animals.webp',
+    alt: 'Lav, slon i zebra kao mekane igračke',
+  },
+  prijevoz: {
+    src: '/assets/games/themes/transport.webp',
+    alt: 'Automobil, avion i jedrilica kao igračke',
+  },
+  odjeća: {
+    src: '/assets/games/themes/clothing.webp',
+    alt: 'Džemper, kapa i čizme',
+  },
+  škola: {
+    src: '/assets/games/themes/school.webp',
+    alt: 'Školski ruksak, knjige i olovka',
+  },
+  igračke: {
+    src: '/assets/games/themes/toys.webp',
+    alt: 'Medvjedić, kocke i lopta',
+  },
+};
 
 const yesNo = (sound: string): readonly AnswerOption[] => [
   { id: 'yes', label: `Čujem glas ${sound}` },
@@ -528,5 +564,6 @@ const DEMO_CONTENT_PACKAGE_DEFINITIONS = [
 export const DEMO_CONTENT_PACKAGES: readonly ContentPackage[] =
   DEMO_CONTENT_PACKAGE_DEFINITIONS.map((contentPackage) => ({
     ...contentPackage,
+    catalogImage: CATALOG_IMAGES[contentPackage.theme],
     professionalReview: { status: 'NOT_REVIEWED' },
   }));
