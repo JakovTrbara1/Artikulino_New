@@ -30,6 +30,7 @@ function useSupportedRecorder(getUserMedia: ReturnType<typeof vi.fn>): void {
 
 describe('MicrophoneRecorderService', () => {
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
@@ -116,5 +117,24 @@ describe('MicrophoneRecorderService', () => {
     expect(service.audioUrl()).toBeNull();
     expect(createObjectURL).not.toHaveBeenCalled();
     expect(stopTrack).toHaveBeenCalledOnce();
+  });
+
+  it('automatically stops a recording at the 15 second prototype limit', async () => {
+    vi.useFakeTimers();
+    const getUserMedia = vi.fn().mockResolvedValue({
+      getTracks: () => [{ stop: vi.fn() }],
+    });
+    useSupportedRecorder(getUserMedia);
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn().mockReturnValue('blob:limited-recording'),
+      revokeObjectURL: vi.fn(),
+    });
+    const service = new MicrophoneRecorderService();
+
+    await service.start();
+    await vi.advanceTimersByTimeAsync(15_000);
+
+    expect(service.status()).toBe('stopped');
+    expect(service.recording()?.durationMs).toBe(15_000);
   });
 });

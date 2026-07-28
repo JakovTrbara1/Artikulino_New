@@ -1,5 +1,4 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { ProgressService } from '../../../core/services/progress.service';
 import { ContentPackage, GameSessionResult } from '../models/content-package.model';
 import { ScoringService } from './scoring.service';
 
@@ -24,6 +23,7 @@ export class GameSessionService {
   private readonly feedbackState = signal<GameFeedback | null>(null);
   private readonly answeredState = signal(false);
   private readonly completeState = signal(false);
+  private readonly completedResultState = signal<GameSessionResult | null>(null);
   private startedAt = Date.now();
 
   readonly contentPackage = this.packageState.asReadonly();
@@ -41,6 +41,7 @@ export class GameSessionService {
   readonly feedback = this.feedbackState.asReadonly();
   readonly isAnswered = this.answeredState.asReadonly();
   readonly isComplete = this.completeState.asReadonly();
+  readonly completedResult = this.completedResultState.asReadonly();
   readonly progressPercent = computed(() => {
     const packageValue = this.packageState();
     return packageValue
@@ -48,10 +49,7 @@ export class GameSessionService {
       : 0;
   });
 
-  constructor(
-    private readonly scoring: ScoringService,
-    private readonly progress: ProgressService,
-  ) {}
+  constructor(private readonly scoring: ScoringService) {}
 
   start(contentPackage: ContentPackage): void {
     this.packageState.set(contentPackage);
@@ -66,6 +64,7 @@ export class GameSessionService {
     this.feedbackState.set(null);
     this.answeredState.set(false);
     this.completeState.set(false);
+    this.completedResultState.set(null);
     this.startedAt = Date.now();
   }
 
@@ -167,6 +166,6 @@ export class GameSessionService {
       durationSeconds: Math.max(1, Math.round((Date.now() - this.startedAt) / 1000)),
       completedAt: new Date().toISOString(),
     };
-    this.progress.addResult(result);
+    this.completedResultState.set(result);
   }
 }

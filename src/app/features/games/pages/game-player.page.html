@@ -18,7 +18,10 @@
         <div class="result-star" aria-hidden="true">★</div>
         <p class="eyebrow">Vježba je završena</p>
         <h1 #resultTitle id="result-title" tabindex="-1">Bravo, stigao/la si do cilja!</h1>
-        <p>{{ package.name }} spremljen je u tvoj napredak.</p>
+        <p>Rezultat za paket {{ package.name }} spreman je za demo profil.</p>
+        @if (persistenceMessage()) {
+          <p class="audio-notice" role="status">{{ persistenceMessage() }}</p>
+        }
 
         <dl class="result-stats">
           <div>
@@ -126,6 +129,8 @@
                 <app-microphone-practice
                   recordingPanel
                   [questionId]="question.id"
+                  [saveAttempt]="saveRecordedAttempt"
+                  [deleteSavedAttempt]="deleteRecordedAttempt"
                   (recordedAttempt)="receiveRecordedAttempt($event)"
                   (recordingDeleted)="clearRecordedAttempt()"
                 />
@@ -144,6 +149,8 @@
                 <app-microphone-practice
                   recordingPanel
                   [questionId]="question.id"
+                  [saveAttempt]="saveRecordedAttempt"
+                  [deleteSavedAttempt]="deleteRecordedAttempt"
                   (recordedAttempt)="receiveRecordedAttempt($event)"
                   (recordingDeleted)="clearRecordedAttempt()"
                 />
@@ -162,6 +169,8 @@
                 <app-microphone-practice
                   recordingPanel
                   [questionId]="question.id"
+                  [saveAttempt]="saveRecordedAttempt"
+                  [deleteSavedAttempt]="deleteRecordedAttempt"
                   (recordedAttempt)="receiveRecordedAttempt($event)"
                   (recordingDeleted)="clearRecordedAttempt()"
                 />

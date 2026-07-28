@@ -14,13 +14,19 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
+import { PrototypeGameSession } from '../../../core/models/prototype-session.model';
+import { PrototypeSessionService } from '../../../core/services/prototype-session.service';
 import { MicrophonePractice } from '../../../shared/components/microphone-practice/microphone-practice';
 import { RecordedAttempt } from '../../../shared/models/recorded-attempt.model';
 import { AudioPlaybackService } from '../../../shared/services/audio-playback.service';
 import { CatchSoundBoard } from '../components/catch-sound-board/catch-sound-board';
 import { ListenDecideBoard } from '../components/listen-decide-board/listen-decide-board';
 import { SoundPositionBoard } from '../components/sound-position-board/sound-position-board';
-import { DIFFICULTY_LABELS, GAME_TYPE_LABELS } from '../models/content-package.model';
+import {
+  ContentPackage,
+  DIFFICULTY_LABELS,
+  GAME_TYPE_LABELS,
+} from '../models/content-package.model';
 import { ContentPackagesService } from '../services/content-packages.service';
 import { GameSessionService } from '../services/game-session.service';
 
@@ -42,6 +48,7 @@ export class GamePlayerPage implements OnDestroy {
   private readonly gameTitle = viewChild<ElementRef<HTMLHeadingElement>>('gameTitle');
   private readonly resultTitle = viewChild<ElementRef<HTMLHeadingElement>>('resultTitle');
   private initializedPackageId?: string;
+  private prototypeSessionPromise?: Promise<PrototypeGameSession>;
 
   protected readonly difficultyLabels = DIFFICULTY_LABELS;
   protected readonly gameTypeLabels = GAME_TYPE_LABELS;
@@ -50,6 +57,7 @@ export class GamePlayerPage implements OnDestroy {
   protected readonly selectedAnswer = signal<string | null>(null);
   protected readonly audioMessage = signal('');
   protected readonly latestRecordedAttempt = signal<RecordedAttempt | null>(null);
+  protected readonly persistenceMessage = signal('');
   protected readonly listenLabel = computed(() =>
     this.hasListened() ? 'Poslušaj ponovno' : 'Poslušaj',
   );
@@ -74,6 +82,7 @@ export class GamePlayerPage implements OnDestroy {
     private readonly packages: ContentPackagesService,
     protected readonly session: GameSessionService,
     protected readonly audio: AudioPlaybackService,
+    private readonly prototypeSessions: PrototypeSessionService,
   ) {
     effect(() => {
       const contentPackage = this.contentPackage();
@@ -81,6 +90,7 @@ export class GamePlayerPage implements OnDestroy {
         this.initializedPackageId = contentPackage.id;
         this.session.start(contentPackage);
         this.resetQuestionUi();
+        this.startPrototypeSession(contentPackage);
       }
     });
   }
@@ -115,6 +125,24 @@ export class GamePlayerPage implements OnDestroy {
     this.session.submitAnswer(answerId);
   }
 
+  protected readonly saveRecordedAttempt = async (
+    attempt: RecordedAttempt,
+  ): Promise<{ readonly id: string }> => {
+    this.latestRecordedAttempt.set(attempt);
+    const contentPackage = this.contentPackage();
+    const question = contentPackage?.questions.find((item) => item.id === attempt.questionId);
+    if (!contentPackage || !question) {
+      throw new Error('Pitanje za snimku nije pronađeno.');
+    }
+    const prototypeSession = await this.ensurePrototypeSession(contentPackage);
+    return this.prototypeSessions.uploadAttempt(prototypeSession.id, attempt, question.spokenText);
+  };
+
+  protected readonly deleteRecordedAttempt = async (attemptId: string): Promise<void> => {
+    await this.prototypeSessions.deleteAttempt(attemptId);
+    this.latestRecordedAttempt.set(null);
+  };
+
   protected receiveRecordedAttempt(attempt: RecordedAttempt): void {
     this.latestRecordedAttempt.set(attempt);
   }
@@ -127,6 +155,7 @@ export class GamePlayerPage implements OnDestroy {
     this.audio.stop();
     this.session.next();
     if (this.session.isComplete()) {
+      void this.completePrototypeSession();
       this.focusHeadingAfterRender('result');
     } else {
       this.resetQuestionUi();
@@ -139,6 +168,7 @@ export class GamePlayerPage implements OnDestroy {
     if (contentPackage) {
       this.session.start(contentPackage);
       this.resetQuestionUi();
+      this.startPrototypeSession(contentPackage);
       this.focusHeadingAfterRender('game');
     }
   }
@@ -149,6 +179,45 @@ export class GamePlayerPage implements OnDestroy {
     this.selectedAnswer.set(null);
     this.audioMessage.set('');
     this.latestRecordedAttempt.set(null);
+  }
+
+  private startPrototypeSession(contentPackage: ContentPackage): void {
+    this.prototypeSessionPromise = undefined;
+    this.persistenceMessage.set('');
+    void this.ensurePrototypeSession(contentPackage).catch(() => undefined);
+  }
+
+  private ensurePrototypeSession(contentPackage: ContentPackage): Promise<PrototypeGameSession> {
+    if (!this.prototypeSessionPromise) {
+      this.prototypeSessionPromise = this.prototypeSessions
+        .create(contentPackage)
+        .catch((error) => {
+          this.prototypeSessionPromise = undefined;
+          this.persistenceMessage.set(
+            error instanceof Error
+              ? `Spremanje nije dostupno: ${error.message}`
+              : 'Spremanje trenutačno nije dostupno.',
+          );
+          throw error;
+        });
+    }
+    return this.prototypeSessionPromise;
+  }
+
+  private async completePrototypeSession(): Promise<void> {
+    const contentPackage = this.contentPackage();
+    const result = this.session.completedResult();
+    if (!contentPackage || !result) {
+      return;
+    }
+    this.persistenceMessage.set('Spremanje rezultata…');
+    try {
+      const prototypeSession = await this.ensurePrototypeSession(contentPackage);
+      await this.prototypeSessions.complete(prototypeSession.id, result);
+      this.persistenceMessage.set('Rezultat je spremljen u napredak demo profila.');
+    } catch {
+      // The game result remains visible and playable even when local persistence is unavailable.
+    }
   }
 
   private focusHeadingAfterRender(target: 'game' | 'result'): void {

@@ -85,7 +85,7 @@ describe('MicrophonePractice', () => {
       attemptNumber: 1,
     });
     expect(emitted[0].blob).toBeInstanceOf(Blob);
-    expect(fixture.nativeElement.textContent).toContain('Snimka spremljena privremeno');
+    expect(fixture.nativeElement.textContent).toContain('Snimka spremljena');
     expect(requireButton('Poslušaj svoju snimku')).toBeTruthy();
 
     const audio = fixture.nativeElement.querySelector('audio') as HTMLAudioElement;
@@ -136,6 +136,61 @@ describe('MicrophonePractice', () => {
     expect(recorder.status()).toBe('denied');
     expect(fixture.nativeElement.textContent).toContain('Mikrofon nije dopušten');
     expect(requireButton('Započni snimanje')).toBeTruthy();
+  });
+
+  it('retains a failed local recording for retry and deletes a saved server attempt', async () => {
+    const saveAttempt = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('Server unavailable'))
+      .mockResolvedValueOnce({ id: 'attempt-1' });
+    const deleteSavedAttempt = vi.fn().mockResolvedValue(undefined);
+    fixture.componentRef.setInput('saveAttempt', saveAttempt);
+    fixture.componentRef.setInput('deleteSavedAttempt', deleteSavedAttempt);
+
+    await recordAttempt(2_500);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(recorder.recording()).not.toBeNull();
+    expect(requireButton('Pokušaj spremiti ponovno')).toBeTruthy();
+
+    requireButton('Pokušaj spremiti ponovno').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(saveAttempt).toHaveBeenCalledTimes(2);
+    expect(fixture.nativeElement.textContent).toContain('Snimka spremljena');
+
+    requireButton('Izbriši').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(deleteSavedAttempt).toHaveBeenCalledWith('attempt-1');
+    expect(recorder.recording()).toBeNull();
+  });
+
+  it('deletes the server attempt when local deletion occurs during a pending upload', async () => {
+    let finishUpload: ((value: { readonly id: string }) => void) | undefined;
+    const saveAttempt = vi.fn(
+      () =>
+        new Promise<{ readonly id: string }>((resolve) => {
+          finishUpload = resolve;
+        }),
+    );
+    const deleteSavedAttempt = vi.fn().mockResolvedValue(undefined);
+    fixture.componentRef.setInput('saveAttempt', saveAttempt);
+    fixture.componentRef.setInput('deleteSavedAttempt', deleteSavedAttempt);
+
+    await recordAttempt(2_500);
+    expect(fixture.nativeElement.textContent).toContain('Spremanje…');
+
+    requireButton('Izbriši').click();
+    finishUpload?.({ id: 'pending-attempt' });
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(deleteSavedAttempt).toHaveBeenCalledWith('pending-attempt');
+    expect(recorder.recording()).toBeNull();
   });
 
   async function recordAttempt(stopTime: number): Promise<void> {

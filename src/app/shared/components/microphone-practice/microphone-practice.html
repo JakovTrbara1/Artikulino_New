@@ -9,7 +9,7 @@
       </span>
       <div>
         <h2 id="microphone-title">Snimi svoj glas</h2>
-        <p>Nije obavezno. Za svako pitanje snima se nova snimka.</p>
+        <p>Nije obavezno. Za svako pitanje snima se nova snimka do 15 sekundi.</p>
       </div>
     </div>
 
@@ -23,12 +23,12 @@
       @case ('saved') {
         <p class="delivery-status is-saved" role="status">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4 10-10" /></svg>
-          Snimka spremljena privremeno
+          Snimka spremljena
         </p>
       }
       @case ('retry') {
         <button class="delivery-status is-retry" type="button" (click)="retryDelivery()">
-          Pokušaj spremiti ponovno
+          {{ retryLabel() }}
         </button>
       }
     }

@@ -22,7 +22,7 @@ export class PrototypeAuthService {
   readonly isTherapist = computed(() => this.userState()?.role === 'THERAPIST');
 
   async login(email: string, password: string): Promise<DemoUser> {
-    const response = await this.request<DemoLoginResponse>(
+    const response = await this.apiRequest<DemoLoginResponse>(
       '/api/auth/login',
       {
         method: 'POST',
@@ -42,7 +42,7 @@ export class PrototypeAuthService {
   async logout(): Promise<void> {
     try {
       if (this.tokenState()) {
-        await this.request<void>('/api/auth/logout', { method: 'POST' });
+        await this.apiRequest<void>('/api/auth/logout', { method: 'POST' });
       }
     } catch {
       // Local logout must still succeed when the demonstration server is unavailable.
@@ -52,7 +52,9 @@ export class PrototypeAuthService {
   }
 
   async loadChildren(): Promise<readonly DemoChildProfile[]> {
-    const response = await this.request<{ children: readonly DemoChildProfile[] }>('/api/children');
+    const response = await this.apiRequest<{ children: readonly DemoChildProfile[] }>(
+      '/api/children',
+    );
     const selected = this.activeChildState();
     if (selected && !response.children.some((child) => child.id === selected.id)) {
       this.selectChild(null);
@@ -61,7 +63,7 @@ export class PrototypeAuthService {
   }
 
   async createChild(displayName: string): Promise<DemoChildProfile> {
-    const response = await this.request<{ child: DemoChildProfile }>('/api/children', {
+    const response = await this.apiRequest<{ child: DemoChildProfile }>('/api/children', {
       method: 'POST',
       body: JSON.stringify({ displayName }),
     });
@@ -69,7 +71,7 @@ export class PrototypeAuthService {
   }
 
   async deleteChild(childId: string): Promise<void> {
-    await this.request<void>(`/api/children/${encodeURIComponent(childId)}`, {
+    await this.apiRequest<void>(`/api/children/${encodeURIComponent(childId)}`, {
       method: 'DELETE',
     });
     if (this.activeChildState()?.id === childId) {
@@ -86,9 +88,9 @@ export class PrototypeAuthService {
     }
   }
 
-  private async request<T>(path: string, init: RequestInit = {}, authenticated = true): Promise<T> {
+  async apiRequest<T>(path: string, init: RequestInit = {}, authenticated = true): Promise<T> {
     const headers = new Headers(init.headers);
-    if (init.body) {
+    if (init.body && !(init.body instanceof FormData)) {
       headers.set('Content-Type', 'application/json');
     }
     if (authenticated) {

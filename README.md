@@ -42,13 +42,13 @@ provjera bez dodavanja nove ovisnosti.
 - `/igre/:packageId` – zajednički game engine s prikazom odabrane igre
 - `/prijava` – prijava unaprijed definiranim demo računom
 - `/profili` – odabir ili upravljanje izmišljenim demo profilima
-- `/napredak` – lokalni pregled aktivnosti za roditelje
+- `/napredak` – pregled sesija aktivnog demo profila s lokalnog poslužitelja
 
 Sve glavne stranice učitavaju se lazy loadingom i koriste standalone komponente.
 
-## Lokalna demo prijava
+## Lokalna demo prijava i podaci
 
-Milestone 9 dodaje zaseban Express/SQLite servis samo za lokalni diplomski prototip.
+Zaseban Express/SQLite servis služi samo lokalnom diplomskom prototipu.
 
 - roditelj: `parent@artikulino.test` / `ParentDemo123!`;
 - terapeut: `therapist@artikulino.test` / `TherapistDemo123!`.
@@ -58,8 +58,8 @@ odabrati izmišljeni profil. Terapeut može samo pregledati sve demo profile; te
 dolazi u kasnijem milestoneu.
 
 Lozinke i tokeni nisu spremljeni u čistom tekstu. Prijava traje osam sati, token je u
-`sessionStorage`, a SQLite baza je u Git-ignoriranoj mapi `server/runtime/`. Bazu i demo račune možeš
-vratiti u početno stanje naredbom:
+`sessionStorage`. SQLite baza i audiosnimke nalaze se u Git-ignoriranoj mapi `server/runtime/`.
+Naredba za reset briše sesije, snimke i profile te ponovno stvara demo račune i početne profile:
 
 ```bash
 npm run prototype:reset
@@ -149,14 +149,16 @@ Mikrofon se aktivira isključivo nakon korisnikova klika. Vidljivi, neobavezni p
 pojma i ponuđenih odgovora. `MediaRecorder` omogućuje djetetu da snimi riječ, posluša snimku i
 izbriše je. Prelaskom na novo pitanje panel se vraća u početno stanje.
 
-- snimka se ne šalje na poslužitelj;
-- ne ulazi u rezultate ni `localStorage`;
-- briše se ručno ili pri napuštanju komponente;
+- snimka se asinkrono šalje samo lokalnom demonstracijskom poslužitelju;
+- više pokušaja za isto pitanje ostaje spremljeno uz sesiju aktivnog demo profila;
+- ne mijenja bodove i ne blokira sljedeće pitanje;
+- neuspjelo slanje zadržava lokalnu snimku za ponovni pokušaj ili brisanje;
+- ograničena je na 15 sekundi i 10 MB;
 - aplikacija ne tvrdi da automatski ocjenjuje izgovor.
 
-Nakon zaustavljanja panel emitira lokalni tipizirani `RecordedAttempt` (audio blob, MIME tip,
-trajanje, ID pitanja i redni broj pokušaja). Trenutačno nema pretplatnika koji podatke trajno
-pohranjuje; ta je granica priprema za lokalni demonstracijski backend iz kasnijeg milestonea.
+Nakon zaustavljanja panel emitira tipizirani `RecordedAttempt` (audio blob, MIME tip, trajanje, ID
+pitanja i redni broj pokušaja). Metapodaci se spremaju u SQLite, a audio u
+`server/runtime/recordings/`. API odgovori ne otkrivaju fizičke putanje.
 
 Za mikrofon je potreban podržani preglednik i siguran kontekst (`https` ili `localhost`). Servisna
 granica `SPEECH_TRANSCRIPTION` postoji, ali je zadano isključena i ne šalje snimke izvan
@@ -166,7 +168,7 @@ preglednika. Arhitekturna granica opisana je u
 
 ## Praćenje napretka
 
-Završena sesija lokalno sprema:
+Završena sesija sprema se pod aktivnim izmišljenim demo profilom na lokalnom poslužitelju:
 
 - broj pitanja i točnih odgovora;
 - ukupan broj pokušaja i ponovnih slušanja;
@@ -174,7 +176,9 @@ Završena sesija lokalno sprema:
 - bodove, trajanje i vrijeme završetka;
 - paket, vrstu igre, glas, temu i razinu.
 
-Podaci se spremaju u `localStorage` pod verzioniranim ključem i mogu se izbrisati sa stranice Napredak.
+Stranica Napredak za prijavljenog demo roditelja čita te sesije iz API-ja. Brisanje sesije uklanja
+metapodatke i povezane audiodatoteke te čisti stari `localStorage` ključ; postojeći lokalni napredak
+se ne migrira.
 
 ## Struktura
 
@@ -248,5 +252,6 @@ Optimizirane transparentne soft-toy ilustracije za osam tema nalaze se u
 `public/assets/games/decorations/`. Katalog povezuje tematske ilustracije s karticama, boji ih prema
 vrsti igre i koristi tri pristupačna preklopna gumba kao prvi filtar.
 
-Lokalni backend, testni računi i izmišljeni profili sada su implementirani. Pohrana sesija i
-snimki, prijepis, novi roditeljski napredak i terapeutski pregled dolaze u sljedećim milestoneima.
+Lokalni backend, testni računi, izmišljeni profili, sesije i višestruki pokušaji snimanja sada su
+implementirani. Lokalni hrvatski prijepis, prošireni roditeljski pregled i terapeutski pregled
+dolaze u sljedećim milestoneima.

@@ -3,15 +3,23 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { AudioPlaybackService } from '../../../shared/services/audio-playback.service';
+import { PrototypeSessionService } from '../../../core/services/prototype-session.service';
 import { GameSessionService } from '../services/game-session.service';
 import { GamePlayerPage } from './game-player.page';
 
 describe('GamePlayerPage accessibility', () => {
   let fixture: ComponentFixture<GamePlayerPage>;
   let session: GameSessionService;
+  const prototypeSessions = {
+    create: vi.fn().mockResolvedValue({ id: 'prototype-session-1' }),
+    complete: vi.fn().mockResolvedValue({ id: 'prototype-session-1' }),
+    uploadAttempt: vi.fn().mockResolvedValue({ id: 'recording-1' }),
+    deleteAttempt: vi.fn().mockResolvedValue(undefined),
+  };
 
   beforeEach(async () => {
     localStorage.clear();
+    Object.values(prototypeSessions).forEach((method) => method.mockClear());
     await TestBed.configureTestingModule({
       imports: [GamePlayerPage],
       providers: [
@@ -30,6 +38,7 @@ describe('GamePlayerPage accessibility', () => {
             stop: vi.fn(),
           },
         },
+        { provide: PrototypeSessionService, useValue: prototypeSessions },
       ],
     }).compileComponents();
 
@@ -92,6 +101,8 @@ describe('GamePlayerPage accessibility', () => {
     const resultTitle = fixture.nativeElement.querySelector('#result-title') as HTMLHeadingElement;
     expect(document.activeElement).toBe(resultTitle);
     expect(resultTitle.textContent?.trim()).toBe('Bravo, stigao/la si do cilja!');
+    await fixture.whenStable();
+    expect(prototypeSessions.complete).toHaveBeenCalledOnce();
   });
 
   function answerCurrentQuestion(): void {

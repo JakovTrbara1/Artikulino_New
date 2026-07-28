@@ -1,5 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 
+export const MAX_RECORDING_DURATION_MS = 15_000;
+
 export type RecorderStatus =
   'idle' | 'requesting' | 'recording' | 'stopped' | 'denied' | 'unsupported' | 'error';
 
@@ -19,6 +21,7 @@ export class MicrophoneRecorderService {
   private discardNextRecording = false;
   private recordingStartedAt?: number;
   private durationTimer?: ReturnType<typeof setInterval>;
+  private recordingLimitTimer?: ReturnType<typeof setTimeout>;
 
   private readonly statusState = signal<RecorderStatus>('idle');
   private readonly audioUrlState = signal<string | null>(null);
@@ -128,6 +131,7 @@ export class MicrophoneRecorderService {
     this.recordingStartedAt = Date.now();
     this.durationMsState.set(0);
     this.durationTimer = setInterval(() => this.updateDuration(), 200);
+    this.recordingLimitTimer = setTimeout(() => this.stop(), MAX_RECORDING_DURATION_MS);
   }
 
   private stopDurationClock(): void {
@@ -138,12 +142,18 @@ export class MicrophoneRecorderService {
       clearInterval(this.durationTimer);
       this.durationTimer = undefined;
     }
+    if (this.recordingLimitTimer !== undefined) {
+      clearTimeout(this.recordingLimitTimer);
+      this.recordingLimitTimer = undefined;
+    }
     this.recordingStartedAt = undefined;
   }
 
   private updateDuration(): void {
     if (this.recordingStartedAt !== undefined) {
-      this.durationMsState.set(Math.max(0, Date.now() - this.recordingStartedAt));
+      this.durationMsState.set(
+        Math.min(MAX_RECORDING_DURATION_MS, Math.max(0, Date.now() - this.recordingStartedAt)),
+      );
     }
   }
 }

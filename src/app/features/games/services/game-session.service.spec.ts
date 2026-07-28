@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { ProgressService } from '../../../core/services/progress.service';
 import { DEMO_CONTENT_PACKAGES } from '../data/demo-content-packages';
 import { ContentPackage } from '../models/content-package.model';
 import { GameSessionService } from './game-session.service';
@@ -11,7 +10,6 @@ describe('GameSessionService', () => {
     localStorage.clear();
     TestBed.configureTestingModule({ providers: [GameSessionService] });
     service = TestBed.inject(GameSessionService);
-    TestBed.inject(ProgressService).clear();
   });
 
   it('tracks attempts and awards 60 percent of points for a correct second attempt', () => {

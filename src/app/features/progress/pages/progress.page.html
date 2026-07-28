@@ -5,21 +5,30 @@
       <h1>Napredak kroz redovitu vježbu</h1>
     </div>
     <p>
-      Ovdje se prikazuju samo aktivnosti završene u ovom pregledniku. Podaci se ne šalju na
-      poslužitelj.
+      Prikazane su sesije aktivnog demo profila
+      <strong>{{ auth.activeChild()?.displayName }}</strong> s lokalnog demonstracijskog
+      poslužitelja.
     </p>
   </header>
 
-  @if (progress.results().length) {
+  @if (errorMessage()) {
+    <p class="progress-notice" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <section class="surface empty-progress" aria-live="polite">
+      <h2>Učitavanje napretka…</h2>
+    </section>
+  } @else if (sessions().length) {
     <section class="summary" aria-label="Sažetak napretka">
       <article>
-        <span>Odigrane vježbe</span><strong>{{ progress.totalSessions() }}</strong>
+        <span>Završene vježbe</span><strong>{{ completedSessions().length }}</strong>
       </article>
       <article>
-        <span>Ukupni bodovi</span><strong>{{ progress.totalPoints() }}</strong>
+        <span>Ukupni bodovi</span><strong>{{ totalPoints() }}</strong>
       </article>
       <article>
-        <span>Točnost</span><strong>{{ accuracy() }}%</strong>
+        <span>Točnost igre</span><strong>{{ accuracy() }}%</strong>
       </article>
       <article>
         <span>Vrijeme vježbe</span><strong>{{ minutes() }} min</strong>
@@ -31,42 +40,53 @@
         <div class="section-title">
           <div>
             <p class="eyebrow">Aktivnosti</p>
-            <h2 id="activity-title">Posljednje vježbe</h2>
+            <h2 id="activity-title">Sesije demo profila</h2>
           </div>
-          <span>{{ progress.results().length }} zapisa</span>
+          <span>{{ sessions().length }} zapisa</span>
         </div>
         <div class="activity-list">
-          @for (result of progress.results(); track result.id) {
+          @for (session of sessions(); track session.id) {
             <article>
               <div
                 class="activity-mark"
-                [attr.data-game]="result.gameType"
+                [attr.data-game]="session.gameType"
                 aria-hidden="true"
               ></div>
               <div class="activity-main">
-                <h3>{{ result.packageName }}</h3>
+                <h3>{{ session.packageName }}</h3>
                 <p>
-                  {{ gameTypeLabels[result.gameType] }} · glas {{ result.targetSound }} ·
-                  {{ result.theme }}
+                  {{ gameTypeLabels[session.gameType] }} · glas {{ session.targetSound }} ·
+                  {{ session.theme }}
                 </p>
-                <time [attr.datetime]="result.completedAt">{{
-                  result.completedAt | date: 'd. M. y., HH:mm'
-                }}</time>
+                <time [attr.datetime]="session.completedAt || session.startedAt">
+                  {{ session.completedAt || session.startedAt | date: 'd. M. y., HH:mm' }}
+                </time>
+                @if (!session.completedAt) {
+                  <span class="session-state">Nedovršena sesija</span>
+                }
               </div>
               <dl>
                 <div>
                   <dt>Točno</dt>
-                  <dd>{{ result.correctAnswers }}/{{ result.questionCount }}</dd>
+                  <dd>{{ session.correctAnswers }}/{{ session.questionCount }}</dd>
                 </div>
                 <div>
                   <dt>Bodovi</dt>
-                  <dd>{{ result.totalPoints }}</dd>
+                  <dd>{{ session.totalPoints }}</dd>
                 </div>
                 <div>
-                  <dt>Razina</dt>
-                  <dd>{{ difficultyLabels[result.difficulty] }}</dd>
+                  <dt>Snimke</dt>
+                  <dd>{{ session.recordingAttempts.length }}</dd>
                 </div>
               </dl>
+              <button
+                class="delete-session"
+                type="button"
+                [disabled]="deletingId() === session.id"
+                (click)="deleteSession(session)"
+              >
+                {{ deletingId() === session.id ? 'Brisanje…' : 'Izbriši sesiju' }}
+              </button>
             </article>
           }
         </div>
@@ -94,23 +114,20 @@
     <section class="surface empty-progress">
       <div aria-hidden="true">☆</div>
       <h2>Prvi rezultat tek čeka</h2>
-      <p>Završite jednu kratku igru i ovdje će se prikazati bodovi, točnost i aktivnost.</p>
-      <a class="button button--primary" routerLink="/igre/slusaj-hrana-s-lagano"
-        >Započni prvu igru</a
-      >
+      <p>Završite jednu kratku igru i ovdje će se prikazati aktivnost demo profila.</p>
+      <a class="button button--primary" routerLink="/igre/slusaj-hrana-s-lagano">
+        Započni prvu igru
+      </a>
     </section>
   }
 
   <section class="privacy-strip">
     <div>
-      <strong>Privatnost u MVP-u</strong>
+      <strong>Lokalni prototip za testne podatke</strong>
       <p>
-        Napredak je spremljen samo u lokalnoj pohrani preglednika. Audiosnimke se ne spremaju u ovaj
-        pregled.
+        Sesije i snimke spremaju se samo na lokalni demonstracijski poslužitelj. Ne unosite stvarne
+        dječje podatke.
       </p>
     </div>
-    @if (progress.results().length) {
-      <button type="button" (click)="progress.clear()">Izbriši lokalni napredak</button>
-    }
   </section>
 </div>
