@@ -55,9 +55,22 @@ nav a {
 }
 
 nav a:hover,
-nav a.active {
+nav a.active,
+.logout-button:hover {
   background: var(--color-sky-100);
   color: var(--color-navy-900);
+}
+
+.logout-button {
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.65rem 1rem;
+  color: var(--color-navy-900);
+  font-family: var(--font-display);
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .menu-button {
@@ -106,5 +119,9 @@ nav a.active {
 
   nav a {
     justify-content: center;
+  }
+
+  .logout-button {
+    width: 100%;
   }
 }

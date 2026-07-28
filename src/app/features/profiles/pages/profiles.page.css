@@ -1,0 +1,132 @@
+.profiles-shell {
+  width: min(100%, 72rem);
+}
+
+header {
+  max-width: 48rem;
+  margin-block: 2rem;
+}
+
+header h1 {
+  margin: 0.2rem 0 0.6rem;
+  font-size: clamp(2.2rem, 7vw, 4rem);
+}
+
+header > p:last-child {
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.page-error {
+  border-radius: var(--radius-sm);
+  background: #fff1ce;
+  padding: 0.85rem;
+  color: #744800;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1rem;
+}
+
+.profile-card {
+  display: grid;
+  justify-items: center;
+  border: 2px solid var(--color-border);
+  border-radius: 1.5rem;
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  padding: 1.3rem;
+  text-align: center;
+}
+
+.profile-card.selected {
+  border-color: var(--color-mint);
+}
+
+.profile-card h2 {
+  margin: 0.7rem 0 1rem;
+}
+
+.profile-card p {
+  color: var(--color-muted);
+}
+
+.avatar {
+  width: 5rem;
+  height: 5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ffe18d, #ffb42b);
+  box-shadow: 0 0.3rem 0 #d98d00;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.delete-button {
+  margin-top: 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-coral-dark);
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.create-profile {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem;
+}
+
+.create-profile h2,
+.create-profile p {
+  margin: 0;
+}
+
+.create-profile p {
+  margin-top: 0.3rem;
+  color: var(--color-muted);
+}
+
+.create-profile form {
+  min-width: min(100%, 28rem);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem 0.7rem;
+}
+
+.create-profile label {
+  grid-column: 1 / -1;
+  font-weight: 800;
+}
+
+.create-profile input {
+  min-height: 3rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem;
+  font: inherit;
+}
+
+@media (max-width: 42rem) {
+  .create-profile {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .create-profile form {
+    min-width: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .create-profile label {
+    grid-column: auto;
+  }
+}

@@ -16,20 +16,27 @@ not diagnose, clinically evaluate speech, or replace a speech therapist.
 - CSS in component styles plus shared global tokens in `src/main.css`
 - Vitest through Angular unit-test builder
 - Browser APIs: Speech Synthesis, MediaRecorder, `localStorage`
+- Separate TypeScript Express 5 service under `server/`
+- SQLite through `better-sqlite3`; password hashing and bearer-token generation through Node crypto
 - npm, Node.js 20.19+ or newer LTS
 
 ## Install, Run, Build, Test
 
 ```bash
 npm install
+npm --prefix server install
+npm run server:start
 npm start
 npm run build
 npm test
 npm run test:ci
 npm run check
+npm --prefix server run check
+npm run prototype:reset
 ```
 
-The dev server is expected at `http://localhost:4200`.
+The Angular dev server is expected at `http://localhost:4200`; its `/api` requests proxy to the
+local prototype server at `http://localhost:3000`. Run the two services in separate terminals.
 
 `npm run check` is the standard repository quality gate. It runs the production build, the
 single-run test suite, and the Prettier check. `npm test` remains available for development, while
@@ -84,6 +91,14 @@ npx prettier . --check
   separate accessible information popover.
 - Provider-neutral `SPEECH_TRANSCRIPTION` boundary with a default disabled adapter, no network
   transfer, and no pronunciation scoring.
+- Local Express/SQLite prototype foundation with hashed demo passwords, hashed eight-hour bearer
+  sessions, parent/therapist roles, and fictional display-name-only child profiles.
+- Demo login at `/prijava` and profile selection at `/profili`. Home and catalog remain public;
+  entering a game requires the parent role and an active demo child.
+- The Angular client stores the demo bearer token and selected fictional profile in
+  `sessionStorage`; logout and expired API responses clear both.
+- A global notice labels every page as a non-production thesis prototype for fictional test data
+  only.
 - Documented privacy, consent, retention, account, vendor, and security requirements that must be
   approved before any external speech processing.
 - Accessible answer groups and selected states, semantic progress reporting, and focus transitions
@@ -95,6 +110,10 @@ npx prettier . --check
 - `src/app/app.routes.ts`: top-level lazy routes.
 - `src/app/core/layout/`: shared app layout/header.
 - `src/app/core/services/speech-transcription.service.ts`: disabled-by-default future ASR boundary.
+- `src/app/core/services/prototype-auth.service.ts`: demo auth/profile API client and
+  `sessionStorage` boundary.
+- `src/app/core/guards/prototype-auth.guards.ts`: authenticated, parent-game, and therapist role
+  guards.
 - `src/app/shared/`: shared components and services.
 - `src/app/features/home/`: home page.
 - `src/app/features/games/games.routes.ts`: lazy game routes.
@@ -108,6 +127,9 @@ npx prettier . --check
   components.
 - `src/app/features/progress/`: local parent/progress view.
 - `src/main.css`: global styles, tokens, colors, typography, reset.
+- `server/`: separate Express/SQLite service, API tests, seed/reset workflow, and ignored runtime
+  database.
+- `docs/PROTOTYPE_BACKEND.md`: local service setup, API, storage, and security boundaries.
 - `public/assets/games/`: generated game assets.
 - `public/assets/games/themes/`: transparent soft-toy artwork for all eight supported themes.
 - `public/assets/games/decorations/`: decorative catalog/gameplay edge artwork.
@@ -154,13 +176,17 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   not affect points or be presented as pronunciation quality, an error score, or a clinical result.
 - The thesis prototype may use predefined demo parent/therapist credentials and fictional child
   display names. It must not claim production security or accept real children’s data.
+- Demo passwords are hashed with scrypt. Random bearer tokens last eight hours, are hashed in
+  SQLite, and are stored by Angular only in `sessionStorage`.
 - Prefer small, explicit services over a global state library.
 - Preserve Croatian UI/content wording.
 - Keep the interface visually friendly for children while the progress page remains clearer and calmer for adults.
 
 ## Known Bugs, Risks, and Unfinished Work
 
-- No backend, authentication, or demo profiles are implemented yet; they begin in Milestone 9.
+- The Milestone 9 backend covers only demo authentication and display-name-only child profiles.
+  Game sessions, recording uploads, cascaded audio deletion, and backend progress begin in
+  Milestone 10.
 - No ASR provider or automatic articulation error detection is implemented. The current service
   boundary remains disabled. A local, non-clinical transcript-matching worker is approved only for
   the later thesis-prototype milestone.
@@ -185,11 +211,11 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Merge the visible per-question recording panel and typed `RecordedAttempt` boundary.
-2. Implement Milestone 9: the local Express/SQLite foundation, demo login, and fictional child
-   profiles.
-3. Continue through session persistence, local transcription, parent progress, therapist review,
-   and integrated QA exactly in the dependency order documented in `DEVELOPMENT_PLAN.md`.
+1. Merge the local Express/SQLite foundation, demo login, and fictional child profiles.
+2. Implement Milestone 10: persist game sessions and multiple recording attempts under the active
+   demo child.
+3. Continue through local transcription, parent progress, therapist review, and integrated QA
+   exactly in the dependency order documented in `DEVELOPMENT_PLAN.md`.
 
 ## Do Not Change Without Asking
 
@@ -218,5 +244,6 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 - Node.js 20.19+ or newer LTS.
 - npm.
+- A second terminal for the Express service during integrated local development.
 - For microphone use: supported browser and secure context (`localhost` or HTTPS).
 - No environment variables are required at this time.
