@@ -12,8 +12,8 @@
     "server:start": "npm --prefix server start",
     "server:dev": "npm --prefix server run dev",
     "server:test": "npm --prefix server test",
-    "transcription:start": "transcription/.venv/Scripts/python.exe -m uvicorn transcription.app:app --host 127.0.0.1 --port 8000",
-    "transcription:test": "transcription/.venv/Scripts/python.exe -m pytest transcription",
+    "transcription:start": "transcription\\.venv\\Scripts\\python.exe -m uvicorn transcription.app:app --host 127.0.0.1 --port 8000",
+    "transcription:test": "transcription\\.venv\\Scripts\\python.exe -m pytest transcription",
     "prototype:reset": "npm --prefix server run reset"
   },
   "private": true,

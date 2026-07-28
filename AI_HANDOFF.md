@@ -81,6 +81,9 @@ npx prettier . --check
 - Configurable scoring per content package.
 - Backend-backed progress for the active fictional demo profile. The legacy local progress service
   remains only to clear the old non-migrated browser key during deletion.
+- Adult-facing progress expands each backend session into all saved recording attempts, including
+  expected text, transcript state, `Podudarnost teksta`, authenticated playback, and the full
+  therapist-review state/comment. It never exposes those automated details in child gameplay.
 - A visible optional microphone panel is placed between each question's prompt/media and answers.
   It supports permission, recording, stopped/replay, delete, asynchronous saving/saved, and retry
   presentation without automatic speech scoring.
@@ -116,7 +119,8 @@ npx prettier . --check
 - Recording upload failures retain the browser-local recording for retry or deletion. Uploading
   never changes points or blocks question progression.
 - Parent session, attempt, and profile deletion cascades through SQLite and physical audio files.
-  The reset command also removes runtime recordings before reseeding.
+  Progress provides confirmed session deletion and confirmed active-profile/data deletion; both
+  also clear the legacy browser key. The reset command removes runtime recordings before reseeding.
 - Demo login at `/prijava` and profile selection at `/profili`. Home and catalog remain public;
   entering a game requires the parent role and an active demo child.
 - The Angular client stores the demo bearer token and selected fictional profile in
@@ -211,8 +215,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Known Bugs, Risks, and Unfinished Work
 
-- Local recording persistence and local Croatian transcription are implemented. Expanded parent
-  presentation of transcript/match state and therapist reviews begin in Milestones 12 and 13.
+- Local recording persistence, Croatian transcription, and the expanded parent presentation are
+  implemented. Creating and saving therapist reviews remains Milestone 13.
 - No external ASR provider or automatic articulation error detection is implemented. The original
   browser transcription port remains disabled; Express alone calls the localhost worker.
 - No approved controller, legal basis, guardian verification, ASR provider, exact provider
@@ -240,10 +244,9 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Merge Milestone 11 local Croatian transcription and non-clinical text matching.
-2. Implement Milestone 12 expanded parent progress and privacy presentation.
-3. Continue through therapist review and integrated QA exactly in the
-   dependency order documented in `DEVELOPMENT_PLAN.md`.
+1. Merge Milestone 12 expanded parent progress and privacy presentation.
+2. Implement Milestone 13 therapist recording review.
+3. Complete integrated thesis-prototype QA exactly as documented in `DEVELOPMENT_PLAN.md`.
 
 ## Do Not Change Without Asking
 

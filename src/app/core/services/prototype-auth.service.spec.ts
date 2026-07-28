@@ -59,4 +59,32 @@ describe('PrototypeAuthService', () => {
     expect(service.isAuthenticated()).toBe(false);
     expect(sessionStorage.getItem('artikulino.prototype.token')).toBeNull();
   });
+
+  it('loads protected audio with the current bearer token', async () => {
+    sessionStorage.setItem('artikulino.prototype.token', 'demo-token');
+    sessionStorage.setItem(
+      'artikulino.prototype.user',
+      JSON.stringify({ id: 'parent', email: 'parent@artikulino.test', role: 'PARENT' }),
+    );
+    const audio = new Blob(['fictional adult recording'], { type: 'audio/webm' });
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(audio, { status: 200, headers: { 'Content-Type': 'audio/webm' } }),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    const service = TestBed.inject(PrototypeAuthService);
+
+    const result = await service.apiBlobRequest('/api/attempts/attempt-1/audio');
+
+    expect(result.type).toBe('audio/webm');
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/attempts/attempt-1/audio',
+      expect.objectContaining({
+        headers: expect.any(Headers),
+      }),
+    );
+    const requestHeaders = fetchMock.mock.calls[0][1].headers as Headers;
+    expect(requestHeaders.get('Authorization')).toBe('Bearer demo-token');
+  });
 });

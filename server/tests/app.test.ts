@@ -245,6 +245,10 @@ describe('prototype API', () => {
     const first = await uploadAttempt(authorization, sessionId).expect(201);
     const second = await uploadAttempt(authorization, sessionId, { attemptNumber: 2 }).expect(201);
     expect(first.body.attempt.id).not.toBe(second.body.attempt.id);
+    expect(first.body.attempt.therapistReview).toEqual({
+      status: 'NOT_REVIEWED',
+      comment: '',
+    });
     expect(first.body.attempt).not.toHaveProperty('storageName');
     expect(first.body.attempt).not.toHaveProperty('path');
     expect(readdirSync(recordingsDirectory)).toHaveLength(2);
@@ -260,6 +264,22 @@ describe('prototype API', () => {
       .set(authorization)
       .expect(200);
     expect(audio.headers['content-type']).toContain('audio/webm');
+  });
+
+  it('requires authentication for audio and permits therapist playback', async () => {
+    const authorization = await parentAuthorization();
+    const sessionId = (await createGameSession(authorization)).body.session.id as string;
+    const attemptId = (await uploadAttempt(authorization, sessionId)).body.attempt.id as string;
+
+    await request(app).get(`/api/attempts/${attemptId}/audio`).expect(401);
+
+    const therapistToken = (await login('therapist@artikulino.test', 'TherapistDemo123!')).body
+      .token as string;
+    const response = await request(app)
+      .get(`/api/attempts/${attemptId}/audio`)
+      .set('Authorization', `Bearer ${therapistToken}`)
+      .expect(200);
+    expect(response.headers['content-type']).toContain('audio/webm');
   });
 
   it('stores Croatian transcripts and text match after queued processing', async () => {

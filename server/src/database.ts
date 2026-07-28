@@ -8,6 +8,13 @@ export type DemoRole = 'PARENT' | 'THERAPIST';
 export type PrototypeGameType = 'listen-and-decide' | 'catch-the-sound' | 'sound-position';
 export type PrototypeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
 export type TranscriptionStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
+export type TherapistReviewStatus = 'NOT_REVIEWED' | 'LOOKS_GOOD' | 'PRACTICE_AGAIN';
+
+export interface TherapistReview {
+  readonly status: TherapistReviewStatus;
+  readonly comment: string;
+  readonly reviewedAt?: string;
+}
 
 export interface DemoUserRow {
   readonly id: string;
@@ -70,6 +77,7 @@ export interface PrototypeRecordingAttempt {
   readonly transcriptionStatus: TranscriptionStatus;
   readonly transcript?: string;
   readonly textMatch?: number;
+  readonly therapistReview: TherapistReview;
 }
 
 export interface PendingTranscriptionJob {
@@ -153,6 +161,9 @@ interface RecordingAttemptDatabaseRow {
   readonly transcription_status: TranscriptionStatus;
   readonly transcript: string | null;
   readonly text_match: number | null;
+  readonly review_status: TherapistReviewStatus | null;
+  readonly review_comment: string | null;
+  readonly reviewed_at: number | null;
 }
 
 const PARENT_ID = 'demo-parent';
@@ -423,7 +434,15 @@ export class PrototypeDatabase {
       );
     return this.mapRecordingAttempt(
       this.sqlite
-        .prepare('SELECT * FROM recording_attempts WHERE id = ?')
+        .prepare(
+          `SELECT recording_attempts.*,
+                  therapist_reviews.status AS review_status,
+                  therapist_reviews.comment AS review_comment,
+                  therapist_reviews.reviewed_at
+           FROM recording_attempts
+           LEFT JOIN therapist_reviews ON therapist_reviews.attempt_id = recording_attempts.id
+           WHERE recording_attempts.id = ?`,
+        )
         .get(id) as RecordingAttemptDatabaseRow,
     );
   }
@@ -523,7 +542,16 @@ export class PrototypeDatabase {
 
   private mapGameSession(row: GameSessionDatabaseRow): PrototypeGameSession {
     const attempts = this.sqlite
-      .prepare('SELECT * FROM recording_attempts WHERE session_id = ? ORDER BY created_at')
+      .prepare(
+        `SELECT recording_attempts.*,
+                therapist_reviews.status AS review_status,
+                therapist_reviews.comment AS review_comment,
+                therapist_reviews.reviewed_at
+         FROM recording_attempts
+         LEFT JOIN therapist_reviews ON therapist_reviews.attempt_id = recording_attempts.id
+         WHERE recording_attempts.session_id = ?
+         ORDER BY recording_attempts.created_at`,
+      )
       .all(row.id) as RecordingAttemptDatabaseRow[];
     return {
       id: row.id,
@@ -560,6 +588,13 @@ export class PrototypeDatabase {
       transcriptionStatus: row.transcription_status,
       ...(row.transcript !== null ? { transcript: row.transcript } : {}),
       ...(row.text_match !== null ? { textMatch: row.text_match } : {}),
+      therapistReview: {
+        status: row.review_status ?? 'NOT_REVIEWED',
+        comment: row.review_comment ?? '',
+        ...(row.reviewed_at !== null
+          ? { reviewedAt: new Date(row.reviewed_at).toISOString() }
+          : {}),
+      },
     };
   }
 

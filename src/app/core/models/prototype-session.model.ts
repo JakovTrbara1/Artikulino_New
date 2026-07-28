@@ -5,6 +5,13 @@ import {
 } from '../../features/games/models/content-package.model';
 
 export type TranscriptionStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
+export type TherapistReviewStatus = 'NOT_REVIEWED' | 'LOOKS_GOOD' | 'PRACTICE_AGAIN';
+
+export interface TherapistReview {
+  readonly status: TherapistReviewStatus;
+  readonly comment: string;
+  readonly reviewedAt?: string;
+}
 
 export interface PrototypeRecordingAttempt {
   readonly id: string;
@@ -18,6 +25,7 @@ export interface PrototypeRecordingAttempt {
   readonly transcriptionStatus: TranscriptionStatus;
   readonly transcript?: string;
   readonly textMatch?: number;
+  readonly therapistReview: TherapistReview;
 }
 
 export interface PrototypeGameSession {

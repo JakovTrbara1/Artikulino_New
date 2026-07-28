@@ -4,10 +4,10 @@
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
   services, and backend-backed local prototype progress.
-- Milestones 0–10 are complete and merged into `main`; Milestone 11 is implemented on its review
-  branch.
-- The current production build, all 61 frontend tests, all 17 server tests, all 5 Python worker
-  tests, and Prettier checks pass.
+- Milestones 0–11 are complete and merged into `main`; Milestone 12 is implemented on
+  `codex/parent-prototype-progress`.
+- The production build, frontend tests, server tests, Python worker tests, and Prettier checks are
+  required to pass before Milestone 12 review.
 - The frontend-only MVP has no confirmed technical blocker, but real-device accessibility,
   microphone, and Croatian voice checks remain documented in `docs/MVP_READINESS.md`.
 - The next phase is a local master’s-thesis prototype. It may add demo accounts, a local backend,
@@ -42,10 +42,10 @@ not authoritative.
    microphone state coverage.
 2. Completed: revised roadmap, approved design references, soft-toy assets, catalog redesign,
    recording UX, backend foundation, demo login, and demo child profiles.
-3. Current: persist sessions and recording attempts.
-4. Next: add local Croatian transcription and text matching.
-5. Then: expand parent progress with transcription and therapist-review details.
-6. Then: add therapist recording review.
+3. Completed: persist sessions and recording attempts.
+4. Completed: local Croatian transcription and text matching.
+5. Current: expand parent progress with transcription and therapist-review details.
+6. Next: add therapist recording review.
 7. Last: run integrated thesis-prototype QA and document the demonstration workflow.
 
 ## 5. Milestones
