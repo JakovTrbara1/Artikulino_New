@@ -1,7 +1,14 @@
 import { Injectable, signal } from '@angular/core';
 
 export type RecorderStatus =
-  'idle' | 'requesting' | 'recording' | 'ready' | 'denied' | 'unsupported' | 'error';
+  'idle' | 'requesting' | 'recording' | 'stopped' | 'denied' | 'unsupported' | 'error';
+
+export interface LocalRecording {
+  readonly blob: Blob;
+  readonly mimeType: string;
+  readonly durationMs: number;
+  readonly audioUrl: string;
+}
 
 @Injectable()
 export class MicrophoneRecorderService {
@@ -10,12 +17,18 @@ export class MicrophoneRecorderService {
   private chunks: Blob[] = [];
   private currentUrl?: string;
   private discardNextRecording = false;
+  private recordingStartedAt?: number;
+  private durationTimer?: ReturnType<typeof setInterval>;
 
   private readonly statusState = signal<RecorderStatus>('idle');
   private readonly audioUrlState = signal<string | null>(null);
+  private readonly recordingState = signal<LocalRecording | null>(null);
+  private readonly durationMsState = signal(0);
 
   readonly status = this.statusState.asReadonly();
   readonly audioUrl = this.audioUrlState.asReadonly();
+  readonly recording = this.recordingState.asReadonly();
+  readonly durationMs = this.durationMsState.asReadonly();
 
   async start(): Promise<void> {
     if (
@@ -43,6 +56,7 @@ export class MicrophoneRecorderService {
       this.recorder.addEventListener(
         'stop',
         () => {
+          this.stopDurationClock();
           if (this.discardNextRecording) {
             this.discardNextRecording = false;
             this.chunks = [];
@@ -50,18 +64,27 @@ export class MicrophoneRecorderService {
             this.releaseStream();
             return;
           }
-          const blob = new Blob(this.chunks, { type: this.recorder?.mimeType || 'audio/webm' });
+          const mimeType = this.recorder?.mimeType || 'audio/webm';
+          const blob = new Blob(this.chunks, { type: mimeType });
           this.currentUrl = URL.createObjectURL(blob);
           this.audioUrlState.set(this.currentUrl);
+          this.recordingState.set({
+            blob,
+            mimeType,
+            durationMs: this.durationMsState(),
+            audioUrl: this.currentUrl,
+          });
           this.releaseStream();
           this.recorder = undefined;
-          this.statusState.set('ready');
+          this.statusState.set('stopped');
         },
         { once: true },
       );
       this.recorder.start();
+      this.startDurationClock();
       this.statusState.set('recording');
     } catch (error) {
+      this.stopDurationClock();
       this.releaseStream();
       const permissionDenied =
         error instanceof DOMException &&
@@ -77,6 +100,7 @@ export class MicrophoneRecorderService {
   }
 
   clearRecording(): void {
+    this.stopDurationClock();
     if (this.recorder?.state === 'recording') {
       this.discardNextRecording = true;
       this.recorder.stop();
@@ -89,6 +113,8 @@ export class MicrophoneRecorderService {
       this.currentUrl = undefined;
     }
     this.audioUrlState.set(null);
+    this.recordingState.set(null);
+    this.durationMsState.set(0);
     this.chunks = [];
     this.statusState.set('idle');
   }
@@ -96,5 +122,28 @@ export class MicrophoneRecorderService {
   private releaseStream(): void {
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = undefined;
+  }
+
+  private startDurationClock(): void {
+    this.recordingStartedAt = Date.now();
+    this.durationMsState.set(0);
+    this.durationTimer = setInterval(() => this.updateDuration(), 200);
+  }
+
+  private stopDurationClock(): void {
+    if (this.recordingStartedAt !== undefined) {
+      this.updateDuration();
+    }
+    if (this.durationTimer !== undefined) {
+      clearInterval(this.durationTimer);
+      this.durationTimer = undefined;
+    }
+    this.recordingStartedAt = undefined;
+  }
+
+  private updateDuration(): void {
+    if (this.recordingStartedAt !== undefined) {
+      this.durationMsState.set(Math.max(0, Date.now() - this.recordingStartedAt));
+    }
   }
 }

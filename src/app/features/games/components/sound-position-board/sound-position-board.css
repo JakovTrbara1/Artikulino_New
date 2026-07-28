@@ -1,8 +1,15 @@
 .position-board {
+  display: grid;
+  grid-template-areas:
+    'word'
+    'train'
+    'recording'
+    'help';
   text-align: center;
 }
 
 .word-row {
+  grid-area: word;
   min-height: 5.5rem;
   display: flex;
   align-items: center;
@@ -22,7 +29,7 @@
 }
 
 .train-stage {
-  position: relative;
+  grid-area: train;
   width: min(100%, 59rem);
   margin-inline: auto;
 }
@@ -38,11 +45,24 @@
 }
 
 .train-options {
-  position: absolute;
-  inset: 0;
+  z-index: 1;
+  grid-area: train;
+  width: min(100%, 59rem);
+  margin-inline: auto;
   display: grid;
   grid-template-columns: 38.5fr 29fr 32.5fr;
   align-items: center;
+}
+
+.recording-slot {
+  grid-area: recording;
+}
+
+.answer-hint-slot {
+  z-index: 2;
+  grid-area: train;
+  align-self: center;
+  justify-self: center;
 }
 
 button,
@@ -88,6 +108,7 @@ button.selected {
 }
 
 .train-help {
+  grid-area: help;
   margin: -0.25rem 0 0;
   color: var(--color-navy-700);
   font-weight: 800;

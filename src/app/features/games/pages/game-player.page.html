@@ -122,7 +122,17 @@
                 [disabled]="!hasListened() || session.isAnswered()"
                 [selectedId]="selectedAnswer()"
                 (answer)="chooseAnswer($event)"
-              />
+              >
+                <app-microphone-practice
+                  recordingPanel
+                  [questionId]="question.id"
+                  (recordedAttempt)="receiveRecordedAttempt($event)"
+                  (recordingDeleted)="clearRecordedAttempt()"
+                />
+                @if (!hasListened()) {
+                  <p answerHint class="listen-hint">Najprije pritisni „Poslušaj”.</p>
+                }
+              </app-listen-decide-board>
             }
             @case ('catch-the-sound') {
               <app-catch-sound-board
@@ -130,7 +140,17 @@
                 [disabled]="!hasListened() || session.isAnswered()"
                 [selectedId]="selectedAnswer()"
                 (answer)="chooseAnswer($event)"
-              />
+              >
+                <app-microphone-practice
+                  recordingPanel
+                  [questionId]="question.id"
+                  (recordedAttempt)="receiveRecordedAttempt($event)"
+                  (recordingDeleted)="clearRecordedAttempt()"
+                />
+                @if (!hasListened()) {
+                  <p answerHint class="listen-hint">Najprije pritisni „Poslušaj”.</p>
+                }
+              </app-catch-sound-board>
             }
             @case ('sound-position') {
               <app-sound-position-board
@@ -138,11 +158,18 @@
                 [disabled]="!hasListened() || session.isAnswered()"
                 [selectedId]="selectedAnswer()"
                 (answer)="chooseAnswer($event)"
-              />
+              >
+                <app-microphone-practice
+                  recordingPanel
+                  [questionId]="question.id"
+                  (recordedAttempt)="receiveRecordedAttempt($event)"
+                  (recordingDeleted)="clearRecordedAttempt()"
+                />
+                @if (!hasListened()) {
+                  <p answerHint class="listen-hint">Najprije pritisni „Poslušaj”.</p>
+                }
+              </app-sound-position-board>
             }
-          }
-          @if (!hasListened()) {
-            <p class="listen-hint">Najprije pritisni „Poslušaj”.</p>
           }
         </div>
 
@@ -175,8 +202,6 @@
             <span aria-hidden="true">→</span>
           </button>
         }
-
-        <app-microphone-practice />
       </section>
     }
   } @else {

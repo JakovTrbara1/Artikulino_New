@@ -24,6 +24,14 @@
     }
   </div>
 
+  <div class="recording-slot">
+    <ng-content select="[recordingPanel]" />
+  </div>
+
+  <div class="answer-hint-slot">
+    <ng-content select="[answerHint]" />
+  </div>
+
   <div class="sound-options" role="group" aria-label="Odaberi koji glas čuješ">
     @for (option of question().answers; track option.id; let index = $index) {
       <button

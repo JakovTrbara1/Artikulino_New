@@ -1,0 +1,44 @@
+<audio
+  #audio
+  [src]="recording().audioUrl"
+  preload="metadata"
+  (ended)="replayEnded()"
+  (pause)="replayEnded()"
+></audio>
+
+<div class="recording-preview">
+  <button
+    class="play-control"
+    type="button"
+    [attr.aria-label]="isReplaying() ? 'Zaustavi svoju snimku' : 'Poslušaj svoju snimku'"
+    (click)="toggleReplay()"
+  >
+    @if (isReplaying()) {
+      <span class="pause-icon" aria-hidden="true"></span>
+    } @else {
+      <span class="play-icon" aria-hidden="true"></span>
+    }
+  </button>
+  <span class="waveform" aria-hidden="true">
+    @for (height of [10, 18, 28, 16, 34, 22, 30, 14, 26, 20, 32, 17, 24, 12]; track $index) {
+      <span [style.height.px]="height"></span>
+    }
+  </span>
+  <strong>{{ formatDuration(recording().durationMs) }}</strong>
+</div>
+
+<div class="recording-actions">
+  <button class="replay-button" type="button" (click)="toggleReplay()">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 10v4h4l5 4V6L9 10H5Z" />
+      <path d="M17 9a4 4 0 0 1 0 6M19 7a7 7 0 0 1 0 10" />
+    </svg>
+    {{ isReplaying() ? 'Zaustavi snimku' : 'Poslušaj snimku' }}
+  </button>
+  <button class="delete-button" type="button" (click)="deleteRequested.emit()">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" />
+    </svg>
+    Izbriši
+  </button>
+</div>

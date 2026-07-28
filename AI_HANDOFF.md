@@ -65,7 +65,12 @@ npx prettier . --check
 - Shared game session flow: play/listen, replay, answer, feedback, scoring, next question, final result.
 - Configurable scoring per content package.
 - Local progress storage.
-- Microphone recording for practice replay only, without upload or automatic speech scoring.
+- A visible optional microphone panel is placed between each question's prompt/media and answers.
+  It supports permission, recording, stopped/replay, delete, saving/saved, and retry presentation
+  without upload or automatic speech scoring.
+- Each question ID resets the local microphone state. A stopped recording emits a typed
+  `RecordedAttempt` with its blob, MIME type, duration, question ID, and per-question attempt
+  number for the later prototype backend boundary.
 - Browser Speech Synthesis as the supported MVP path for spoken prompts when no approved local
   recording is available.
 - Demo content packages for required sounds, pairs, themes, and difficulty levels.
@@ -169,7 +174,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   human verification on target devices.
 - The experimental `codex/priority-food-audio` branch contains unreviewed Windows OneCore-generated
   WAV files and must not be merged. Packaged audio is deferred and does not block the MVP.
-- MediaRecorder availability and output format vary by browser.
+- MediaRecorder availability and output format vary by browser. Permission and recording still
+  require a supported browser and a human check on the target device.
 - Python is not installed on the current development machine. Local Whisper work requires
   documented Python 3.11/3.12 and FFmpeg setup.
 - The catalog information control uses an in-page popover rather than a dialog. Escape, outside
@@ -179,10 +185,11 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Merge the catalog filter/tile redesign and theme-to-package mapping.
-2. Implement the visible per-question recording panel and reset behavior.
-3. Continue through backend, local transcription, parent progress, therapist review, and integrated
-   QA exactly in the dependency order documented in `DEVELOPMENT_PLAN.md`.
+1. Merge the visible per-question recording panel and typed `RecordedAttempt` boundary.
+2. Implement Milestone 9: the local Express/SQLite foundation, demo login, and fictional child
+   profiles.
+3. Continue through session persistence, local transcription, parent progress, therapist review,
+   and integrated QA exactly in the dependency order documented in `DEVELOPMENT_PLAN.md`.
 
 ## Do Not Change Without Asking
 

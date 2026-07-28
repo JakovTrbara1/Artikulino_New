@@ -1,83 +1,287 @@
-.practice {
-  width: min(100%, 38rem);
-  margin: 1.5rem auto 0;
-  border-top: 1px solid var(--color-border);
-  padding-top: 1rem;
+:host {
+  display: block;
+  width: min(100%, 58rem);
+  margin: 1.25rem auto;
 }
 
-summary {
-  min-height: 2.75rem;
+.practice {
+  border: 2px solid rgb(85 200 167 / 42%);
+  border-radius: 1.65rem;
+  background: linear-gradient(145deg, #fff 0%, #e6f9f2 100%);
+  box-shadow:
+    0 0.38rem 0 rgb(35 127 106 / 44%),
+    0 1rem 2rem rgb(13 49 95 / 10%);
+  padding: clamp(1rem, 2.5vw, 1.4rem);
+  text-align: left;
+}
+
+.practice-header,
+.practice-title,
+.practice-body,
+.delivery-status,
+.recording-live {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
+}
+
+.practice-header {
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.practice-title {
+  gap: 0.75rem;
+}
+
+.title-icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 0.85rem;
+  background: #bcebd9;
+  color: var(--color-mint-dark);
+}
+
+.title-icon svg,
+.microphone-button svg,
+.recording-actions svg,
+.delivery-status svg {
+  width: 1.65rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.practice-title h2 {
+  margin: 0 0 0.18rem;
+  font-size: clamp(1.25rem, 3vw, 1.65rem);
+}
+
+.practice-title p {
+  margin: 0;
   color: var(--color-navy-700);
-  font-weight: 800;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.delivery-status {
+  min-height: 2.65rem;
+  flex: 0 0 auto;
+  gap: 0.45rem;
+  margin: 0;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.delivery-status svg {
+  width: 1.2rem;
+}
+
+.delivery-status.is-saving {
+  background: var(--color-sky-100);
+  color: var(--color-navy-700);
+}
+
+.delivery-status.is-saving span {
+  width: 0.7rem;
+  height: 0.7rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+.delivery-status.is-saved {
+  background: #d5f5e9;
+  color: var(--color-mint-dark);
+}
+
+.delivery-status.is-retry {
+  background: #fff1ce;
+  color: #744800;
   cursor: pointer;
 }
 
 .practice-body {
-  padding-top: 0.75rem;
-  text-align: center;
+  gap: clamp(1rem, 3vw, 1.6rem);
+  margin-top: 1rem;
 }
 
-.practice-body p {
-  margin-bottom: 0.85rem;
-  color: var(--color-muted);
-  font-size: 0.9rem;
-}
-
-.record-button {
-  min-height: 3rem;
+.microphone-button {
+  width: clamp(5.5rem, 12vw, 7rem);
+  height: clamp(5.5rem, 12vw, 7rem);
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
   border: 0;
-  border-radius: 999px;
-  background: var(--color-sky-100);
-  padding: 0.75rem 1.1rem;
-  color: var(--color-navy-900);
-  font-weight: 800;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #7ee0c1, #43b892);
+  box-shadow:
+    0 0.42rem 0 var(--color-mint-dark),
+    0 0.9rem 1.6rem rgb(13 49 95 / 18%),
+    inset 0 0.18rem 0 rgb(255 255 255 / 60%);
+  color: #fff;
   cursor: pointer;
 }
 
-.record-button span {
-  width: 0.7rem;
-  height: 0.7rem;
-  display: inline-block;
-  margin-right: 0.35rem;
+.microphone-button:not(:disabled):hover,
+.microphone-button:not(:disabled):focus-visible {
+  transform: translateY(-0.2rem);
+  box-shadow:
+    0 0.6rem 0 var(--color-mint-dark),
+    0 1.1rem 2rem rgb(13 49 95 / 22%);
+}
+
+.microphone-button:active {
+  transform: translateY(0.25rem);
+  box-shadow: 0 0.12rem 0 var(--color-mint-dark);
+}
+
+.microphone-button:disabled {
+  opacity: 0.62;
+  cursor: wait;
+}
+
+.microphone-button svg {
+  width: 3.6rem;
+  stroke-width: 1.7;
+}
+
+.microphone-button.is-recording {
+  background: linear-gradient(145deg, #ff7a71, var(--color-coral));
+  box-shadow:
+    0 0.42rem 0 var(--color-coral-dark),
+    0 0 0 0.45rem rgb(244 95 87 / 14%);
+  animation: recording-pulse 1.4s ease-in-out infinite;
+}
+
+.stop-mark {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 0.45rem;
+  background: #fff;
+}
+
+.recording-content {
+  flex: 1 1 auto;
+}
+
+.idle-copy strong,
+.idle-copy span {
+  display: block;
+}
+
+.idle-copy strong {
+  margin-bottom: 0.35rem;
+  color: var(--color-navy-900);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.idle-copy span,
+.recording-help {
+  color: var(--color-muted);
+  font-size: 0.84rem;
+}
+
+.recording-live {
+  gap: 0.5rem;
+}
+
+.recording-live strong {
+  font-family: var(--font-display);
+}
+
+.recording-live > span:last-child {
+  margin-left: auto;
+  font-weight: 900;
+}
+
+.recording-dot {
+  width: 0.85rem;
+  height: 0.85rem;
   border-radius: 50%;
   background: var(--color-coral);
+  animation: recording-pulse 1s ease-in-out infinite;
 }
 
-.record-button.is-recording span {
-  border-radius: 0.12rem;
-}
-
-.recording {
-  margin-top: 1rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-}
-
-audio {
-  max-width: 100%;
-}
-
-.remove-button {
-  min-height: 2.75rem;
-  border: 0;
-  background: transparent;
-  color: var(--color-danger);
-  font-weight: 800;
-  text-decoration: underline;
-  cursor: pointer;
+.recording-help {
+  margin: 0.35rem 0 0;
 }
 
 .notice {
-  margin-top: 0.75rem;
+  margin: 0.85rem 0 0;
   border-radius: var(--radius-sm);
-  background: #fff4d8;
+  background: #fff1ce;
   padding: 0.75rem;
-  color: var(--color-navy-900) !important;
+  color: #744800;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+@keyframes recording-pulse {
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 38rem) {
+  :host {
+    margin-block: 1rem;
+  }
+
+  .practice {
+    border-radius: 1.35rem;
+    padding: 0.9rem;
+  }
+
+  .practice-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .delivery-status {
+    align-self: flex-start;
+  }
+
+  .microphone-button {
+    width: 5.4rem;
+    height: 5.4rem;
+  }
+
+  .microphone-button svg {
+    width: 3rem;
+  }
+}
+
+@media (max-width: 27rem) {
+  .practice-body {
+    flex-direction: column;
+  }
+
+  .microphone-button {
+    align-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .microphone-button,
+  .recording-dot,
+  .delivery-status.is-saving span {
+    animation: none;
+    transform: none !important;
+  }
 }

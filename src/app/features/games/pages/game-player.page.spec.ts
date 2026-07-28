@@ -51,6 +51,24 @@ describe('GamePlayerPage accessibility', () => {
     expect(progress.getAttribute('aria-valuetext')).toBe('Pitanje 1 od 4');
   });
 
+  it('places the visible optional recording panel before the answer controls', () => {
+    const recorder = fixture.nativeElement.querySelector(
+      'app-microphone-practice',
+    ) as HTMLElement | null;
+    const answers = fixture.nativeElement.querySelector('[role="group"]') as HTMLElement | null;
+
+    expect(recorder).not.toBeNull();
+    expect(answers).not.toBeNull();
+    if (!recorder || !answers) {
+      throw new Error('Panel za snimanje ili odgovori nisu prikazani.');
+    }
+    expect(recorder?.querySelector('details')).toBeNull();
+    expect(recorder?.textContent).toContain('Snimi svoj glas');
+    expect(
+      Boolean(recorder.compareDocumentPosition(answers) & Node.DOCUMENT_POSITION_FOLLOWING),
+    ).toBe(true);
+  });
+
   it('moves focus to the next question heading after advancing', async () => {
     answerCurrentQuestion();
     await clickNextButton();
