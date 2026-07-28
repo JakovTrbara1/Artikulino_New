@@ -13,6 +13,13 @@ import {
 } from './database.js';
 import { DEFAULT_DATABASE_FILE, DEFAULT_RECORDINGS_DIRECTORY } from './runtime-path.js';
 import { createBearerToken, verifyPassword } from './security.js';
+import {
+  LocalTranscriptionClient,
+  SerialTranscriptionQueue,
+  TranscriptionClient,
+  TranscriptionJob,
+  textMatchPercentage,
+} from './transcription.js';
 
 const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000;
 const MAX_RECORDING_BYTES = 10 * 1024 * 1024;
@@ -35,6 +42,7 @@ export interface PrototypeAppOptions {
   readonly databaseFile?: string;
   readonly recordingsDirectory?: string;
   readonly sessionTtlMs?: number;
+  readonly transcriptionClient?: TranscriptionClient;
 }
 
 function bearerToken(request: Request): string | undefined {
@@ -69,6 +77,8 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
   const recordingsDirectory = options.recordingsDirectory ?? DEFAULT_RECORDINGS_DIRECTORY;
   const sessionTtlMs = options.sessionTtlMs ?? EIGHT_HOURS_MS;
   const database = new PrototypeDatabase(databaseFile);
+  const transcriptionClient = options.transcriptionClient ?? new LocalTranscriptionClient();
+  const transcriptionQueue = new SerialTranscriptionQueue();
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: MAX_RECORDING_BYTES, files: 1, fields: 5 },
@@ -129,8 +139,39 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
     );
   };
 
-  app.get('/api/health', (_request, response) => {
-    response.json({ status: 'ok', mode: 'LOCAL_THESIS_PROTOTYPE' });
+  const enqueueTranscription = (job: TranscriptionJob): void => {
+    transcriptionQueue.enqueue(async () => {
+      try {
+        const transcript = await transcriptionClient.transcribe({
+          audioPath: job.audioPath,
+          mimeType: job.mimeType,
+        });
+        database.completeTranscription(
+          job.attemptId,
+          transcript,
+          textMatchPercentage(job.expectedText, transcript),
+        );
+      } catch {
+        database.failTranscription(job.attemptId);
+      }
+    });
+  };
+
+  for (const pending of database.listPendingTranscriptionJobs()) {
+    enqueueTranscription({
+      attemptId: pending.attemptId,
+      audioPath: join(recordingsDirectory, pending.storageName),
+      mimeType: pending.mimeType,
+      expectedText: pending.expectedText,
+    });
+  }
+
+  app.get('/api/health', async (_request, response) => {
+    response.json({
+      status: 'ok',
+      mode: 'LOCAL_THESIS_PROTOTYPE',
+      transcription: await transcriptionClient.health(),
+    });
   });
 
   app.post('/api/auth/login', (request, response) => {
@@ -305,6 +346,12 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
           response.status(404).json({ message: 'Sesija igre nije pronađena.' });
           return;
         }
+        enqueueTranscription({
+          attemptId: attempt.id,
+          audioPath: filePath,
+          mimeType,
+          expectedText,
+        });
         response.status(201).json({ attempt });
       } catch (error) {
         await unlink(filePath).catch(() => undefined);
@@ -348,7 +395,7 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
     response.status(500).json({ message: 'Lokalni prototip trenutačno nije dostupan.' });
   });
 
-  return { app, database };
+  return { app, database, transcriptionQueue };
 }
 
 function parseGameSession(body: unknown): CreateGameSessionInput | undefined {

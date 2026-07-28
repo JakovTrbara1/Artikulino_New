@@ -19,6 +19,8 @@ not diagnose, clinically evaluate speech, or replace a speech therapist.
 - Browser APIs: Speech Synthesis, MediaRecorder, `localStorage`
 - Separate TypeScript Express 5 service under `server/`
 - SQLite through `better-sqlite3`; password hashing and bearer-token generation through Node crypto
+- Python 3.11 FastAPI worker with `faster-whisper` 1.2, local Croatian transcription, CPU, and
+  `int8`
 - npm, Node.js 20.19+ or newer LTS
 
 ## Install, Run, Build, Test
@@ -26,6 +28,9 @@ not diagnose, clinically evaluate speech, or replace a speech therapist.
 ```bash
 npm install
 npm --prefix server install
+py -3.11 -m venv transcription/.venv
+.\transcription\.venv\Scripts\python.exe -m pip install -r transcription/requirements-dev.txt
+npm run transcription:start
 npm run server:start
 npm start
 npm run build
@@ -33,11 +38,13 @@ npm test
 npm run test:ci
 npm run check
 npm --prefix server run check
+npm run transcription:test
 npm run prototype:reset
 ```
 
 The Angular dev server is expected at `http://localhost:4200`; its `/api` requests proxy to the
-local prototype server at `http://localhost:3000`. Run the two services in separate terminals.
+local prototype server at `http://localhost:3000`. Express calls the local transcription worker at
+`http://127.0.0.1:8000`. Run all three services in separate terminals.
 
 `npm run check` is the standard repository quality gate. It runs the production build, the
 single-run test suite, and the Prettier check. `npm test` remains available for development, while
@@ -98,6 +105,14 @@ npx prettier . --check
 - Backend game sessions are stored under the active demo child. Multiple multipart recording
   attempts per question are retained as SQLite metadata plus local files, limited to 15 seconds
   and 10 MB.
+- Express queues stored recording attempts one at a time for the localhost FastAPI worker. Attempts
+  retain `PENDING`, `COMPLETED`, or `FAILED` state plus an optional transcript and integer
+  `Podudarnost teksta`.
+- The worker lazily loads `faster-whisper` `small` by default with Croatian language, CPU, and
+  `int8`; `ARTIKULINO_WHISPER_MODEL` can select a lighter local development model.
+- Transcript matching lowercases, removes punctuation, collapses whitespace, preserves Croatian
+  diacritics, and uses normalized Levenshtein similarity. It never affects points or appears as a
+  pronunciation or clinical score.
 - Recording upload failures retain the browser-local recording for retry or deletion. Uploading
   never changes points or blocks question progression.
 - Parent session, attempt, and profile deletion cascades through SQLite and physical audio files.
@@ -196,11 +211,10 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Known Bugs, Risks, and Unfinished Work
 
-- Local recording persistence is implemented, but transcription state, transcript text,
-  `Podudarnost teksta`, and therapist reviews begin in Milestone 11 and later.
-- No ASR provider or automatic articulation error detection is implemented. The current service
-  boundary remains disabled. A local, non-clinical transcript-matching worker is approved only for
-  the later thesis-prototype milestone.
+- Local recording persistence and local Croatian transcription are implemented. Expanded parent
+  presentation of transcript/match state and therapist reviews begin in Milestones 12 and 13.
+- No external ASR provider or automatic articulation error detection is implemented. The original
+  browser transcription port remains disabled; Express alone calls the localhost worker.
 - No approved controller, legal basis, guardian verification, ASR provider, exact provider
   retention, or consent flow. Requirements are documented, but all release gates remain open.
 - Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
@@ -213,8 +227,12 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   WAV files and must not be merged. Packaged audio is deferred and does not block the MVP.
 - MediaRecorder availability and output format vary by browser. Permission and recording still
   require a supported browser and a human check on the target device.
-- Python is not installed on the current development machine. Local Whisper work requires
-  documented Python 3.11/3.12 and FFmpeg setup.
+- Python 3.11.2 is installed at `C:\Python311\python.exe` and available through `py -3.11`; the
+  `python` Windows Store alias is unreliable. The isolated `transcription/.venv` is Git-ignored.
+- Standalone FFmpeg is not installed. `faster-whisper` uses bundled PyAV/FFmpeg libraries for
+  supported audio, while standalone FFmpeg remains recommended for diagnostics.
+- The first real transcription downloads the configured Whisper model and can take several minutes
+  on the CPU-only development machine.
 - The catalog information control uses an in-page popover rather than a dialog. Escape, outside
   activation, and a second activation close it; only one popover is open at a time.
 - ESLint is not configured; the agreed MVP quality gate is build, tests, and Prettier.
@@ -222,9 +240,9 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Merge Milestone 10 session and recording persistence.
-2. Implement Milestone 11: local Croatian transcription and non-clinical text matching.
-3. Continue through expanded parent progress, therapist review, and integrated QA exactly in the
+1. Merge Milestone 11 local Croatian transcription and non-clinical text matching.
+2. Implement Milestone 12 expanded parent progress and privacy presentation.
+3. Continue through therapist review and integrated QA exactly in the
    dependency order documented in `DEVELOPMENT_PLAN.md`.
 
 ## Do Not Change Without Asking

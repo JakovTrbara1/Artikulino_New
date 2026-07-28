@@ -5,25 +5,61 @@ import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createPrototypeApp } from '../src/app.js';
 import { PrototypeDatabase } from '../src/database.js';
+import {
+  SerialTranscriptionQueue,
+  TranscriptionClient,
+  TranscriptionRequest,
+} from '../src/transcription.js';
+
+class FakeTranscriptionClient implements TranscriptionClient {
+  readonly requests: TranscriptionRequest[] = [];
+  transcript = 'kruška';
+  shouldFail = false;
+
+  async health() {
+    return {
+      status: 'AVAILABLE' as const,
+      model: 'fake-small',
+      language: 'hr',
+      device: 'cpu',
+      computeType: 'int8',
+      modelLoaded: false,
+    };
+  }
+
+  async transcribe(request: TranscriptionRequest): Promise<string> {
+    this.requests.push(request);
+    if (this.shouldFail) {
+      throw new Error('fictional worker failure');
+    }
+    return this.transcript;
+  }
+}
 
 describe('prototype API', () => {
   let directory: string;
   let database: PrototypeDatabase;
   let app: ReturnType<typeof createPrototypeApp>['app'];
   let recordingsDirectory: string;
+  let transcriptionClient: FakeTranscriptionClient;
+  let transcriptionQueue: SerialTranscriptionQueue;
 
   beforeEach(() => {
     directory = mkdtempSync(join(tmpdir(), 'artikulino-server-'));
     recordingsDirectory = join(directory, 'recordings');
+    transcriptionClient = new FakeTranscriptionClient();
     const prototype = createPrototypeApp({
       databaseFile: join(directory, 'test.sqlite'),
       recordingsDirectory,
+      transcriptionClient,
     });
     app = prototype.app;
     database = prototype.database;
+    transcriptionQueue = prototype.transcriptionQueue;
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await transcriptionQueue.waitForIdle();
     database.close();
     rmSync(directory, { recursive: true, force: true });
   });
@@ -78,7 +114,18 @@ describe('prototype API', () => {
 
   it('reports local prototype health', async () => {
     const response = await request(app).get('/api/health').expect(200);
-    expect(response.body).toEqual({ status: 'ok', mode: 'LOCAL_THESIS_PROTOTYPE' });
+    expect(response.body).toEqual({
+      status: 'ok',
+      mode: 'LOCAL_THESIS_PROTOTYPE',
+      transcription: {
+        status: 'AVAILABLE',
+        model: 'fake-small',
+        language: 'hr',
+        device: 'cpu',
+        computeType: 'int8',
+        modelLoaded: false,
+      },
+    });
   });
 
   it('authenticates seeded users without storing plaintext passwords', async () => {
@@ -107,9 +154,11 @@ describe('prototype API', () => {
     const expired = createPrototypeApp({
       databaseFile: join(directory, 'expired.sqlite'),
       sessionTtlMs: -1,
+      transcriptionClient,
     });
     database = expired.database;
     app = expired.app;
+    transcriptionQueue = expired.transcriptionQueue;
     const token = (await login()).body.token as string;
     await request(app).get('/api/children').set('Authorization', `Bearer ${token}`).expect(401);
   });
@@ -211,6 +260,54 @@ describe('prototype API', () => {
       .set(authorization)
       .expect(200);
     expect(audio.headers['content-type']).toContain('audio/webm');
+  });
+
+  it('stores Croatian transcripts and text match after queued processing', async () => {
+    const authorization = await parentAuthorization();
+    const sessionId = (await createGameSession(authorization)).body.session.id as string;
+
+    const uploaded = await uploadAttempt(authorization, sessionId).expect(201);
+    expect(uploaded.body.attempt).toMatchObject({
+      expectedText: 'kruška',
+      transcriptionStatus: 'PENDING',
+    });
+    expect(uploaded.body.attempt).not.toHaveProperty('transcript');
+    await transcriptionQueue.waitForIdle();
+
+    const listed = await request(app)
+      .get('/api/sessions?childId=demo-child-luka')
+      .set(authorization)
+      .expect(200);
+    expect(listed.body.sessions[0].recordingAttempts[0]).toMatchObject({
+      transcriptionStatus: 'COMPLETED',
+      transcript: 'kruška',
+      textMatch: 100,
+    });
+    expect(transcriptionClient.requests).toEqual([
+      expect.objectContaining({
+        mimeType: 'audio/webm',
+      }),
+    ]);
+    expect(transcriptionClient.requests[0]).not.toHaveProperty('expectedText');
+  });
+
+  it('keeps audio and marks the attempt failed when the worker is unavailable', async () => {
+    transcriptionClient.shouldFail = true;
+    const authorization = await parentAuthorization();
+    const sessionId = (await createGameSession(authorization)).body.session.id as string;
+    const uploaded = await uploadAttempt(authorization, sessionId).expect(201);
+    await transcriptionQueue.waitForIdle();
+
+    const listed = await request(app)
+      .get('/api/sessions?childId=demo-child-luka')
+      .set(authorization)
+      .expect(200);
+    expect(listed.body.sessions[0].recordingAttempts[0]).toMatchObject({
+      id: uploaded.body.attempt.id,
+      transcriptionStatus: 'FAILED',
+    });
+    expect(listed.body.sessions[0].recordingAttempts[0]).not.toHaveProperty('transcript');
+    expect(readdirSync(recordingsDirectory)).toHaveLength(1);
   });
 
   it('rejects unsupported, empty, oversized, and overlong recordings clearly', async () => {

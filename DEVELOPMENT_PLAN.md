@@ -3,11 +3,11 @@
 ## 1. Current project understanding
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
-  services, and local-only progress.
-- Milestones 0–9 are complete and merged into `main`; Milestone 10 is implemented on its review
+  services, and backend-backed local prototype progress.
+- Milestones 0–10 are complete and merged into `main`; Milestone 11 is implemented on its review
   branch.
-- The current production build, all 61 frontend tests, all 12 server tests, and Prettier checks
-  pass.
+- The current production build, all 61 frontend tests, all 17 server tests, all 5 Python worker
+  tests, and Prettier checks pass.
 - The frontend-only MVP has no confirmed technical blocker, but real-device accessibility,
   microphone, and Croatian voice checks remain documented in `docs/MVP_READINESS.md`.
 - The next phase is a local master’s-thesis prototype. It may add demo accounts, a local backend,

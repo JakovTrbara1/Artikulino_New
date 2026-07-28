@@ -7,6 +7,7 @@ import { hashBearerToken, hashPassword } from './security.js';
 export type DemoRole = 'PARENT' | 'THERAPIST';
 export type PrototypeGameType = 'listen-and-decide' | 'catch-the-sound' | 'sound-position';
 export type PrototypeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
+export type TranscriptionStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 
 export interface DemoUserRow {
   readonly id: string;
@@ -66,6 +67,16 @@ export interface PrototypeRecordingAttempt {
   readonly durationMs: number;
   readonly fileSize: number;
   readonly createdAt: string;
+  readonly transcriptionStatus: TranscriptionStatus;
+  readonly transcript?: string;
+  readonly textMatch?: number;
+}
+
+export interface PendingTranscriptionJob {
+  readonly attemptId: string;
+  readonly storageName: string;
+  readonly mimeType: string;
+  readonly expectedText: string;
 }
 
 export interface PrototypeGameSession {
@@ -139,6 +150,9 @@ interface RecordingAttemptDatabaseRow {
   readonly file_size: number;
   readonly storage_name: string;
   readonly created_at: number;
+  readonly transcription_status: TranscriptionStatus;
+  readonly transcript: string | null;
+  readonly text_match: number | null;
 }
 
 const PARENT_ID = 'demo-parent';
@@ -414,6 +428,43 @@ export class PrototypeDatabase {
     );
   }
 
+  listPendingTranscriptionJobs(): readonly PendingTranscriptionJob[] {
+    const rows = this.sqlite
+      .prepare(
+        `SELECT id AS attemptId, storage_name AS storageName, mime_type AS mimeType,
+                expected_text AS expectedText
+         FROM recording_attempts
+         WHERE transcription_status = 'PENDING'
+         ORDER BY created_at`,
+      )
+      .all() as PendingTranscriptionJob[];
+    return rows;
+  }
+
+  completeTranscription(attemptId: string, transcript: string, textMatch: number): boolean {
+    return (
+      this.sqlite
+        .prepare(
+          `UPDATE recording_attempts
+           SET transcription_status = 'COMPLETED', transcript = ?, text_match = ?
+           WHERE id = ?`,
+        )
+        .run(transcript, textMatch, attemptId).changes > 0
+    );
+  }
+
+  failTranscription(attemptId: string): boolean {
+    return (
+      this.sqlite
+        .prepare(
+          `UPDATE recording_attempts
+           SET transcription_status = 'FAILED', transcript = NULL, text_match = NULL
+           WHERE id = ?`,
+        )
+        .run(attemptId).changes > 0
+    );
+  }
+
   getRecordingStorage(
     user: AuthenticatedUser,
     attemptId: string,
@@ -506,6 +557,9 @@ export class PrototypeDatabase {
       durationMs: row.duration_ms,
       fileSize: row.file_size,
       createdAt: new Date(row.created_at).toISOString(),
+      transcriptionStatus: row.transcription_status,
+      ...(row.transcript !== null ? { transcript: row.transcript } : {}),
+      ...(row.text_match !== null ? { textMatch: row.text_match } : {}),
     };
   }
 
@@ -565,7 +619,11 @@ export class PrototypeDatabase {
         duration_ms INTEGER NOT NULL CHECK (duration_ms > 0),
         file_size INTEGER NOT NULL CHECK (file_size > 0),
         storage_name TEXT NOT NULL UNIQUE,
-        created_at INTEGER NOT NULL
+        created_at INTEGER NOT NULL,
+        transcription_status TEXT NOT NULL DEFAULT 'PENDING'
+          CHECK (transcription_status IN ('PENDING', 'COMPLETED', 'FAILED')),
+        transcript TEXT,
+        text_match INTEGER CHECK (text_match BETWEEN 0 AND 100)
       );
 
       CREATE TABLE IF NOT EXISTS therapist_reviews (
@@ -582,6 +640,18 @@ export class PrototypeDatabase {
       CREATE INDEX IF NOT EXISTS idx_recording_attempts_session
         ON recording_attempts(session_id, created_at);
     `);
+    this.ensureRecordingAttemptColumn('transcription_status', "TEXT NOT NULL DEFAULT 'PENDING'");
+    this.ensureRecordingAttemptColumn('transcript', 'TEXT');
+    this.ensureRecordingAttemptColumn('text_match', 'INTEGER');
+  }
+
+  private ensureRecordingAttemptColumn(name: string, definition: string): void {
+    const columns = this.sqlite.pragma('table_info(recording_attempts)') as {
+      readonly name: string;
+    }[];
+    if (!columns.some((column) => column.name === name)) {
+      this.sqlite.exec(`ALTER TABLE recording_attempts ADD COLUMN ${name} ${definition}`);
+    }
   }
 
   private seedDemoData(): void {

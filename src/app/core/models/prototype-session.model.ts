@@ -4,6 +4,8 @@ import {
   GameType,
 } from '../../features/games/models/content-package.model';
 
+export type TranscriptionStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
+
 export interface PrototypeRecordingAttempt {
   readonly id: string;
   readonly questionId: string;
@@ -13,6 +15,9 @@ export interface PrototypeRecordingAttempt {
   readonly durationMs: number;
   readonly fileSize: number;
   readonly createdAt: string;
+  readonly transcriptionStatus: TranscriptionStatus;
+  readonly transcript?: string;
+  readonly textMatch?: number;
 }
 
 export interface PrototypeGameSession {
