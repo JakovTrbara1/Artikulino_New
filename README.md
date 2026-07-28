@@ -47,6 +47,7 @@ provjera bez dodavanja nove ovisnosti.
 - `/prijava` – prijava unaprijed definiranim demo računom
 - `/profili` – odabir ili upravljanje izmišljenim demo profilima
 - `/napredak` – pregled sesija aktivnog demo profila s lokalnog poslužitelja
+- `/pregled-terapeuta` – zaštićeni pregled završenih demo sesija, snimki i osvrta terapeuta
 
 Sve glavne stranice učitavaju se lazy loadingom i koriste standalone komponente.
 
@@ -58,8 +59,8 @@ Zaseban Express/SQLite servis služi samo lokalnom diplomskom prototipu.
 - terapeut: `therapist@artikulino.test` / `TherapistDemo123!`.
 
 Naslovnica i katalog ostaju javni. Za pokretanje igre treba se prijaviti kao demo roditelj i
-odabrati izmišljeni profil. Terapeut može samo pregledati sve demo profile; terapeutsko sučelje
-dolazi u kasnijem milestoneu.
+odabrati izmišljeni profil. Terapeut može pregledati završene sesije svih izmišljenih demo profila,
+zaštićeno reproducirati testne snimke te spremiti jednostavan status pregleda i komentar.
 
 Lozinke i tokeni nisu spremljeni u čistom tekstu. Prijava traje osam sati, token je u
 `sessionStorage`. SQLite baza i audiosnimke nalaze se u Git-ignoriranoj mapi `server/runtime/`.
@@ -268,6 +269,6 @@ Optimizirane transparentne soft-toy ilustracije za osam tema nalaze se u
 vrsti igre i koristi tri pristupačna preklopna gumba kao prvi filtar.
 
 Lokalni backend, testni računi, izmišljeni profili, sesije, višestruki pokušaji snimanja, lokalni
-hrvatski prijepis i prošireni roditeljski pregled sada su implementirani. Terapeutski pregled
-dolazi u sljedećem milestoneu. Detaljne upute za Python worker nalaze se u
+hrvatski prijepis, prošireni roditeljski pregled i terapeutski pregled sada su implementirani.
+Sljedeći milestone objedinjuje završnu provjeru cijelog prototipa. Detaljne upute za Python worker nalaze se u
 [`transcription/README.md`](transcription/README.md).

@@ -1,0 +1,324 @@
+<div class="page-shell therapist-shell">
+  <header class="review-heading">
+    <h1>Pregled snimki</h1>
+    <p>
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+        <path d="M12 10v6m0-9h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      Prototip za diplomski rad · Nije klinički sustav
+    </p>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="review-notice" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <section class="surface loading-state" aria-live="polite">
+      <h2>Učitavanje testnih snimki…</h2>
+    </section>
+  } @else {
+    <div class="review-layout">
+      <aside class="surface review-master" aria-label="Odabir demo profila i sesije">
+        <section aria-labelledby="children-title">
+          <h2 id="children-title">Djeca (demo)</h2>
+          <div class="master-list">
+            @for (child of children(); track child.id) {
+              <button
+                type="button"
+                [class.is-selected]="selectedChildId() === child.id"
+                [attr.aria-pressed]="selectedChildId() === child.id"
+                (click)="selectChild(child)"
+              >
+                <span class="profile-avatar" aria-hidden="true">{{ child.displayName[0] }}</span>
+                <span>
+                  <strong>{{ child.displayName }}</strong>
+                  <small>{{ sessionCount(child.id) }} završenih igara</small>
+                </span>
+                <svg aria-hidden="true" viewBox="0 0 20 20">
+                  <path
+                    d="m7 4 6 6-6 6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            } @empty {
+              <p>Nema izmišljenih demo profila.</p>
+            }
+          </div>
+        </section>
+
+        <section aria-labelledby="sessions-title">
+          <h2 id="sessions-title">Završene igre ({{ selectedChildName() }})</h2>
+          <div class="master-list session-master-list">
+            @for (session of selectedChildSessions(); track session.id) {
+              <button
+                type="button"
+                [class.is-selected]="selectedSessionId() === session.id"
+                [attr.aria-pressed]="selectedSessionId() === session.id"
+                (click)="selectSession(session)"
+              >
+                <span class="session-icon" [attr.data-game]="session.gameType" aria-hidden="true">
+                  {{ session.targetSound }}
+                </span>
+                <span>
+                  <strong>{{ session.packageName }}</strong>
+                  <small>{{ session.completedAt | date: 'd. M. y., HH:mm' }}</small>
+                </span>
+                <svg aria-hidden="true" viewBox="0 0 20 20">
+                  <path
+                    d="m7 4 6 6-6 6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            } @empty {
+              <p>Ovaj demo profil još nema dovršenih igara.</p>
+            }
+          </div>
+        </section>
+      </aside>
+
+      <main class="surface attempt-panel">
+        <div class="panel-title">
+          <div>
+            <h2>Pokušaji snimanja</h2>
+            @if (selectedSession(); as session) {
+              <p>
+                {{ session.childDisplayName }} · {{ session.packageName }} · glas
+                {{ session.targetSound }}
+              </p>
+            }
+          </div>
+          @if (selectedSession(); as session) {
+            <span>{{ session.recordingAttempts.length }} testnih snimki</span>
+          }
+        </div>
+
+        @if (detailLoading()) {
+          <div class="detail-state" aria-live="polite">Učitavanje detalja sesije…</div>
+        } @else if (selectedSession(); as session) {
+          @if (session.recordingAttempts.length) {
+            <div class="attempt-table">
+              <div class="attempt-columns" aria-hidden="true">
+                <span>Pitanje</span>
+                <span>Pokušaj</span>
+                <span>Očekivano</span>
+                <span>Prijepis</span>
+                <span>Podudarnost</span>
+                <span>Snimka</span>
+                <span>Status pregleda</span>
+                <span></span>
+              </div>
+
+              @for (
+                attempt of session.recordingAttempts;
+                track attempt.id;
+                let questionIndex = $index
+              ) {
+                <article class="attempt-item" [class.is-open]="expandedAttemptId() === attempt.id">
+                  <div class="attempt-summary">
+                    <span class="question-number" [attr.data-label]="'Pitanje'">
+                      {{ questionIndex + 1 }}
+                    </span>
+                    <span [attr.data-label]="'Pokušaj'">{{ attempt.attemptNumber }}.</span>
+                    <strong [attr.data-label]="'Očekivano'">{{ attempt.expectedText }}</strong>
+                    <span [attr.data-label]="'Prijepis'">
+                      @switch (attempt.transcriptionStatus) {
+                        @case ('COMPLETED') {
+                          {{ attempt.transcript || 'Nije prepoznat tekst.' }}
+                        }
+                        @default {
+                          <small>{{ transcriptionLabels[attempt.transcriptionStatus] }}</small>
+                        }
+                      }
+                    </span>
+                    <strong
+                      class="match-score"
+                      [attr.data-label]="'Podudarnost'"
+                      [attr.data-score]="
+                        attempt.textMatch !== undefined && attempt.textMatch >= 90
+                          ? 'high'
+                          : attempt.textMatch !== undefined && attempt.textMatch >= 70
+                            ? 'medium'
+                            : 'low'
+                      "
+                    >
+                      {{
+                        attempt.transcriptionStatus === 'COMPLETED' &&
+                        attempt.textMatch !== undefined
+                          ? attempt.textMatch + '%'
+                          : '—'
+                      }}
+                    </strong>
+                    <span class="row-audio" [attr.data-label]="'Snimka'">
+                      @if (audioUrls()[attempt.id]; as audioUrl) {
+                        <audio controls preload="metadata" [src]="audioUrl">
+                          Vaš preglednik ne podržava reprodukciju zvuka.
+                        </audio>
+                      } @else {
+                        <button
+                          type="button"
+                          [disabled]="loadingAudioId() === attempt.id"
+                          (click)="loadAudio(attempt)"
+                        >
+                          <svg aria-hidden="true" viewBox="0 0 20 20">
+                            <path d="M6 4.5v11l9-5.5z" fill="currentColor" />
+                          </svg>
+                          {{ formatDuration(attempt.durationMs) }}
+                        </button>
+                      }
+                    </span>
+                    <span
+                      class="review-status"
+                      [attr.data-label]="'Status pregleda'"
+                      [attr.data-review]="attempt.therapistReview.status"
+                    >
+                      {{ reviewLabels[attempt.therapistReview.status] }}
+                    </span>
+                    <button
+                      class="expand-button"
+                      type="button"
+                      [attr.aria-expanded]="expandedAttemptId() === attempt.id"
+                      [attr.aria-label]="
+                        (expandedAttemptId() === attempt.id ? 'Zatvori' : 'Otvori') +
+                        ' osvrt za pokušaj ' +
+                        attempt.attemptNumber
+                      "
+                      (click)="toggleAttempt(attempt)"
+                    >
+                      <svg aria-hidden="true" viewBox="0 0 20 20">
+                        <path
+                          d="m5 7 5 5 5-5"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  @if (audioErrors()[attempt.id]; as audioError) {
+                    <p class="audio-error" role="alert">{{ audioError }}</p>
+                  }
+
+                  @if (expandedAttemptId() === attempt.id) {
+                    <section class="review-editor" aria-label="Uređivanje osvrta terapeuta">
+                      <div class="editor-playback">
+                        <strong>Testna snimka</strong>
+                        @if (audioUrls()[attempt.id]; as audioUrl) {
+                          <audio controls preload="metadata" [src]="audioUrl">
+                            Vaš preglednik ne podržava reprodukciju zvuka.
+                          </audio>
+                        } @else {
+                          <button
+                            class="button button--secondary"
+                            type="button"
+                            [disabled]="loadingAudioId() === attempt.id"
+                            (click)="loadAudio(attempt)"
+                          >
+                            Poslušaj snimku
+                          </button>
+                        }
+                      </div>
+
+                      <div class="editor-form">
+                        <fieldset>
+                          <legend>Osvrt terapeuta</legend>
+                          <div class="review-options">
+                            @for (status of reviewStatuses; track status) {
+                              <label
+                                [attr.data-review]="status"
+                                [class.is-selected]="draftFor(attempt).status === status"
+                              >
+                                <input
+                                  type="radio"
+                                  [name]="'review-' + attempt.id"
+                                  [value]="status"
+                                  [checked]="draftFor(attempt).status === status"
+                                  (change)="updateStatus(attempt, status)"
+                                />
+                                <span aria-hidden="true"></span>
+                                {{ reviewLabels[status] }}
+                              </label>
+                            }
+                          </div>
+                        </fieldset>
+
+                        <label class="comment-field">
+                          <span>Komentar terapeuta (opcionalno)</span>
+                          <textarea
+                            rows="3"
+                            maxlength="400"
+                            placeholder="Upišite komentar…"
+                            [value]="draftFor(attempt).comment"
+                            (input)="updateComment(attempt, $any($event.target).value)"
+                          ></textarea>
+                          <small>{{ draftFor(attempt).comment.length }} / 400</small>
+                        </label>
+
+                        <div class="save-row">
+                          @if (reviewError()) {
+                            <p role="alert">{{ reviewError() }}</p>
+                          } @else if (savedAttemptId() === attempt.id) {
+                            <p class="save-success" role="status">Osvrt je spremljen.</p>
+                          }
+                          <button
+                            class="button save-review"
+                            type="button"
+                            [disabled]="savingAttemptId() === attempt.id"
+                            (click)="saveReview(attempt)"
+                          >
+                            <svg aria-hidden="true" viewBox="0 0 20 20">
+                              <path
+                                d="M4 3h10l2 2v12H4zM7 3v5h6V3M7 13h6"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                            {{ savingAttemptId() === attempt.id ? 'Spremanje…' : 'Spremi osvrt' }}
+                          </button>
+                        </div>
+                      </div>
+                    </section>
+                  }
+                </article>
+              }
+            </div>
+
+            <p class="automated-note">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+                <path
+                  d="M12 10v6m0-9h.01"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+              Automatsko uspoređivanje uspoređuje prepoznati i očekivani tekst. Ne procjenjuje
+              kvalitetu izgovora niti daje klinički zaključak.
+            </p>
+          } @else {
+            <div class="detail-state">Ova dovršena sesija nema spremljenih testnih snimki.</div>
+          }
+        } @else {
+          <div class="detail-state">Odaberite dovršenu igru za pregled testnih snimki.</div>
+        }
+      </main>
+    </div>
+  }
+</div>

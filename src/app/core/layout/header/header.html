@@ -38,11 +38,19 @@
         Naslovnica
       </a>
       <a routerLink="/igre" routerLinkActive="active" (click)="closeMenu()">Igre</a>
-      <a routerLink="/napredak" routerLinkActive="active" (click)="closeMenu()">Napredak</a>
-      @if (auth.isAuthenticated()) {
+      @if (!auth.isTherapist()) {
+        <a routerLink="/napredak" routerLinkActive="active" (click)="closeMenu()">Napredak</a>
+      }
+      @if (auth.isParent()) {
         <a routerLink="/profili" routerLinkActive="active" (click)="closeMenu()">
           {{ auth.activeChild()?.displayName || 'Demo profili' }}
         </a>
+      } @else if (auth.isTherapist()) {
+        <a routerLink="/pregled-terapeuta" routerLinkActive="active" (click)="closeMenu()">
+          Pregled terapeuta
+        </a>
+      }
+      @if (auth.isAuthenticated()) {
         <button class="logout-button" type="button" (click)="logout()">Odjava</button>
       } @else {
         <a routerLink="/prijava" routerLinkActive="active" (click)="closeMenu()">Demo prijava</a>

@@ -83,9 +83,13 @@ points.
 - `POST /api/sessions/:sessionId/attempts` (multipart, own parent session only)
 - `GET /api/attempts/:attemptId/audio` (authenticated owner or therapist)
 - `DELETE /api/attempts/:attemptId` (own parent attempt only)
+- `GET /api/therapist/sessions` (therapist only; completed demo sessions)
+- `GET /api/therapist/sessions/:sessionId` (therapist only; completed session and attempts)
+- `PUT /api/attempts/:attemptId/review` (therapist only; review status and optional comment)
 
-Therapists can read fictional profiles and authenticated audio, but Milestone 13 will add their
-session-review API and interface. They cannot mutate parent sessions or recordings.
+Therapists can read completed sessions for fictional profiles, stream authenticated audio, and
+save `NOT_REVIEWED`, `LOOKS_GOOD`, or `PRACTICE_AGAIN` with an optional comment of at most 400
+characters. They cannot mutate parent sessions or recordings.
 
 ## Reset
 

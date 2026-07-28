@@ -73,6 +73,12 @@ describe('prototype API', () => {
     return { Authorization: `Bearer ${token}` };
   }
 
+  async function therapistAuthorization(): Promise<{ Authorization: string }> {
+    const token = (await login('therapist@artikulino.test', 'TherapistDemo123!')).body
+      .token as string;
+    return { Authorization: `Bearer ${token}` };
+  }
+
   function createGameSession(
     authorization: { Authorization: string },
     childId = 'demo-child-luka',
@@ -236,6 +242,111 @@ describe('prototype API', () => {
       .expect(200);
     expect(listed.body.sessions).toHaveLength(1);
     expect(listed.body.sessions[0].packageName).toBe('Što jedemo?');
+  });
+
+  it('lists completed sessions and their attempts only for the demo therapist', async () => {
+    const parent = await parentAuthorization();
+    const completedId = (await createGameSession(parent)).body.session.id as string;
+    const incompleteId = (await createGameSession(parent, 'demo-child-mia')).body.session
+      .id as string;
+    const attempt = await uploadAttempt(parent, completedId).expect(201);
+    await request(app)
+      .post(`/api/sessions/${completedId}/complete`)
+      .set(parent)
+      .send({
+        correctAnswers: 4,
+        attempts: 4,
+        replays: 0,
+        longestStreak: 4,
+        totalPoints: 50,
+        durationSeconds: 30,
+      })
+      .expect(200);
+
+    const therapist = await therapistAuthorization();
+    const listed = await request(app).get('/api/therapist/sessions').set(therapist).expect(200);
+    expect(listed.body.sessions).toEqual([
+      expect.objectContaining({
+        id: completedId,
+        childDisplayName: 'Luka',
+        recordingAttemptCount: 1,
+      }),
+    ]);
+    expect(listed.body.sessions).not.toContainEqual(expect.objectContaining({ id: incompleteId }));
+
+    const detail = await request(app)
+      .get(`/api/therapist/sessions/${completedId}`)
+      .set(therapist)
+      .expect(200);
+    expect(detail.body.session).toMatchObject({
+      id: completedId,
+      childDisplayName: 'Luka',
+      recordingAttempts: [expect.objectContaining({ id: attempt.body.attempt.id })],
+    });
+    expect(detail.body.session.recordingAttempts[0]).not.toHaveProperty('storageName');
+
+    await request(app).get('/api/therapist/sessions').set(parent).expect(403);
+    await request(app).get(`/api/therapist/sessions/${completedId}`).set(parent).expect(403);
+  });
+
+  it('saves validated therapist reviews and exposes them to the demo parent', async () => {
+    const parent = await parentAuthorization();
+    const sessionId = (await createGameSession(parent)).body.session.id as string;
+    const attemptId = (await uploadAttempt(parent, sessionId)).body.attempt.id as string;
+    await request(app)
+      .post(`/api/sessions/${sessionId}/complete`)
+      .set(parent)
+      .send({
+        correctAnswers: 4,
+        attempts: 4,
+        replays: 0,
+        longestStreak: 4,
+        totalPoints: 50,
+        durationSeconds: 30,
+      })
+      .expect(200);
+    const therapist = await therapistAuthorization();
+
+    const saved = await request(app)
+      .put(`/api/attempts/${attemptId}/review`)
+      .set(therapist)
+      .send({ status: 'PRACTICE_AGAIN', comment: '  Ponoviti testni primjer.  ' })
+      .expect(200);
+    expect(saved.body.attempt.therapistReview).toMatchObject({
+      status: 'PRACTICE_AGAIN',
+      comment: 'Ponoviti testni primjer.',
+      reviewedAt: expect.any(String),
+    });
+
+    const parentProgress = await request(app)
+      .get('/api/sessions?childId=demo-child-luka')
+      .set(parent)
+      .expect(200);
+    expect(parentProgress.body.sessions[0].recordingAttempts[0].therapistReview).toMatchObject({
+      status: 'PRACTICE_AGAIN',
+      comment: 'Ponoviti testni primjer.',
+    });
+
+    await request(app)
+      .put(`/api/attempts/${attemptId}/review`)
+      .set(parent)
+      .send({ status: 'LOOKS_GOOD', comment: '' })
+      .expect(403);
+    await request(app)
+      .put(`/api/attempts/${attemptId}/review`)
+      .set(therapist)
+      .send({ status: 'UNKNOWN', comment: '' })
+      .expect(400);
+    await request(app)
+      .put(`/api/attempts/${attemptId}/review`)
+      .set(therapist)
+      .send({ status: 'LOOKS_GOOD', comment: 'x'.repeat(401) })
+      .expect(400);
+    await request(app)
+      .put('/api/attempts/missing/review')
+      .set(therapist)
+      .send({ status: 'NOT_REVIEWED', comment: '' })
+      .expect(404);
   });
 
   it('preserves multiple recording attempts without exposing physical paths', async () => {

@@ -49,6 +49,23 @@ export interface PrototypeGameSession {
   readonly recordingAttempts: readonly PrototypeRecordingAttempt[];
 }
 
+export interface TherapistSessionSummary {
+  readonly id: string;
+  readonly childId: string;
+  readonly childDisplayName: string;
+  readonly packageName: string;
+  readonly gameType: GameType;
+  readonly targetSound: string;
+  readonly theme: string;
+  readonly difficulty: Difficulty;
+  readonly completedAt: string;
+  readonly recordingAttemptCount: number;
+}
+
+export interface TherapistGameSession extends PrototypeGameSession {
+  readonly childDisplayName: string;
+}
+
 export type PrototypeGameCompletion = Pick<
   GameSessionResult,
   'correctAnswers' | 'attempts' | 'replays' | 'longestStreak' | 'totalPoints' | 'durationSeconds'

@@ -10,6 +10,7 @@ import {
   PrototypeDatabase,
   PrototypeDifficulty,
   PrototypeGameType,
+  TherapistReviewStatus,
 } from './database.js';
 import { DEFAULT_DATABASE_FILE, DEFAULT_RECORDINGS_DIRECTORY } from './runtime-path.js';
 import { createBearerToken, verifyPassword } from './security.js';
@@ -37,6 +38,11 @@ const GAME_TYPES = new Set<PrototypeGameType>([
   'sound-position',
 ]);
 const DIFFICULTIES = new Set<PrototypeDifficulty>(['EASY', 'MEDIUM', 'HARD']);
+const REVIEW_STATUSES = new Set<TherapistReviewStatus>([
+  'NOT_REVIEWED',
+  'LOOKS_GOOD',
+  'PRACTICE_AGAIN',
+]);
 
 export interface PrototypeAppOptions {
   readonly databaseFile?: string;
@@ -117,6 +123,14 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
   const requireParent = (_request: Request, response: Response, next: NextFunction): void => {
     if (currentUser(response).role !== 'PARENT') {
       response.status(403).json({ message: 'Ova radnja dostupna je samo demo roditelju.' });
+      return;
+    }
+    next();
+  };
+
+  const requireTherapist = (_request: Request, response: Response, next: NextFunction): void => {
+    if (currentUser(response).role !== 'THERAPIST') {
+      response.status(403).json({ message: 'Ova radnja dostupna je samo demo terapeutu.' });
       return;
     }
     next();
@@ -247,6 +261,24 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
     response.json({ sessions });
   });
 
+  app.get('/api/therapist/sessions', requireAuth, requireTherapist, (_request, response) => {
+    response.json({ sessions: database.listTherapistSessions() });
+  });
+
+  app.get(
+    '/api/therapist/sessions/:sessionId',
+    requireAuth,
+    requireTherapist,
+    (request, response) => {
+      const session = database.getTherapistSession(routeParameter(request.params['sessionId']));
+      if (!session) {
+        response.status(404).json({ message: 'Dovršena sesija nije pronađena.' });
+        return;
+      }
+      response.json({ session });
+    },
+  );
+
   app.post('/api/sessions', requireAuth, requireParent, (request, response) => {
     const input = parseGameSession(request.body);
     if (!input) {
@@ -371,6 +403,33 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
     }
     response.type(recording.mimeType);
     response.sendFile(join(recordingsDirectory, recording.storageName));
+  });
+
+  app.put('/api/attempts/:attemptId/review', requireAuth, requireTherapist, (request, response) => {
+    const status = request.body?.status;
+    const comment = typeof request.body?.comment === 'string' ? request.body.comment.trim() : null;
+    if (
+      typeof status !== 'string' ||
+      !REVIEW_STATUSES.has(status as TherapistReviewStatus) ||
+      comment === null ||
+      comment.length > 400
+    ) {
+      response.status(400).json({
+        message: 'Odaberite valjani status i komentar do 400 znakova.',
+      });
+      return;
+    }
+    const attempt = database.saveTherapistReview(
+      currentUser(response).id,
+      routeParameter(request.params['attemptId']),
+      status as TherapistReviewStatus,
+      comment,
+    );
+    if (!attempt) {
+      response.status(404).json({ message: 'Pokušaj snimanja nije pronađen.' });
+      return;
+    }
+    response.json({ attempt });
   });
 
   app.delete('/api/attempts/:attemptId', requireAuth, requireParent, async (request, response) => {
