@@ -72,6 +72,7 @@ npx prettier . --check
   difficulty filters.
 - Game player at `/igre/:packageId`.
 - Parent/progress page at `/napredak`.
+- Therapist review page at `/pregled-terapeuta`, protected by the therapist role.
 - Shared header with logo and navigation.
 - Three configurable games:
   - `listen-and-decide`: category decision from heard word/sentence.
@@ -84,6 +85,9 @@ npx prettier . --check
 - Adult-facing progress expands each backend session into all saved recording attempts, including
   expected text, transcript state, `Podudarnost teksta`, authenticated playback, and the full
   therapist-review state/comment. It never exposes those automated details in child gameplay.
+- Therapist review lists completed sessions for fictional demo profiles, streams recordings
+  through the authenticated API, and stores one of three review states plus an optional
+  400-character comment, reviewer, and timestamp.
 - A visible optional microphone panel is placed between each question's prompt/media and answers.
   It supports permission, recording, stopped/replay, delete, asynchronous saving/saved, and retry
   presentation without automatic speech scoring.
@@ -154,6 +158,7 @@ npx prettier . --check
 - `src/app/features/games/components/`: game board renderers plus catalog card and type-filter
   components.
 - `src/app/features/progress/`: backend-backed parent session view.
+- `src/app/features/therapist/`: therapist-only completed-session and recording-review interface.
 - `src/main.css`: global styles, tokens, colors, typography, reset.
 - `server/`: separate Express/SQLite service, API tests, seed/reset workflow, and ignored runtime
   database.
@@ -213,10 +218,21 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Preserve Croatian UI/content wording.
 - Keep the interface visually friendly for children while the progress page remains clearer and calmer for adults.
 
+## Milestone 13 Validation
+
+- `npm run check`: production build, 20 frontend test files / 75 tests, and Prettier passed.
+- `npm --prefix server run check`: TypeScript build and 20 API/database tests passed.
+- `npm run transcription:test`: 5 Python worker tests passed.
+- Live localhost verification covered therapist login, completed-session selection, authenticated
+  audio loading, saving `LOOKS_GOOD` with a full comment, and parent visibility of that review.
+- The therapist view matched the approved calm master-detail direction at 1440×1000 and remained
+  usable without horizontal overflow at 390×844. No browser console warnings or errors were
+  observed.
+
 ## Known Bugs, Risks, and Unfinished Work
 
-- Local recording persistence, Croatian transcription, and the expanded parent presentation are
-  implemented. Creating and saving therapist reviews remains Milestone 13.
+- Local recording persistence, Croatian transcription, expanded parent progress, and therapist
+  review are implemented. Integrated cross-service and failure-path QA remains Milestone 14.
 - No external ASR provider or automatic articulation error detection is implemented. The original
   browser transcription port remains disabled; Express alone calls the localhost worker.
 - No approved controller, legal basis, guardian verification, ASR provider, exact provider
@@ -244,9 +260,11 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Merge Milestone 12 expanded parent progress and privacy presentation.
-2. Implement Milestone 13 therapist recording review.
-3. Complete integrated thesis-prototype QA exactly as documented in `DEVELOPMENT_PLAN.md`.
+1. Review and merge Milestone 13 therapist recording review.
+2. Implement Milestone 14 integrated thesis-prototype QA exactly as documented in
+   `DEVELOPMENT_PLAN.md`.
+3. Perform the remaining human microphone, Croatian voice, keyboard, and screen-reader checks on
+   the target device.
 
 ## Do Not Change Without Asking
 

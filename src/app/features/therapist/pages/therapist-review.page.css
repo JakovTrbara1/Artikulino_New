@@ -1,0 +1,571 @@
+.therapist-shell {
+  width: min(calc(100% - 2rem), 94rem);
+  padding-top: 2rem;
+}
+
+.review-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.review-heading p,
+.automated-note {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1px solid var(--color-sky-200);
+  border-radius: 0.55rem;
+  background: rgb(234 247 255 / 70%);
+  padding: 0.65rem 0.9rem;
+  color: var(--color-navy-700);
+  line-height: 1.35;
+}
+
+.review-heading svg,
+.automated-note svg {
+  width: 1.25rem;
+  flex: 0 0 auto;
+}
+
+.review-layout {
+  display: grid;
+  grid-template-columns: 20.5rem minmax(0, 1fr);
+  gap: 2.75rem;
+}
+
+.review-master,
+.attempt-panel {
+  border-color: var(--color-border);
+  border-radius: 0.9rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.review-master {
+  align-self: start;
+  overflow: hidden;
+  padding: 1.25rem 0.65rem;
+}
+
+.review-master section + section {
+  margin-top: 1.5rem;
+}
+
+.review-master h2 {
+  margin: 0 0 0.65rem;
+  padding-inline: 0.8rem;
+  font: 800 1rem/1.3 var(--font-body);
+}
+
+.master-list {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.master-list > p {
+  margin: 0;
+  padding: 0.8rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.master-list button {
+  min-height: 4.5rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) 1rem;
+  align-items: center;
+  gap: 0.65rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.master-list button::before {
+  width: 0.2rem;
+  position: absolute;
+  inset: 0.2rem auto 0.2rem 0;
+  border-radius: 999px;
+  background: transparent;
+  content: '';
+}
+
+.master-list button:hover,
+.master-list button.is-selected {
+  background: var(--color-sky-100);
+}
+
+.master-list button.is-selected::before {
+  background: var(--color-sky-500);
+}
+
+.master-list button > svg {
+  width: 1rem;
+}
+
+.master-list strong,
+.master-list small {
+  display: block;
+}
+
+.master-list strong {
+  margin-bottom: 0.2rem;
+}
+
+.master-list small {
+  color: var(--color-muted);
+}
+
+.profile-avatar,
+.session-icon {
+  width: 2.35rem;
+  height: 2.35rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #d9f4ef;
+  color: var(--color-mint-dark);
+  font-family: var(--font-display);
+  font-weight: 900;
+}
+
+.session-icon {
+  border-radius: 0.65rem;
+  background: #fff1c9;
+  color: #a66800;
+}
+
+.session-icon[data-game='catch-the-sound'] {
+  background: #d9f4ef;
+  color: var(--color-mint-dark);
+}
+
+.session-icon[data-game='sound-position'] {
+  background: var(--color-sky-100);
+  color: var(--color-sky-500);
+}
+
+.attempt-panel {
+  min-width: 0;
+  padding: 1.2rem 1rem;
+}
+
+.panel-title {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0.5rem 1rem;
+}
+
+.panel-title h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.panel-title p {
+  margin: 0.35rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.panel-title > span {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.attempt-columns,
+.attempt-summary {
+  display: grid;
+  grid-template-columns:
+    3.8rem 4.5rem minmax(5.5rem, 0.8fr) minmax(6.5rem, 1fr) 7rem minmax(7rem, 0.85fr)
+    9.75rem 2.25rem;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.attempt-columns {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.8rem 1rem;
+  color: var(--color-navy-700);
+  font-size: 0.78rem;
+}
+
+.attempt-item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.attempt-item.is-open {
+  margin: 0.4rem 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 0.7rem;
+  background: #f9fcff;
+}
+
+.attempt-summary {
+  min-height: 4.75rem;
+  padding: 0.7rem 1rem;
+}
+
+.question-number {
+  width: 2.3rem;
+  height: 2.3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-sky-100);
+  color: var(--color-sky-500);
+  font-weight: 800;
+}
+
+.match-score[data-score='high'] {
+  color: #15966f;
+}
+
+.match-score[data-score='medium'] {
+  color: #c77800;
+}
+
+.match-score[data-score='low'] {
+  color: var(--color-coral-dark);
+}
+
+.row-audio button {
+  min-height: 2.3rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.55rem;
+  background: var(--color-white);
+  padding: 0.35rem 0.65rem;
+  color: var(--color-navy-900);
+  cursor: pointer;
+}
+
+.row-audio button svg {
+  width: 1.2rem;
+}
+
+.row-audio audio {
+  width: 7.5rem;
+  height: 2.4rem;
+}
+
+.review-status {
+  justify-self: start;
+  border-radius: 0.5rem;
+  background: #fff4d8;
+  padding: 0.45rem 0.65rem;
+  color: #a66800;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.review-status[data-review='LOOKS_GOOD'] {
+  background: #dcf5ed;
+  color: #148268;
+}
+
+.review-status[data-review='PRACTICE_AGAIN'] {
+  background: #ffe8e3;
+  color: var(--color-coral-dark);
+}
+
+.expand-button {
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.expand-button:hover {
+  background: var(--color-sky-100);
+}
+
+.expand-button svg {
+  width: 1.2rem;
+  transition: transform 160ms ease;
+}
+
+.attempt-item.is-open .expand-button svg {
+  transform: rotate(180deg);
+}
+
+.audio-error,
+.review-notice {
+  border-radius: 0.55rem;
+  background: #fff0ee;
+  padding: 0.75rem 1rem;
+  color: var(--color-danger);
+}
+
+.audio-error {
+  margin: 0 1rem 0.8rem;
+}
+
+.review-editor {
+  display: grid;
+  grid-template-columns: minmax(13rem, 0.7fr) minmax(22rem, 1.5fr);
+  gap: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  padding: 1.5rem 1rem;
+}
+
+.editor-playback {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.editor-playback audio {
+  width: 100%;
+}
+
+.editor-form fieldset {
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.editor-form legend,
+.comment-field > span {
+  margin-bottom: 0.65rem;
+  font-weight: 800;
+}
+
+.review-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+
+.review-options label {
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.55rem;
+  background: var(--color-white);
+  padding: 0.6rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.review-options label.is-selected {
+  border: 2px solid var(--color-sky-500);
+  padding: calc(0.6rem - 1px) calc(0.75rem - 1px);
+}
+
+.review-options input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.review-options label > span {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.review-options label.is-selected > span {
+  box-shadow: inset 0 0 0 0.2rem var(--color-white);
+  background: currentColor;
+}
+
+.review-options label[data-review='NOT_REVIEWED'] {
+  color: #a66800;
+}
+
+.review-options label[data-review='LOOKS_GOOD'] {
+  color: #148268;
+}
+
+.review-options label[data-review='PRACTICE_AGAIN'] {
+  color: var(--color-coral-dark);
+}
+
+.comment-field {
+  display: grid;
+  margin-top: 1rem;
+}
+
+.comment-field textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: 0.55rem;
+  background: var(--color-white);
+  padding: 0.75rem;
+  color: var(--color-navy-900);
+  font: inherit;
+}
+
+.comment-field small {
+  justify-self: end;
+  margin-top: -1.4rem;
+  padding-right: 0.65rem;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.save-row {
+  min-height: 3.2rem;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.save-row p {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.85rem;
+}
+
+.save-row .save-success {
+  color: var(--color-mint-dark);
+}
+
+.save-review {
+  margin-left: auto;
+  border-radius: 0.45rem;
+  background: #146fd1;
+  color: var(--color-white);
+  box-shadow: 0 0.2rem 0.5rem rgb(13 49 95 / 15%);
+}
+
+.save-review svg {
+  width: 1.15rem;
+}
+
+.automated-note {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+}
+
+.detail-state,
+.loading-state {
+  padding: 3rem 1rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+@media (max-width: 72rem) {
+  .review-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .review-master {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .review-master section + section {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 58rem) {
+  .attempt-columns {
+    display: none;
+  }
+
+  .attempt-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1rem;
+    padding: 1rem;
+  }
+
+  .attempt-summary > span:not(.question-number),
+  .attempt-summary > strong {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .attempt-summary > span:not(.question-number)::before,
+  .attempt-summary > strong::before {
+    color: var(--color-muted);
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 400;
+  }
+
+  .question-number {
+    grid-column: 1 / -1;
+  }
+
+  .expand-button {
+    position: absolute;
+    right: 1.25rem;
+  }
+
+  .attempt-item {
+    position: relative;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.7rem;
+  }
+
+  .review-editor {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 42rem) {
+  .therapist-shell {
+    width: min(calc(100% - 1rem), 94rem);
+  }
+
+  .review-heading,
+  .panel-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .review-heading p {
+    margin: 0;
+  }
+
+  .review-master {
+    grid-template-columns: 1fr;
+  }
+
+  .review-options,
+  .attempt-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .question-number {
+    grid-column: auto;
+  }
+
+  .save-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .save-review {
+    width: 100%;
+  }
+}

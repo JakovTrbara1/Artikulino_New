@@ -108,6 +108,23 @@ export interface PrototypeGameSession {
   readonly recordingAttempts: readonly PrototypeRecordingAttempt[];
 }
 
+export interface TherapistSessionSummary {
+  readonly id: string;
+  readonly childId: string;
+  readonly childDisplayName: string;
+  readonly packageName: string;
+  readonly gameType: PrototypeGameType;
+  readonly targetSound: string;
+  readonly theme: string;
+  readonly difficulty: PrototypeDifficulty;
+  readonly completedAt: string;
+  readonly recordingAttemptCount: number;
+}
+
+export interface TherapistGameSession extends PrototypeGameSession {
+  readonly childDisplayName: string;
+}
+
 interface UserDatabaseRow {
   readonly id: string;
   readonly email: string;
@@ -164,6 +181,11 @@ interface RecordingAttemptDatabaseRow {
   readonly review_status: TherapistReviewStatus | null;
   readonly review_comment: string | null;
   readonly reviewed_at: number | null;
+}
+
+interface TherapistSessionDatabaseRow extends GameSessionDatabaseRow {
+  readonly child_display_name: string;
+  readonly recording_attempt_count: number;
 }
 
 const PARENT_ID = 'demo-parent';
@@ -353,6 +375,51 @@ export class PrototypeDatabase {
     return row ? this.mapGameSession(row) : undefined;
   }
 
+  listTherapistSessions(): readonly TherapistSessionSummary[] {
+    const rows = this.sqlite
+      .prepare(
+        `SELECT game_sessions.*, demo_children.display_name AS child_display_name,
+                COUNT(recording_attempts.id) AS recording_attempt_count
+         FROM game_sessions
+         JOIN demo_children ON demo_children.id = game_sessions.child_id
+         LEFT JOIN recording_attempts ON recording_attempts.session_id = game_sessions.id
+         WHERE game_sessions.completed_at IS NOT NULL
+         GROUP BY game_sessions.id
+         ORDER BY game_sessions.completed_at DESC`,
+      )
+      .all() as TherapistSessionDatabaseRow[];
+    return rows.map((row) => ({
+      id: row.id,
+      childId: row.child_id,
+      childDisplayName: row.child_display_name,
+      packageName: row.package_name,
+      gameType: row.game_type,
+      targetSound: row.target_sound,
+      theme: row.theme,
+      difficulty: row.difficulty,
+      completedAt: new Date(row.completed_at!).toISOString(),
+      recordingAttemptCount: row.recording_attempt_count,
+    }));
+  }
+
+  getTherapistSession(sessionId: string): TherapistGameSession | undefined {
+    const row = this.sqlite
+      .prepare(
+        `SELECT game_sessions.*, demo_children.display_name AS child_display_name
+         FROM game_sessions
+         JOIN demo_children ON demo_children.id = game_sessions.child_id
+         WHERE game_sessions.id = ? AND game_sessions.completed_at IS NOT NULL`,
+      )
+      .get(sessionId) as
+      (GameSessionDatabaseRow & { readonly child_display_name: string }) | undefined;
+    return row
+      ? {
+          ...this.mapGameSession(row),
+          childDisplayName: row.child_display_name,
+        }
+      : undefined;
+  }
+
   completeGameSession(
     ownerUserId: string,
     sessionId: string,
@@ -484,6 +551,31 @@ export class PrototypeDatabase {
     );
   }
 
+  saveTherapistReview(
+    reviewerUserId: string,
+    attemptId: string,
+    status: TherapistReviewStatus,
+    comment: string,
+  ): PrototypeRecordingAttempt | undefined {
+    const attempt = this.getRecordingAttempt(attemptId);
+    if (!attempt) {
+      return undefined;
+    }
+    this.sqlite
+      .prepare(
+        `INSERT INTO therapist_reviews (
+           attempt_id, status, comment, reviewer_user_id, reviewed_at
+         ) VALUES (?, ?, ?, ?, ?)
+         ON CONFLICT(attempt_id) DO UPDATE SET
+           status = excluded.status,
+           comment = excluded.comment,
+           reviewer_user_id = excluded.reviewer_user_id,
+           reviewed_at = excluded.reviewed_at`,
+      )
+      .run(attemptId, status, comment, reviewerUserId, Date.now());
+    return this.getRecordingAttempt(attemptId);
+  }
+
   getRecordingStorage(
     user: AuthenticatedUser,
     attemptId: string,
@@ -596,6 +688,21 @@ export class PrototypeDatabase {
           : {}),
       },
     };
+  }
+
+  private getRecordingAttempt(attemptId: string): PrototypeRecordingAttempt | undefined {
+    const row = this.sqlite
+      .prepare(
+        `SELECT recording_attempts.*,
+                therapist_reviews.status AS review_status,
+                therapist_reviews.comment AS review_comment,
+                therapist_reviews.reviewed_at
+         FROM recording_attempts
+         LEFT JOIN therapist_reviews ON therapist_reviews.attempt_id = recording_attempts.id
+         WHERE recording_attempts.id = ?`,
+      )
+      .get(attemptId) as RecordingAttemptDatabaseRow | undefined;
+    return row ? this.mapRecordingAttempt(row) : undefined;
   }
 
   private migrate(): void {

@@ -51,10 +51,15 @@ export class LoginPage {
         this.form.controls.password.value,
       );
       const requestedUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-      await this.router.navigate(['/profili'], {
-        queryParams:
-          user.role === 'PARENT' && requestedUrl ? { returnUrl: requestedUrl } : undefined,
-      });
+      if (user.role === 'THERAPIST') {
+        await this.router.navigateByUrl(
+          requestedUrl?.startsWith('/pregled-terapeuta') ? requestedUrl : '/pregled-terapeuta',
+        );
+      } else {
+        await this.router.navigate(['/profili'], {
+          queryParams: requestedUrl ? { returnUrl: requestedUrl } : undefined,
+        });
+      }
     } catch (error) {
       this.errorMessage.set(error instanceof Error ? error.message : 'Prijava nije uspjela.');
     } finally {

@@ -1,5 +1,9 @@
 import { Routes } from '@angular/router';
-import { authenticatedGuard, parentGameGuard } from './core/guards/prototype-auth.guards';
+import {
+  authenticatedGuard,
+  parentGameGuard,
+  therapistGuard,
+} from './core/guards/prototype-auth.guards';
 
 export const routes: Routes = [
   {
@@ -30,6 +34,13 @@ export const routes: Routes = [
     canActivate: [parentGameGuard],
     loadComponent: () =>
       import('./features/progress/pages/progress.page').then((m) => m.ProgressPage),
+  },
+  {
+    path: 'pregled-terapeuta',
+    title: 'Pregled terapeuta | Artikulino',
+    canActivate: [therapistGuard],
+    loadComponent: () =>
+      import('./features/therapist/pages/therapist-review.page').then((m) => m.TherapistReviewPage),
   },
   { path: '**', redirectTo: '' },
 ];
