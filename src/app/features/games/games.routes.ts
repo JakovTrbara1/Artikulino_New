@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { parentGameGuard } from '../../core/guards/prototype-auth.guards';
 
 export const GAME_ROUTES: Routes = [
   {
@@ -7,6 +8,7 @@ export const GAME_ROUTES: Routes = [
   },
   {
     path: ':packageId',
+    canActivate: [parentGameGuard],
     loadComponent: () => import('./pages/game-player.page').then((m) => m.GamePlayerPage),
   },
 ];

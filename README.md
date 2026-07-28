@@ -8,10 +8,19 @@ Preduvjeti su Node.js 20.19+ ili noviji LTS i npm.
 
 ```bash
 npm install
+npm --prefix server install
+```
+
+Pokreni lokalni API i Angular u dva terminala:
+
+```bash
+npm run server:start
 npm start
 ```
 
-Aplikacija je zatim dostupna na `http://localhost:4200`.
+Aplikacija je zatim dostupna na `http://localhost:4200`, a lokalni API na
+`http://localhost:3000`. Angular razvojni poslužitelj prosljeđuje `/api` pozive kroz
+`proxy.conf.json`.
 
 Provjere kvalitete:
 
@@ -31,9 +40,33 @@ provjera bez dodavanja nove ovisnosti.
 - `/` – naslovnica i najkraći put do prve igre
 - `/igre` – katalog s preklopnim vrstama igara i filtrima sadržajnih paketa
 - `/igre/:packageId` – zajednički game engine s prikazom odabrane igre
+- `/prijava` – prijava unaprijed definiranim demo računom
+- `/profili` – odabir ili upravljanje izmišljenim demo profilima
 - `/napredak` – lokalni pregled aktivnosti za roditelje
 
 Sve glavne stranice učitavaju se lazy loadingom i koriste standalone komponente.
+
+## Lokalna demo prijava
+
+Milestone 9 dodaje zaseban Express/SQLite servis samo za lokalni diplomski prototip.
+
+- roditelj: `parent@artikulino.test` / `ParentDemo123!`;
+- terapeut: `therapist@artikulino.test` / `TherapistDemo123!`.
+
+Naslovnica i katalog ostaju javni. Za pokretanje igre treba se prijaviti kao demo roditelj i
+odabrati izmišljeni profil. Terapeut može samo pregledati sve demo profile; terapeutsko sučelje
+dolazi u kasnijem milestoneu.
+
+Lozinke i tokeni nisu spremljeni u čistom tekstu. Prijava traje osam sati, token je u
+`sessionStorage`, a SQLite baza je u Git-ignoriranoj mapi `server/runtime/`. Bazu i demo račune možeš
+vratiti u početno stanje naredbom:
+
+```bash
+npm run prototype:reset
+```
+
+Detalji API-ja i granica nalaze se u
+[`docs/PROTOTYPE_BACKEND.md`](docs/PROTOTYPE_BACKEND.md).
 
 ## Igre
 
@@ -168,7 +201,8 @@ Globalni design tokeni, reset i zajednički stilovi nalaze se u `src/main.css`. 
 
 ## Trenutačna ograničenja
 
-- Nema korisničkih računa, backend API-ja ni sinkronizacije između uređaja.
+- Demo prijava i profili rade samo na lokalnom prototipnom API-ju; nema produkcijskih računa,
+  javne objave ni sinkronizacije između uređaja.
 - Nema automatske procjene pravilnosti izgovora ni ASR integracije.
 - Demo sadržaj služi tehničkoj demonstraciji i prije stručne uporabe treba ga pregledati logoped.
 - Svaki demo paket izričito je označen statusom `NOT_REVIEWED`; upute za dokumentiranje stručne
@@ -214,5 +248,5 @@ Optimizirane transparentne soft-toy ilustracije za osam tema nalaze se u
 `public/assets/games/decorations/`. Katalog povezuje tematske ilustracije s karticama, boji ih prema
 vrsti igre i koristi tri pristupačna preklopna gumba kao prvi filtar.
 
-Backend, prijepis, testni računi i terapeutski pregled još nisu implementirani. Trenutačno
-ponašanje aplikacije ostaje opisano u prethodnim odjeljcima ovog dokumenta.
+Lokalni backend, testni računi i izmišljeni profili sada su implementirani. Pohrana sesija i
+snimki, prijepis, novi roditeljski napredak i terapeutski pregled dolaze u sljedećim milestoneima.

@@ -1,0 +1,63 @@
+<div class="page-shell profiles-shell">
+  <header>
+    <p class="eyebrow">
+      {{ auth.isTherapist() ? 'Pregled testnih podataka' : 'Odabir za vježbu' }}
+    </p>
+    <h1>{{ auth.isTherapist() ? 'Demo profili' : 'Tko danas vježba?' }}</h1>
+    <p>
+      Profili sadrže samo izmišljeno prikazno ime. Nemoj unositi dob, zdravstvene podatke ni stvarni
+      identitet djeteta.
+    </p>
+  </header>
+
+  @if (errorMessage()) {
+    <p class="page-error" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (loading()) {
+    <p role="status">Učitavanje demo profila…</p>
+  } @else {
+    <section class="profile-grid" aria-label="Demo profili">
+      @for (child of children(); track child.id) {
+        <article class="profile-card" [class.selected]="auth.activeChild()?.id === child.id">
+          <span class="avatar" aria-hidden="true">{{ child.displayName.slice(0, 1) }}</span>
+          <h2>{{ child.displayName }}</h2>
+          @if (auth.isParent()) {
+            <button class="button button--primary" type="button" (click)="selectChild(child)">
+              Odaberi i nastavi
+            </button>
+            <button class="delete-button" type="button" (click)="deleteChild(child)">
+              Izbriši profil
+            </button>
+          } @else {
+            <p>Izmišljeni testni profil</p>
+          }
+        </article>
+      } @empty {
+        <p>Nema demo profila.</p>
+      }
+    </section>
+  }
+
+  @if (auth.isParent()) {
+    <section class="surface create-profile" aria-labelledby="create-profile-title">
+      <div>
+        <h2 id="create-profile-title">Dodaj izmišljeni profil</h2>
+        <p>Samo prikazno ime, najviše 50 znakova.</p>
+      </div>
+      <form (submit)="$event.preventDefault(); createChild()">
+        <label for="display-name">Prikazno ime</label>
+        <input
+          id="display-name"
+          type="text"
+          maxlength="50"
+          autocomplete="off"
+          [formControl]="displayName"
+        />
+        <button class="button button--secondary" type="submit" [disabled]="busy()">
+          {{ busy() ? 'Dodavanje…' : 'Dodaj profil' }}
+        </button>
+      </form>
+    </section>
+  }
+</div>

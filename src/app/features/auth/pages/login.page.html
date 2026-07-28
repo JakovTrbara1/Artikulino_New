@@ -1,0 +1,51 @@
+<div class="page-shell auth-shell">
+  <section class="surface login-card" aria-labelledby="login-title">
+    <p class="eyebrow">Lokalni demonstracijski pristup</p>
+    <h1 id="login-title">Demo prijava</h1>
+    <p>
+      Prijavi se unaprijed definiranim računom. Ovaj prototip smije sadržavati samo izmišljene
+      profile i testne podatke.
+    </p>
+
+    <div class="demo-choices" aria-label="Odaberi demo račun">
+      <button type="button" (click)="useParentDemo()">Roditelj</button>
+      <button type="button" (click)="useTherapistDemo()">Terapeut</button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        <span>E-pošta</span>
+        <input type="email" autocomplete="username" [formControl]="form.controls.email" />
+      </label>
+      <label>
+        <span>Lozinka</span>
+        <input
+          type="password"
+          autocomplete="current-password"
+          [formControl]="form.controls.password"
+        />
+      </label>
+
+      @if (errorMessage()) {
+        <p class="form-error" role="alert">{{ errorMessage() }}</p>
+      }
+
+      <button class="button button--primary" type="submit" [disabled]="busy()">
+        {{ busy() ? 'Prijava…' : 'Prijavi se' }}
+      </button>
+    </form>
+
+    <dl class="credentials">
+      <div>
+        <dt>Roditelj</dt>
+        <dd>parent&#64;artikulino.test / ParentDemo123!</dd>
+      </div>
+      <div>
+        <dt>Terapeut</dt>
+        <dd>therapist&#64;artikulino.test / TherapistDemo123!</dd>
+      </div>
+    </dl>
+
+    <a routerLink="/">← Povratak na naslovnicu</a>
+  </section>
+</div>

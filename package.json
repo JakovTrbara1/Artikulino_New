@@ -3,12 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false",
-    "check": "npm run build && npm run test:ci && prettier . --check"
+    "check": "npm run build && npm run test:ci && prettier . --check",
+    "server:start": "npm --prefix server start",
+    "server:dev": "npm --prefix server run dev",
+    "server:test": "npm --prefix server test",
+    "prototype:reset": "npm --prefix server run reset"
   },
   "private": true,
   "packageManager": "npm@11.16.0",

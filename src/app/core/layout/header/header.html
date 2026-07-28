@@ -39,6 +39,14 @@
       </a>
       <a routerLink="/igre" routerLinkActive="active" (click)="closeMenu()">Igre</a>
       <a routerLink="/napredak" routerLinkActive="active" (click)="closeMenu()">Napredak</a>
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/profili" routerLinkActive="active" (click)="closeMenu()">
+          {{ auth.activeChild()?.displayName || 'Demo profili' }}
+        </a>
+        <button class="logout-button" type="button" (click)="logout()">Odjava</button>
+      } @else {
+        <a routerLink="/prijava" routerLinkActive="active" (click)="closeMenu()">Demo prijava</a>
+      }
     </nav>
   </div>
 </header>
