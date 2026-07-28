@@ -29,15 +29,19 @@ worker izravno.
 Provjere kvalitete:
 
 ```bash
-npm run check
+npm run prototype:check
 ```
 
-Ova naredba izrađuje produkcijsku verziju aplikacije, pokreće testove jednokratno i provjerava
-formatiranje Prettierom. Pojedinačne provjere dostupne su kroz `npm run build`, `npm run test:ci` i
-`npx prettier . --check`. `npm test` ostaje dostupan za rad tijekom razvoja.
+Ova naredba izrađuje produkcijsku verziju aplikacije te pokreće Angular, Express i Python testove
+uz provjeru formatiranja. Frontend provjera ostaje dostupna kroz `npm run check`, a pojedinačne
+provjere kroz `npm run build`, `npm run test:ci`, `npm --prefix server run check`,
+`npm run transcription:test` i `npx prettier . --check`.
 
 ESLint trenutačno nije uveden. Za MVP su dogovoreni Angular build, testovi i Prettier kao zajednička
 provjera bez dodavanja nove ovisnosti.
+
+Točne postavke za zajedničko pokretanje sva tri servisa u IntelliJ IDEA-i nalaze se u
+[`docs/INTELLIJ_RUN_CONFIGURATIONS.md`](docs/INTELLIJ_RUN_CONFIGURATIONS.md).
 
 ## Rute
 
