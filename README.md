@@ -185,9 +185,14 @@ Završena sesija sprema se pod aktivnim izmišljenim demo profilom na lokalnom p
 - bodove, trajanje i vrijeme završetka;
 - paket, vrstu igre, glas, temu i razinu.
 
-Stranica Napredak za prijavljenog demo roditelja čita te sesije iz API-ja. Brisanje sesije uklanja
-metapodatke i povezane audiodatoteke te čisti stari `localStorage` ključ; postojeći lokalni napredak
-se ne migrira.
+Stranica Napredak za prijavljenog demo roditelja čita te sesije iz API-ja. Proširivi detalji sesije
+prikazuju svaki pokušaj s očekivanim i prepoznatim tekstom, stanjem prijepisa, `Podudarnosti
+teksta`, zaštićenom reprodukcijom i spremljenim osvrtom terapeuta. Ti podaci ostaju u prikazu za
+odrasle i ne pojavljuju se tijekom dječje igre.
+
+Brisanje sesije uklanja metapodatke i povezane audiodatoteke. Roditelj može potvrditi i potpuno
+brisanje aktivnog demo profila sa svim sesijama, prijepisima i snimkama. Obje radnje čiste stari
+`localStorage` ključ; postojeći lokalni napredak se ne migrira.
 
 ## Struktura
 
@@ -262,7 +267,7 @@ Optimizirane transparentne soft-toy ilustracije za osam tema nalaze se u
 `public/assets/games/decorations/`. Katalog povezuje tematske ilustracije s karticama, boji ih prema
 vrsti igre i koristi tri pristupačna preklopna gumba kao prvi filtar.
 
-Lokalni backend, testni računi, izmišljeni profili, sesije, višestruki pokušaji snimanja i lokalni
-hrvatski prijepis sada su implementirani. Prošireni roditeljski pregled i terapeutski pregled
-dolaze u sljedećim milestoneima. Detaljne upute za Python worker nalaze se u
+Lokalni backend, testni računi, izmišljeni profili, sesije, višestruki pokušaji snimanja, lokalni
+hrvatski prijepis i prošireni roditeljski pregled sada su implementirani. Terapeutski pregled
+dolazi u sljedećem milestoneu. Detaljne upute za Python worker nalaze se u
 [`transcription/README.md`](transcription/README.md).

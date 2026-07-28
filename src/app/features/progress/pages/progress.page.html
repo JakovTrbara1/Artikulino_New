@@ -4,11 +4,21 @@
       <p class="eyebrow">Pregled za roditelje</p>
       <h1>Napredak kroz redovitu vježbu</h1>
     </div>
-    <p>
-      Prikazane su sesije aktivnog demo profila
-      <strong>{{ auth.activeChild()?.displayName }}</strong> s lokalnog demonstracijskog
-      poslužitelja.
-    </p>
+    <div class="header-context">
+      <p>
+        Sesije aktivnog demo profila
+        <strong>{{ auth.activeChild()?.displayName }}</strong> s lokalnog demonstracijskog
+        poslužitelja.
+      </p>
+      <button
+        class="refresh-button"
+        type="button"
+        [disabled]="loading()"
+        (click)="refreshSessions()"
+      >
+        {{ loading() ? 'Osvježavanje…' : 'Osvježi podatke' }}
+      </button>
+    </div>
   </header>
 
   @if (errorMessage()) {
@@ -36,58 +46,165 @@
     </section>
 
     <div class="progress-layout">
-      <section class="surface activity" aria-labelledby="activity-title">
+      <section class="activity" aria-labelledby="activity-title">
         <div class="section-title">
           <div>
-            <p class="eyebrow">Aktivnosti</p>
+            <p class="eyebrow">Aktivnosti i testne snimke</p>
             <h2 id="activity-title">Sesije demo profila</h2>
           </div>
           <span>{{ sessions().length }} zapisa</span>
         </div>
-        <div class="activity-list">
+
+        <div class="session-list">
           @for (session of sessions(); track session.id) {
-            <article>
-              <div
-                class="activity-mark"
-                [attr.data-game]="session.gameType"
-                aria-hidden="true"
-              ></div>
-              <div class="activity-main">
-                <h3>{{ session.packageName }}</h3>
-                <p>
-                  {{ gameTypeLabels[session.gameType] }} · glas {{ session.targetSound }} ·
-                  {{ session.theme }}
-                </p>
-                <time [attr.datetime]="session.completedAt || session.startedAt">
-                  {{ session.completedAt || session.startedAt | date: 'd. M. y., HH:mm' }}
-                </time>
+            <details class="surface session-card">
+              <summary>
+                <span
+                  class="activity-mark"
+                  [attr.data-game]="session.gameType"
+                  aria-hidden="true"
+                ></span>
+                <span class="session-heading">
+                  <strong>{{ session.packageName }}</strong>
+                  <span>
+                    {{ gameTypeLabels[session.gameType] }} · glas {{ session.targetSound }} ·
+                    {{ session.theme }}
+                  </span>
+                  <time [attr.datetime]="session.completedAt || session.startedAt">
+                    {{ session.completedAt || session.startedAt | date: 'd. M. y., HH:mm' }}
+                  </time>
+                </span>
+                <span class="session-stats" aria-label="Sažetak sesije">
+                  <span
+                    ><small>Točno</small>{{ session.correctAnswers }}/{{
+                      session.questionCount
+                    }}</span
+                  >
+                  <span><small>Bodovi</small>{{ session.totalPoints }}</span>
+                  <span><small>Snimke</small>{{ session.recordingAttempts.length }}</span>
+                </span>
+                <span class="expand-label" aria-hidden="true">Detalji</span>
+              </summary>
+
+              <div class="session-body">
                 @if (!session.completedAt) {
-                  <span class="session-state">Nedovršena sesija</span>
+                  <p class="session-state">Ova sesija nije dovršena.</p>
                 }
+
+                <div class="attempt-list">
+                  @for (attempt of session.recordingAttempts; track attempt.id) {
+                    <article class="attempt-card">
+                      <header class="attempt-header">
+                        <div>
+                          <p class="attempt-number">Pokušaj {{ attempt.attemptNumber }}</p>
+                          <time [attr.datetime]="attempt.createdAt">
+                            {{ attempt.createdAt | date: 'd. M. y., HH:mm:ss' }}
+                          </time>
+                        </div>
+                        <span class="status-badge" [attr.data-status]="attempt.transcriptionStatus">
+                          {{ transcriptionLabels[attempt.transcriptionStatus] }}
+                        </span>
+                      </header>
+
+                      <dl class="attempt-results">
+                        <div>
+                          <dt>Očekivani tekst</dt>
+                          <dd>{{ attempt.expectedText }}</dd>
+                        </div>
+                        <div>
+                          <dt>Prepoznati tekst</dt>
+                          <dd>
+                            @switch (attempt.transcriptionStatus) {
+                              @case ('PENDING') {
+                                <span class="muted">Pričekajte ili osvježite podatke.</span>
+                              }
+                              @case ('FAILED') {
+                                <span class="muted"
+                                  >Prijepis nije dostupan. Snimka je sačuvana.</span
+                                >
+                              }
+                              @default {
+                                {{ attempt.transcript || 'Nije prepoznat tekst.' }}
+                              }
+                            }
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Podudarnost teksta</dt>
+                          <dd>
+                            @if (
+                              attempt.transcriptionStatus === 'COMPLETED' &&
+                              attempt.textMatch !== undefined
+                            ) {
+                              <strong>{{ attempt.textMatch }}%</strong>
+                            } @else {
+                              <span class="muted">—</span>
+                            }
+                          </dd>
+                        </div>
+                      </dl>
+
+                      <p class="match-explanation">
+                        Podudarnost uspoređuje očekivani i prepoznati tekst. Nije ocjena izgovora ni
+                        klinički rezultat.
+                      </p>
+
+                      <div class="audio-area">
+                        @if (audioUrls()[attempt.id]; as audioUrl) {
+                          <audio controls preload="metadata" [src]="audioUrl">
+                            Vaš preglednik ne podržava reprodukciju zvuka.
+                          </audio>
+                        } @else {
+                          <button
+                            class="button button--secondary load-audio"
+                            type="button"
+                            [disabled]="loadingAudioId() === attempt.id"
+                            (click)="loadAttemptAudio(attempt)"
+                          >
+                            {{
+                              loadingAudioId() === attempt.id
+                                ? 'Učitavanje snimke…'
+                                : 'Poslušaj testnu snimku'
+                            }}
+                          </button>
+                          <span>{{ formatDuration(attempt.durationMs) }}</span>
+                        }
+                        @if (audioErrors()[attempt.id]; as audioError) {
+                          <p class="audio-error" role="alert">{{ audioError }}</p>
+                        }
+                      </div>
+
+                      <section
+                        class="review-summary"
+                        [attr.data-review]="attempt.therapistReview.status"
+                        aria-label="Osvrt terapeuta"
+                      >
+                        <strong>
+                          Osvrt terapeuta:
+                          {{ reviewLabels[attempt.therapistReview.status] }}
+                        </strong>
+                        @if (attempt.therapistReview.comment) {
+                          <p>{{ attempt.therapistReview.comment }}</p>
+                        } @else {
+                          <p>Za ovu testnu snimku još nema komentara.</p>
+                        }
+                      </section>
+                    </article>
+                  } @empty {
+                    <p class="no-attempts">U ovoj sesiji nema spremljenih testnih snimki.</p>
+                  }
+                </div>
+
+                <button
+                  class="delete-session"
+                  type="button"
+                  [disabled]="deletingId() === session.id"
+                  (click)="deleteSession(session)"
+                >
+                  {{ deletingId() === session.id ? 'Brisanje…' : 'Izbriši sesiju i snimke' }}
+                </button>
               </div>
-              <dl>
-                <div>
-                  <dt>Točno</dt>
-                  <dd>{{ session.correctAnswers }}/{{ session.questionCount }}</dd>
-                </div>
-                <div>
-                  <dt>Bodovi</dt>
-                  <dd>{{ session.totalPoints }}</dd>
-                </div>
-                <div>
-                  <dt>Snimke</dt>
-                  <dd>{{ session.recordingAttempts.length }}</dd>
-                </div>
-              </dl>
-              <button
-                class="delete-session"
-                type="button"
-                [disabled]="deletingId() === session.id"
-                (click)="deleteSession(session)"
-              >
-                {{ deletingId() === session.id ? 'Brisanje…' : 'Izbriši sesiju' }}
-              </button>
-            </article>
+            </details>
           }
         </div>
       </section>
@@ -104,7 +221,7 @@
         <section class="clinical-note">
           <strong>Informativni podaci</strong>
           <p>
-            Ovi rezultati prate korištenje aplikacije. Ne predstavljaju dijagnozu ni stručnu
+            Rezultati i prijepisi prate korištenje prototipa. Ne predstavljaju dijagnozu ni stručnu
             procjenu izgovora.
           </p>
         </section>
@@ -121,13 +238,21 @@
     </section>
   }
 
-  <section class="privacy-strip">
+  <section class="privacy-strip" aria-labelledby="privacy-title">
     <div>
-      <strong>Lokalni prototip za testne podatke</strong>
+      <strong id="privacy-title">Lokalna pohrana testnih podataka</strong>
       <p>
-        Sesije i snimke spremaju se samo na lokalni demonstracijski poslužitelj. Ne unosite stvarne
-        dječje podatke.
+        Rezultati, prijepisi i snimke pohranjuju se na lokalnom demonstracijskom poslužitelju.
+        Koristite samo izmišljene profile i testne podatke. Sve podatke aktivnog profila možete
+        trajno izbrisati.
       </p>
     </div>
+    <button
+      type="button"
+      [disabled]="deletingProfile() || !auth.activeChild()"
+      (click)="deleteActiveProfile()"
+    >
+      {{ deletingProfile() ? 'Brisanje podataka…' : 'Izbriši profil i sve podatke' }}
+    </button>
   </section>
 </div>

@@ -5,15 +5,17 @@ import { PrototypeSessionService } from './prototype-session.service';
 
 describe('PrototypeSessionService', () => {
   const apiRequest = vi.fn();
+  const apiBlobRequest = vi.fn();
   const activeChild = vi.fn().mockReturnValue({ id: 'child-1', displayName: 'Luka' });
 
   beforeEach(() => {
     apiRequest.mockReset();
+    apiBlobRequest.mockReset();
     TestBed.configureTestingModule({
       providers: [
         {
           provide: PrototypeAuthService,
-          useValue: { apiRequest, activeChild },
+          useValue: { apiRequest, apiBlobRequest, activeChild },
         },
       ],
     });
@@ -60,5 +62,14 @@ describe('PrototypeSessionService', () => {
     expect(body.get('attemptNumber')).toBe('2');
     expect(body.get('expectedText')).toBe('kruška');
     expect(body.get('audio')).toBeInstanceOf(Blob);
+  });
+
+  it('loads recording audio through the authenticated API boundary', async () => {
+    const audio = new Blob(['fictional adult recording'], { type: 'audio/webm' });
+    apiBlobRequest.mockResolvedValue(audio);
+    const service = TestBed.inject(PrototypeSessionService);
+
+    await expect(service.loadAttemptAudio('attempt/1')).resolves.toBe(audio);
+    expect(apiBlobRequest).toHaveBeenCalledWith('/api/attempts/attempt%2F1/audio');
   });
 });

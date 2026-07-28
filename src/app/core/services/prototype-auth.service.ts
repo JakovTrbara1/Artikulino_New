@@ -89,6 +89,20 @@ export class PrototypeAuthService {
   }
 
   async apiRequest<T>(path: string, init: RequestInit = {}, authenticated = true): Promise<T> {
+    const response = await this.fetchApiResponse(path, init, authenticated);
+    return (response.status === 204 ? undefined : await response.json()) as T;
+  }
+
+  async apiBlobRequest(path: string): Promise<Blob> {
+    const response = await this.fetchApiResponse(path);
+    return response.blob();
+  }
+
+  private async fetchApiResponse(
+    path: string,
+    init: RequestInit = {},
+    authenticated = true,
+  ): Promise<Response> {
     const headers = new Headers(init.headers);
     if (init.body && !(init.body instanceof FormData)) {
       headers.set('Content-Type', 'application/json');
@@ -109,8 +123,7 @@ export class PrototypeAuthService {
       const body = (await response.json().catch(() => ({}))) as ApiMessage;
       throw new Error(body.message || 'Lokalni prototip trenutačno nije dostupan.');
     }
-
-    return (response.status === 204 ? undefined : await response.json()) as T;
+    return response;
   }
 
   private clearSession(): void {

@@ -97,6 +97,10 @@ export class PrototypeSessionService {
       method: 'DELETE',
     });
   }
+
+  async loadAttemptAudio(attemptId: string): Promise<Blob> {
+    return this.auth.apiBlobRequest(`/api/attempts/${encodeURIComponent(attemptId)}/audio`);
+  }
 }
 
 function extension(mimeType: string): string {
