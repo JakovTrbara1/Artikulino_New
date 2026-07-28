@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authenticatedGuard } from './core/guards/prototype-auth.guards';
+import { authenticatedGuard, parentGameGuard } from './core/guards/prototype-auth.guards';
 
 export const routes: Routes = [
   {
@@ -27,6 +27,7 @@ export const routes: Routes = [
   {
     path: 'napredak',
     title: 'Napredak | Artikulino',
+    canActivate: [parentGameGuard],
     loadComponent: () =>
       import('./features/progress/pages/progress.page').then((m) => m.ProgressPage),
   },

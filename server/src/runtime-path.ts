@@ -7,3 +7,10 @@ export const DEFAULT_DATABASE_FILE = resolve(
   'runtime',
   'artikulino.sqlite',
 );
+
+export const DEFAULT_RECORDINGS_DIRECTORY = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '..',
+  'runtime',
+  'recordings',
+);

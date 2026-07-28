@@ -4,8 +4,10 @@
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
   services, and local-only progress.
-- Milestones 0–4 and the microphone state-coverage follow-up are complete and merged into `main`.
-- The current production build, all 38 tests, and Prettier checks pass.
+- Milestones 0–9 are complete and merged into `main`; Milestone 10 is implemented on its review
+  branch.
+- The current production build, all 61 frontend tests, all 12 server tests, and Prettier checks
+  pass.
 - The frontend-only MVP has no confirmed technical blocker, but real-device accessibility,
   microphone, and Croatian voice checks remain documented in `docs/MVP_READINESS.md`.
 - The next phase is a local master’s-thesis prototype. It may add demo accounts, a local backend,
@@ -38,16 +40,13 @@ not authoritative.
 
 1. Completed: repository quality gate, content validation, accessibility pass, MVP readiness, and
    microphone state coverage.
-2. Current: lock this revised roadmap and the approved design references.
-3. Next: create the soft-toy theme asset pack.
-4. Then: redesign catalog filtering and game tiles.
-5. Then: improve recording UX and reset it for every question.
-6. Then: add the local prototype backend, demo login, and demo child profiles.
-7. Then: persist sessions and recording attempts.
-8. Then: add local Croatian transcription and text matching.
-9. Then: move parent progress to the prototype backend.
-10. Then: add therapist recording review.
-11. Last: run integrated thesis-prototype QA and document the demonstration workflow.
+2. Completed: revised roadmap, approved design references, soft-toy assets, catalog redesign,
+   recording UX, backend foundation, demo login, and demo child profiles.
+3. Current: persist sessions and recording attempts.
+4. Next: add local Croatian transcription and text matching.
+5. Then: expand parent progress with transcription and therapist-review details.
+6. Then: add therapist recording review.
+7. Last: run integrated thesis-prototype QA and document the demonstration workflow.
 
 ## 5. Milestones
 

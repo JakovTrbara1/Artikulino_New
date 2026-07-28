@@ -138,6 +138,25 @@
   font-weight: 800;
 }
 
+.delete-session {
+  grid-column: 2 / -1;
+  justify-self: end;
+  border: 0;
+  background: transparent;
+  color: var(--color-danger);
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.progress-notice {
+  border: 1px solid #f1b7b2;
+  border-radius: var(--radius-sm);
+  background: #fff4f2;
+  padding: 0.85rem 1rem;
+  color: var(--color-danger);
+}
+
 .side-column {
   display: flex;
   flex-direction: column;

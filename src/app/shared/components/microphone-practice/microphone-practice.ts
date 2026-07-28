@@ -12,6 +12,7 @@ import { MicrophoneRecorderService } from '../../services/microphone-recorder.se
 import { RecordingPreview } from '../recording-preview/recording-preview';
 
 type AttemptDeliveryStatus = 'idle' | 'saving' | 'saved' | 'retry';
+type RetryAction = 'save' | 'delete';
 
 @Component({
   selector: 'app-microphone-practice',
@@ -23,6 +24,8 @@ type AttemptDeliveryStatus = 'idle' | 'saving' | 'saved' | 'retry';
 })
 export class MicrophonePractice implements OnDestroy {
   readonly questionId = input.required<string>();
+  readonly saveAttempt = input<(attempt: RecordedAttempt) => Promise<{ readonly id: string }>>();
+  readonly deleteSavedAttempt = input<(attemptId: string) => Promise<void>>();
   readonly recordedAttempt = output<RecordedAttempt>();
   readonly recordingDeleted = output<void>();
 
@@ -32,6 +35,10 @@ export class MicrophonePractice implements OnDestroy {
   private attemptNumber = 0;
   private handledRecording?: Blob;
   private latestAttempt?: RecordedAttempt;
+  private savedAttemptId?: string;
+  private pendingSave?: Promise<{ readonly id: string } | undefined>;
+  private retryAction: RetryAction = 'save';
+  private deliverySequence = 0;
 
   constructor(recorder: MicrophoneRecorderService) {
     this.recorder = recorder;
@@ -71,6 +78,7 @@ export class MicrophonePractice implements OnDestroy {
     this.deliveryStatus.set('idle');
     this.latestAttempt = undefined;
     this.handledRecording = undefined;
+    this.savedAttemptId = undefined;
     await this.recorder.start();
   }
 
@@ -78,16 +86,47 @@ export class MicrophonePractice implements OnDestroy {
     this.recorder.stop();
   }
 
-  protected clearRecording(): void {
+  protected async clearRecording(): Promise<void> {
+    const pendingSave = this.pendingSave;
+    let savedAttemptId = this.savedAttemptId;
+    const deleteSavedAttempt = this.deleteSavedAttempt();
+    this.deliverySequence += 1;
+    if (!savedAttemptId && pendingSave) {
+      this.deliveryStatus.set('saving');
+      try {
+        savedAttemptId = (await pendingSave)?.id;
+      } catch {
+        // A failed upload leaves no server recording to delete.
+      }
+    }
+    if (savedAttemptId && deleteSavedAttempt) {
+      this.deliveryStatus.set('saving');
+      try {
+        await deleteSavedAttempt(savedAttemptId);
+      } catch {
+        this.retryAction = 'delete';
+        this.deliveryStatus.set('retry');
+        return;
+      }
+    }
     this.recorder.clearRecording();
     this.deliveryStatus.set('idle');
     this.latestAttempt = undefined;
     this.handledRecording = undefined;
+    this.savedAttemptId = undefined;
     this.recordingDeleted.emit();
   }
 
   protected retryDelivery(): void {
-    this.deliverAttempt();
+    if (this.retryAction === 'delete') {
+      void this.clearRecording();
+    } else {
+      void this.deliverAttempt();
+    }
+  }
+
+  protected retryLabel(): string {
+    return this.retryAction === 'delete' ? 'Pokušaj izbrisati ponovno' : 'Pokušaj spremiti ponovno';
   }
 
   protected formatDuration(durationMs: number): string {
@@ -97,21 +136,32 @@ export class MicrophonePractice implements OnDestroy {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
-  private deliverAttempt(): void {
+  private async deliverAttempt(): Promise<void> {
     if (!this.latestAttempt) {
       return;
     }
 
+    const attempt = this.latestAttempt;
+    const sequence = ++this.deliverySequence;
+    this.retryAction = 'save';
     this.deliveryStatus.set('saving');
+    const saveOperation = this.saveAttempt()?.(attempt) ?? Promise.resolve(undefined);
+    this.pendingSave = saveOperation;
     try {
-      this.recordedAttempt.emit(this.latestAttempt);
-      queueMicrotask(() => {
-        if (this.recorder.recording()?.blob === this.latestAttempt?.blob) {
-          this.deliveryStatus.set('saved');
-        }
-      });
+      this.recordedAttempt.emit(attempt);
+      const saved = await saveOperation;
+      if (sequence === this.deliverySequence && this.recorder.recording()?.blob === attempt.blob) {
+        this.savedAttemptId = saved?.id;
+        this.deliveryStatus.set('saved');
+      }
     } catch {
-      this.deliveryStatus.set('retry');
+      if (sequence === this.deliverySequence && this.recorder.recording()?.blob === attempt.blob) {
+        this.deliveryStatus.set('retry');
+      }
+    } finally {
+      if (this.pendingSave === saveOperation) {
+        this.pendingSave = undefined;
+      }
     }
   }
 
@@ -121,5 +171,8 @@ export class MicrophonePractice implements OnDestroy {
     this.attemptNumber = 0;
     this.handledRecording = undefined;
     this.latestAttempt = undefined;
+    this.savedAttemptId = undefined;
+    this.pendingSave = undefined;
+    this.deliverySequence += 1;
   }
 }

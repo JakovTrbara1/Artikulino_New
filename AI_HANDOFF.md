@@ -4,7 +4,8 @@
 
 Artikulino is an Angular application for kid-friendly speech and articulation practice for
 preschool and school-age children. The completed frontend-only MVP supports gamified exercises and
-a local progress view. The approved next phase is a localhost-only master’s-thesis prototype using
+the current localhost thesis prototype adds fictional profiles, retained sessions, recordings, and
+backend progress. The approved next phase continues this master’s-thesis prototype using
 fictional profiles and recordings. The app remains a practice and research prototype only; it does
 not diagnose, clinically evaluate speech, or replace a speech therapist.
 
@@ -71,10 +72,11 @@ npx prettier . --check
   - `sound-position`: identify beginning, middle, or end of a word using a train UI.
 - Shared game session flow: play/listen, replay, answer, feedback, scoring, next question, final result.
 - Configurable scoring per content package.
-- Local progress storage.
+- Backend-backed progress for the active fictional demo profile. The legacy local progress service
+  remains only to clear the old non-migrated browser key during deletion.
 - A visible optional microphone panel is placed between each question's prompt/media and answers.
-  It supports permission, recording, stopped/replay, delete, saving/saved, and retry presentation
-  without upload or automatic speech scoring.
+  It supports permission, recording, stopped/replay, delete, asynchronous saving/saved, and retry
+  presentation without automatic speech scoring.
 - Each question ID resets the local microphone state. A stopped recording emits a typed
   `RecordedAttempt` with its blob, MIME type, duration, question ID, and per-question attempt
   number for the later prototype backend boundary.
@@ -93,6 +95,13 @@ npx prettier . --check
   transfer, and no pronunciation scoring.
 - Local Express/SQLite prototype foundation with hashed demo passwords, hashed eight-hour bearer
   sessions, parent/therapist roles, and fictional display-name-only child profiles.
+- Backend game sessions are stored under the active demo child. Multiple multipart recording
+  attempts per question are retained as SQLite metadata plus local files, limited to 15 seconds
+  and 10 MB.
+- Recording upload failures retain the browser-local recording for retry or deletion. Uploading
+  never changes points or blocks question progression.
+- Parent session, attempt, and profile deletion cascades through SQLite and physical audio files.
+  The reset command also removes runtime recordings before reseeding.
 - Demo login at `/prijava` and profile selection at `/profili`. Home and catalog remain public;
   entering a game requires the parent role and an active demo child.
 - The Angular client stores the demo bearer token and selected fictional profile in
@@ -125,7 +134,7 @@ npx prettier . --check
 - `src/app/features/games/pages/`: catalog and player pages.
 - `src/app/features/games/components/`: game board renderers plus catalog card and type-filter
   components.
-- `src/app/features/progress/`: local parent/progress view.
+- `src/app/features/progress/`: backend-backed parent session view.
 - `src/main.css`: global styles, tokens, colors, typography, reset.
 - `server/`: separate Express/SQLite service, API tests, seed/reset workflow, and ignored runtime
   database.
@@ -150,7 +159,10 @@ npx prettier . --check
 
 The game engine is content-driven. Games should not be hard-coded for one sound, one theme, or one fixed question set. A `ContentPackage` defines the game type, target sound, optional contrast sound, sound pair, theme, difficulty, optional catalog artwork, questions, media, answer options, correct answers, explanation, and scoring.
 
-`GamePlayerPage` selects a package by route id and delegates answer UI to the correct board component. Shared services handle session state, scoring, replay counts, attempts, streaks, and completion. Progress is saved locally after completed sessions.
+`GamePlayerPage` selects a package by route id and delegates answer UI to the correct board
+component. Shared services handle session state, scoring, replay counts, attempts, streaks, and
+completion. The page starts and completes a backend session without blocking game progression;
+authenticated parent progress reads those sessions for the active fictional profile.
 
 `validateContentPackages` provides a pure content-authoring and test gate for identifiers, required
 fields, answers, sounds, sound pairs, scoring, image descriptions, target-sound occurrences, and
@@ -184,9 +196,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Known Bugs, Risks, and Unfinished Work
 
-- The Milestone 9 backend covers only demo authentication and display-name-only child profiles.
-  Game sessions, recording uploads, cascaded audio deletion, and backend progress begin in
-  Milestone 10.
+- Local recording persistence is implemented, but transcription state, transcript text,
+  `Podudarnost teksta`, and therapist reviews begin in Milestone 11 and later.
 - No ASR provider or automatic articulation error detection is implemented. The current service
   boundary remains disabled. A local, non-clinical transcript-matching worker is approved only for
   the later thesis-prototype milestone.
@@ -211,11 +222,10 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Merge the local Express/SQLite foundation, demo login, and fictional child profiles.
-2. Implement Milestone 10: persist game sessions and multiple recording attempts under the active
-   demo child.
-3. Continue through local transcription, parent progress, therapist review, and integrated QA
-   exactly in the dependency order documented in `DEVELOPMENT_PLAN.md`.
+1. Merge Milestone 10 session and recording persistence.
+2. Implement Milestone 11: local Croatian transcription and non-clinical text matching.
+3. Continue through expanded parent progress, therapist review, and integrated QA exactly in the
+   dependency order documented in `DEVELOPMENT_PLAN.md`.
 
 ## Do Not Change Without Asking
 
