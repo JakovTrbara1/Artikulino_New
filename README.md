@@ -112,12 +112,18 @@ kvaliteta hrvatskog glasa ovise o uređaju.
 
 ## Mikrofon i privatnost
 
-Mikrofon se aktivira isključivo nakon korisnikova klika. `MediaRecorder` omogućuje djetetu da snimi riječ i posluša vlastitu snimku.
+Mikrofon se aktivira isključivo nakon korisnikova klika. Vidljivi, neobavezni panel nalazi se između
+pojma i ponuđenih odgovora. `MediaRecorder` omogućuje djetetu da snimi riječ, posluša snimku i
+izbriše je. Prelaskom na novo pitanje panel se vraća u početno stanje.
 
 - snimka se ne šalje na poslužitelj;
 - ne ulazi u rezultate ni `localStorage`;
 - briše se ručno ili pri napuštanju komponente;
 - aplikacija ne tvrdi da automatski ocjenjuje izgovor.
+
+Nakon zaustavljanja panel emitira lokalni tipizirani `RecordedAttempt` (audio blob, MIME tip,
+trajanje, ID pitanja i redni broj pokušaja). Trenutačno nema pretplatnika koji podatke trajno
+pohranjuje; ta je granica priprema za lokalni demonstracijski backend iz kasnijeg milestonea.
 
 Za mikrofon je potreban podržani preglednik i siguran kontekst (`https` ili `localhost`). Servisna
 granica `SPEECH_TRANSCRIPTION` postoji, ali je zadano isključena i ne šalje snimke izvan

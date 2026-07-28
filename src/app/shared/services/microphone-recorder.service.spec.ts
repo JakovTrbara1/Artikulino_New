@@ -31,6 +31,7 @@ function useSupportedRecorder(getUserMedia: ReturnType<typeof vi.fn>): void {
 describe('MicrophoneRecorderService', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it('reports unsupported recording without requesting microphone access', async () => {
@@ -59,7 +60,7 @@ describe('MicrophoneRecorderService', () => {
     expect(service.audioUrl()).toBeNull();
   });
 
-  it('makes a stopped local recording available and then removes it', async () => {
+  it('makes a typed stopped local recording available and then removes it', async () => {
     const stopTrack = vi.fn();
     const getUserMedia = vi.fn().mockResolvedValue({
       getTracks: () => [{ stop: stopTrack }],
@@ -68,15 +69,24 @@ describe('MicrophoneRecorderService', () => {
     const revokeObjectURL = vi.fn();
     useSupportedRecorder(getUserMedia);
     vi.stubGlobal('URL', { createObjectURL, revokeObjectURL });
+    let currentTime = 1_000;
+    vi.spyOn(Date, 'now').mockImplementation(() => currentTime);
     const service = new MicrophoneRecorderService();
 
     await service.start();
     expect(service.status()).toBe('recording');
 
+    currentTime = 2_750;
     service.stop();
 
-    expect(service.status()).toBe('ready');
+    expect(service.status()).toBe('stopped');
     expect(service.audioUrl()).toBe('blob:local-recording');
+    expect(service.recording()).toMatchObject({
+      mimeType: 'audio/webm',
+      durationMs: 1_750,
+      audioUrl: 'blob:local-recording',
+    });
+    expect(service.recording()?.blob).toBeInstanceOf(Blob);
     expect(createObjectURL).toHaveBeenCalledOnce();
     expect(stopTrack).toHaveBeenCalledOnce();
 
@@ -84,6 +94,8 @@ describe('MicrophoneRecorderService', () => {
 
     expect(service.status()).toBe('idle');
     expect(service.audioUrl()).toBeNull();
+    expect(service.recording()).toBeNull();
+    expect(service.durationMs()).toBe(0);
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:local-recording');
   });
 

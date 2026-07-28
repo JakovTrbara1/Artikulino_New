@@ -15,6 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { MicrophonePractice } from '../../../shared/components/microphone-practice/microphone-practice';
+import { RecordedAttempt } from '../../../shared/models/recorded-attempt.model';
 import { AudioPlaybackService } from '../../../shared/services/audio-playback.service';
 import { CatchSoundBoard } from '../components/catch-sound-board/catch-sound-board';
 import { ListenDecideBoard } from '../components/listen-decide-board/listen-decide-board';
@@ -48,6 +49,7 @@ export class GamePlayerPage implements OnDestroy {
   protected readonly hasListened = signal(false);
   protected readonly selectedAnswer = signal<string | null>(null);
   protected readonly audioMessage = signal('');
+  protected readonly latestRecordedAttempt = signal<RecordedAttempt | null>(null);
   protected readonly listenLabel = computed(() =>
     this.hasListened() ? 'Poslušaj ponovno' : 'Poslušaj',
   );
@@ -113,6 +115,14 @@ export class GamePlayerPage implements OnDestroy {
     this.session.submitAnswer(answerId);
   }
 
+  protected receiveRecordedAttempt(attempt: RecordedAttempt): void {
+    this.latestRecordedAttempt.set(attempt);
+  }
+
+  protected clearRecordedAttempt(): void {
+    this.latestRecordedAttempt.set(null);
+  }
+
   protected nextQuestion(): void {
     this.audio.stop();
     this.session.next();
@@ -138,6 +148,7 @@ export class GamePlayerPage implements OnDestroy {
     this.hasListened.set(false);
     this.selectedAnswer.set(null);
     this.audioMessage.set('');
+    this.latestRecordedAttempt.set(null);
   }
 
   private focusHeadingAfterRender(target: 'game' | 'result'): void {
