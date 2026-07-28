@@ -97,3 +97,17 @@ Ako se kasnije uvedu računi:
 - [EDPB: zaštita podataka djece](https://www.edpb.europa.eu/topics/key-gdpr-concepts/children_en)
 - [EDPB: osnove zaštite podataka za male organizacije](https://www.edpb.europa.eu/sme/learn-the-basics/data-protection-basics_en)
 - [AZOP: privola i dobna granica u Hrvatskoj](https://azop.hr/privola/)
+
+## Lokalni prototip diplomskog rada
+
+Za odobreni localhost prototip vrijedi zasebna, ograničena iznimka od zabrane vanjskog ASR-a:
+
+- koriste se samo izmišljeni profili i izmišljene ili odrasle testne snimke;
+- audio, SQLite podaci, Python model i obrada ostaju na lokalnom razvojnom računalu;
+- preglednik šalje snimku samo lokalnom Express servisu; Express workeru šalje samo audio;
+- rezultat je prijepis i `Podudarnost teksta`, ne procjena izgovora niti klinički zaključak;
+- neuspjeh obrade ne briše audio, ne mijenja bodove i ne blokira igru;
+- roditelj može izbrisati pokušaj, sesiju ili profil zajedno s pripadajućim lokalnim audiozapisima.
+
+Ova iznimka ne zatvara nijednu produkcijsku kontrolnu točku iznad i ne dopušta stvarne dječje
+podatke, javnu objavu ni vanjskog pružatelja.

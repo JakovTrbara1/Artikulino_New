@@ -9,18 +9,22 @@ Preduvjeti su Node.js 20.19+ ili noviji LTS i npm.
 ```bash
 npm install
 npm --prefix server install
+py -3.11 -m venv transcription/.venv
+.\transcription\.venv\Scripts\python.exe -m pip install -r transcription/requirements-dev.txt
 ```
 
-Pokreni lokalni API i Angular u dva terminala:
+Pokreni lokalni prijepis, API i Angular u tri terminala:
 
 ```bash
+npm run transcription:start
 npm run server:start
 npm start
 ```
 
 Aplikacija je zatim dostupna na `http://localhost:4200`, a lokalni API na
-`http://localhost:3000`. Angular razvojni poslužitelj prosljeđuje `/api` pozive kroz
-`proxy.conf.json`.
+`http://localhost:3000`. Lokalni FastAPI worker sluša na `http://127.0.0.1:8000`. Angular razvojni
+poslužitelj prosljeđuje `/api` pozive kroz `proxy.conf.json`; preglednik nikada ne poziva Python
+worker izravno.
 
 Provjere kvalitete:
 
@@ -156,6 +160,11 @@ izbriše je. Prelaskom na novo pitanje panel se vraća u početno stanje.
 - ograničena je na 15 sekundi i 10 MB;
 - aplikacija ne tvrdi da automatski ocjenjuje izgovor.
 
+Nakon spremanja Express asinkrono šalje samo audiodatoteku lokalnom FastAPI workeru. Pokušaj ima
+status `PENDING`, `COMPLETED` ili `FAILED`. Uspješan prijepis sprema tekst i cjelobrojnu
+`Podudarnost teksta`, dobivenu normaliziranom Levenshteinovom sličnošću. To nije procjena
+izgovora, ne prikazuje se djetetu i ne utječe na bodove. Neuspjeh prijepisa ne briše snimku.
+
 Nakon zaustavljanja panel emitira tipizirani `RecordedAttempt` (audio blob, MIME tip, trajanje, ID
 pitanja i redni broj pokušaja). Metapodaci se spremaju u SQLite, a audio u
 `server/runtime/recordings/`. API odgovori ne otkrivaju fizičke putanje.
@@ -207,7 +216,8 @@ Globalni design tokeni, reset i zajednički stilovi nalaze se u `src/main.css`. 
 
 - Demo prijava i profili rade samo na lokalnom prototipnom API-ju; nema produkcijskih računa,
   javne objave ni sinkronizacije između uređaja.
-- Nema automatske procjene pravilnosti izgovora ni ASR integracije.
+- Nema automatske procjene pravilnosti izgovora. Lokalni hrvatski prijepis služi samo demonstraciji
+  s izmišljenim ili odraslim testnim snimkama; `Podudarnost teksta` nije logopedska procjena.
 - Demo sadržaj služi tehničkoj demonstraciji i prije stručne uporabe treba ga pregledati logoped.
 - Svaki demo paket izričito je označen statusom `NOT_REVIEWED`; upute za dokumentiranje stručne
   provjere nalaze se u `docs/CONTENT_PACKAGES.md`.
@@ -252,6 +262,7 @@ Optimizirane transparentne soft-toy ilustracije za osam tema nalaze se u
 `public/assets/games/decorations/`. Katalog povezuje tematske ilustracije s karticama, boji ih prema
 vrsti igre i koristi tri pristupačna preklopna gumba kao prvi filtar.
 
-Lokalni backend, testni računi, izmišljeni profili, sesije i višestruki pokušaji snimanja sada su
-implementirani. Lokalni hrvatski prijepis, prošireni roditeljski pregled i terapeutski pregled
-dolaze u sljedećim milestoneima.
+Lokalni backend, testni računi, izmišljeni profili, sesije, višestruki pokušaji snimanja i lokalni
+hrvatski prijepis sada su implementirani. Prošireni roditeljski pregled i terapeutski pregled
+dolaze u sljedećim milestoneima. Detaljne upute za Python worker nalaze se u
+[`transcription/README.md`](transcription/README.md).

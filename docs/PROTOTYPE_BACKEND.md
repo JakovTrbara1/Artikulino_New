@@ -7,25 +7,29 @@ is not a production identity system, a medical record, or a public deployment ta
 real children’s names, recordings, ages, health information, or credentials.
 
 The backend stores predefined demo users, hashed bearer sessions, fictional display-name-only child
-profiles, game sessions, and recording attempts. It does not yet transcribe audio or provide
-therapist review workflows.
+profiles, game sessions, recording attempts, and local Croatian transcripts. It does not provide
+therapist review workflows yet.
 
 ## Setup
 
 ```bash
 npm install
 npm --prefix server install
+py -3.11 -m venv transcription/.venv
+.\transcription\.venv\Scripts\python.exe -m pip install -r transcription/requirements-dev.txt
 ```
 
-Run the API and Angular app in separate terminals:
+Run the transcription worker, API, and Angular app in three separate terminals:
 
 ```bash
+npm run transcription:start
 npm run server:start
 npm start
 ```
 
 The API listens on `http://localhost:3000`. Angular listens on `http://localhost:4200` and proxies
-`/api` requests through `proxy.conf.json`.
+`/api` requests through `proxy.conf.json`. The FastAPI worker listens only on
+`http://127.0.0.1:8000`; the browser never calls it directly.
 
 ## Demo credentials
 
@@ -52,9 +56,20 @@ Every stopped recording is an independent attempt. Uploading is asynchronous and
 game scoring or progression. Session, attempt, and child-profile deletion removes both database
 records and associated audio files.
 
+After upload, an attempt starts as `PENDING`. Express submits only the stored audio to the local
+worker, one attempt at a time. A successful result becomes `COMPLETED` and stores the transcript
+plus an integer `Podudarnost teksta`; an unavailable or failed worker marks it `FAILED` without
+removing the audio or invalidating the game session. The worker receives no expected text, profile
+name, package, score, or stable child identifier.
+
+`Podudarnost teksta` is normalized Levenshtein similarity. Normalization lowercases Croatian text,
+collapses whitespace, removes punctuation, and preserves Croatian diacritics. Exact text is 100;
+an empty transcript is 0. It is not a pronunciation or clinical score and never affects game
+points.
+
 ## API
 
-- `GET /api/health`
+- `GET /api/health` (includes local transcription-worker availability and model configuration)
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 - `POST /api/auth/logout`
@@ -85,6 +100,10 @@ npm run prototype:reset
 
 ```bash
 npm --prefix server run check
+npm run transcription:test
 npm run check
 git diff --check
 ```
+
+Worker setup, model override, first-download behavior, and isolated Python testing are documented in
+[`../transcription/README.md`](../transcription/README.md).

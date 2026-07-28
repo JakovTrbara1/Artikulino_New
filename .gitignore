@@ -11,6 +11,10 @@
 /server/node_modules
 /server/dist
 /server/runtime
+/transcription/.venv
+/transcription/.pytest_cache
+/transcription/**/__pycache__
+/.pytest_cache
 npm-debug.log
 yarn-error.log
 

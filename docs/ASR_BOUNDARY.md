@@ -41,3 +41,19 @@ Do tada `SPEECH_TRANSCRIPTION` mora ostati u stanju `not-configured`.
 Detaljni proizvodni i tehnički uvjeti, popis otvorenih odluka i izlazna kontrolna lista nalaze se u
 [`PRIVACY_AND_CONSENT.md`](PRIVACY_AND_CONSENT.md). Taj dokument ne odobrava vanjski prijenos:
 adapter ostaje isključen dok sve kontrolne točke nisu potvrđene.
+
+## Lokalna iznimka za prototip diplomskog rada
+
+Odobreni lokalni prototip koristi zaseban FastAPI/faster-whisper proces isključivo na
+`127.0.0.1`. Preglednik ga nikada ne poziva izravno: Express šalje već spremljenu testnu
+audiosnimku bez imena profila, očekivanog teksta, bodova ili drugih podataka sesije.
+
+Ova lokalna iznimka:
+
+- vrijedi samo za izmišljene profile i izmišljene ili odrasle testne snimke;
+- ne odobrava vanjskog ASR pružatelja ni prijenos u oblak;
+- vraća samo prijepis; `Podudarnost teksta` računa Express;
+- ne mijenja bodove i ne prikazuje rezultat djetetu tijekom igre;
+- ne uklanja snimku ako prijepis ne uspije.
+
+Produkcijske i vanjske kontrolne točke u ovom dokumentu i dalje ostaju otvorene.
