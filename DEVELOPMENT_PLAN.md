@@ -4,10 +4,10 @@
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
   services, and backend-backed local prototype progress.
-- Milestones 0–12 are complete and merged into `main`; Milestone 13 is implemented on
-  `codex/therapist-recording-review`.
-- The production build, frontend tests, server tests, Python worker tests, and Prettier checks are
-  required to pass before Milestone 13 review.
+- Milestones 0–13 are complete and merged into `main`; Milestone 14 is implemented on
+  `codex/thesis-prototype-qa`.
+- The consolidated Angular, Express, Python, and formatting gate passes through
+  `npm run prototype:check`.
 - The frontend-only MVP has no confirmed technical blocker, but real-device accessibility,
   microphone, and Croatian voice checks remain documented in `docs/MVP_READINESS.md`.
 - The next phase is a local master’s-thesis prototype. It may add demo accounts, a local backend,
@@ -45,8 +45,8 @@ not authoritative.
 3. Completed: persist sessions and recording attempts.
 4. Completed: local Croatian transcription and text matching.
 5. Completed: expand parent progress with transcription and therapist-review details.
-6. Current: add therapist recording review.
-7. Next: run integrated thesis-prototype QA and document the demonstration workflow.
+6. Completed: add therapist recording review.
+7. Completed: run integrated thesis-prototype QA and document the demonstration workflow.
 
 ## 5. Milestones
 
@@ -252,17 +252,15 @@ responses must never expose physical audio paths.
 
 ## 7. Validation strategy
 
-Until all services exist, each milestone runs the checks applicable to its scope. The complete
-prototype gate will be:
+The complete prototype gate is:
 
 ```bash
-npm run check
-npm --prefix server test
-python -m pytest transcription
+npm run prototype:check
 git diff --check
 ```
 
-Milestone 14 consolidates them as `npm run prototype:check`.
+Detailed automated, integrated, visual, and remaining human-device checks are recorded in
+`docs/THESIS_PROTOTYPE_QA.md`.
 
 ## 8. Explicit boundaries
 
@@ -279,8 +277,9 @@ Milestone 14 consolidates them as `npm run prototype:check`.
 
 ## 9. Risks
 
-- The development machine currently has no Python installation; Milestone 11 must document and
-  verify Python and FFmpeg setup before local Whisper validation.
+- Python 3.11 is installed and the isolated worker environment is verified. Standalone FFmpeg is
+  not installed; bundled PyAV/FFmpeg libraries handle supported prototype audio while standalone
+  FFmpeg remains useful for diagnostics.
 - CPU-only `small` Whisper inference may be slow; recordings remain short and transcription is
   serialized.
 - Generated visual assets need consistent art direction, transparency validation, optimization,

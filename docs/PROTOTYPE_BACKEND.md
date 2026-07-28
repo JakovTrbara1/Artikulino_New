@@ -7,8 +7,7 @@ is not a production identity system, a medical record, or a public deployment ta
 real children’s names, recordings, ages, health information, or credentials.
 
 The backend stores predefined demo users, hashed bearer sessions, fictional display-name-only child
-profiles, game sessions, recording attempts, and local Croatian transcripts. It does not provide
-therapist review workflows yet.
+profiles, game sessions, recording attempts, local Croatian transcripts, and therapist reviews.
 
 ## Setup
 
@@ -101,6 +100,12 @@ npm run prototype:reset
 ```
 
 ## Validation
+
+```bash
+npm run prototype:check
+```
+
+Individual checks remain available through:
 
 ```bash
 npm --prefix server run check

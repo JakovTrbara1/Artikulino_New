@@ -39,6 +39,7 @@ npm run test:ci
 npm run check
 npm --prefix server run check
 npm run transcription:test
+npm run prototype:check
 npm run prototype:reset
 ```
 
@@ -46,9 +47,10 @@ The Angular dev server is expected at `http://localhost:4200`; its `/api` reques
 local prototype server at `http://localhost:3000`. Express calls the local transcription worker at
 `http://127.0.0.1:8000`. Run all three services in separate terminals.
 
-`npm run check` is the standard repository quality gate. It runs the production build, the
-single-run test suite, and the Prettier check. `npm test` remains available for development, while
-`npm run test:ci` always runs once and exits.
+`npm run prototype:check` is the complete thesis-prototype quality gate. It runs the Angular
+production build and tests, Prettier, the Express build and tests, and the Python worker tests.
+`npm run check` remains the frontend-only gate. `npm test` remains available for development,
+while `npm run test:ci` always runs once and exits.
 
 ESLint is intentionally deferred for the MVP. The current quality gate uses the Angular compiler,
 Vitest, and Prettier without adding another dependency. Prettier can also be run directly with:
@@ -59,10 +61,10 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Branch at handoff creation: `main`
+- Current implementation branch: `codex/thesis-prototype-qa`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Last commit before this handoff: `5180a67 Document Angular MVP setup, game content model, privacy, and progress`
-- Repository was clean before adding this handoff documentation.
+- Base: `origin/main` at merge commit `0af8fed`
+- Milestone 14 checkpoint: `d2e2ef3 Add integrated prototype quality gate`
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -171,6 +173,8 @@ npx prettier . --check
 - `docs/ASR_BOUNDARY.md`: privacy and architecture gates for any future ASR adapter.
 - `docs/PRIVACY_AND_CONSENT.md`: data inventory, required decisions, and ASR release checklist.
 - `docs/MVP_READINESS.md`: dated MVP smoke-test results and remaining human-device checks.
+- `docs/INTELLIJ_RUN_CONFIGURATIONS.md`: exact three-service IntelliJ IDEA setup.
+- `docs/THESIS_PROTOTYPE_QA.md`: final automated, integrated, responsive, and human-check record.
 - `DEVELOPMENT_PLAN.md`: approved thesis-prototype roadmap and milestone boundaries.
 - `docs/design/artikulino-game-concept.png`: visual concept reference.
 - `docs/design/catalog-soft-toy-desktop.png`: approved desktop catalog direction.
@@ -229,10 +233,23 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   usable without horizontal overflow at 390×844. No browser console warnings or errors were
   observed.
 
+## Milestone 14 Validation
+
+- `npm run prototype:check` passed: 20 frontend files / 75 tests, 3 server files / 21 tests, and
+  5 Python worker tests (101 tests total), plus the production build and Prettier.
+- A new integrated API workflow covers both demo roles, a completed session, multiple attempts,
+  transcription, text matching, protected playback, therapist feedback, parent visibility, and
+  database/filesystem deletion.
+- Live Angular verification covered parent login, child selection, a complete 4/4 game, saved
+  progress, therapist review and comment, and parent visibility of the saved review.
+- Catalog, gameplay, and therapist layouts were checked at 1440×1000 and 390×844 without
+  horizontal overflow. Detailed evidence and remaining physical-device checks are in
+  `docs/THESIS_PROTOTYPE_QA.md`.
+
 ## Known Bugs, Risks, and Unfinished Work
 
-- Local recording persistence, Croatian transcription, expanded parent progress, and therapist
-  review are implemented. Integrated cross-service and failure-path QA remains Milestone 14.
+- Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
+  and integrated cross-service/failure-path QA are implemented.
 - No external ASR provider or automatic articulation error detection is implemented. The original
   browser transcription port remains disabled; Express alone calls the localhost worker.
 - No approved controller, legal basis, guardian verification, ASR provider, exact provider
@@ -260,11 +277,11 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review and merge Milestone 13 therapist recording review.
-2. Implement Milestone 14 integrated thesis-prototype QA exactly as documented in
-   `DEVELOPMENT_PLAN.md`.
-3. Perform the remaining human microphone, Croatian voice, keyboard, and screen-reader checks on
-   the target device.
+1. Review and merge the Milestone 14 integrated QA pull request.
+2. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
+   screen-reader checks on the target device.
+3. Record any thesis demonstration observations without expanding this prototype into production
+   or clinical scope.
 
 ## Do Not Change Without Asking
 
