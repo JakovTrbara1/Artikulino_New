@@ -102,6 +102,12 @@ npm run prototype:reset
 ## Validation
 
 ```bash
+npm run prototype:check
+```
+
+Individual checks remain available through:
+
+```bash
 npm --prefix server run check
 npm run transcription:test
 npm run check

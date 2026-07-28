@@ -42,6 +42,8 @@ provjera bez dodavanja nove ovisnosti.
 
 Točne postavke za zajedničko pokretanje sva tri servisa u IntelliJ IDEA-i nalaze se u
 [`docs/INTELLIJ_RUN_CONFIGURATIONS.md`](docs/INTELLIJ_RUN_CONFIGURATIONS.md).
+Završni automatski, integrirani i responzivni rezultati te preostale provjere na stvarnom uređaju
+nalaze se u [`docs/THESIS_PROTOTYPE_QA.md`](docs/THESIS_PROTOTYPE_QA.md).
 
 ## Rute
 
@@ -274,5 +276,6 @@ vrsti igre i koristi tri pristupačna preklopna gumba kao prvi filtar.
 
 Lokalni backend, testni računi, izmišljeni profili, sesije, višestruki pokušaji snimanja, lokalni
 hrvatski prijepis, prošireni roditeljski pregled i terapeutski pregled sada su implementirani.
-Sljedeći milestone objedinjuje završnu provjeru cijelog prototipa. Detaljne upute za Python worker nalaze se u
+Završna integrirana provjera prototipa također je implementirana i dokumentirana u
+[`docs/THESIS_PROTOTYPE_QA.md`](docs/THESIS_PROTOTYPE_QA.md). Detaljne upute za Python worker nalaze se u
 [`transcription/README.md`](transcription/README.md).
