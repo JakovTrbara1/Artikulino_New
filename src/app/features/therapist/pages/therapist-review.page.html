@@ -64,7 +64,7 @@
                 (click)="selectSession(session)"
               >
                 <span class="session-icon" [attr.data-game]="session.gameType" aria-hidden="true">
-                  {{ session.targetSound }}
+                  {{ session.targetSound || '•' }}
                 </span>
                 <span>
                   <strong>{{ session.packageName }}</strong>
@@ -94,8 +94,10 @@
             <h2>Pokušaji snimanja</h2>
             @if (selectedSession(); as session) {
               <p>
-                {{ session.childDisplayName }} · {{ session.packageName }} · glas
-                {{ session.targetSound }}
+                {{ session.childDisplayName }} · {{ session.packageName }}
+                @if (session.targetSound) {
+                  · glas {{ session.targetSound }}
+                }
               </p>
             }
           </div>

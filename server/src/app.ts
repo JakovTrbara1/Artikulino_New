@@ -463,7 +463,7 @@ function parseGameSession(body: unknown): CreateGameSessionInput | undefined {
   const packageId = textField(value?.['packageId'], 100);
   const packageName = textField(value?.['packageName'], 100);
   const gameType = value?.['gameType'];
-  const targetSound = textField(value?.['targetSound'], 20);
+  const targetSound = textField(value?.['targetSound'], 20) ?? '';
   const theme = textField(value?.['theme'], 50);
   const difficulty = value?.['difficulty'];
   const questionCount = integerField(value?.['questionCount'], 1, 1_000);
@@ -473,7 +473,6 @@ function parseGameSession(body: unknown): CreateGameSessionInput | undefined {
     !packageName ||
     typeof gameType !== 'string' ||
     !GAME_TYPES.has(gameType as PrototypeGameType) ||
-    !targetSound ||
     !theme ||
     typeof difficulty !== 'string' ||
     !DIFFICULTIES.has(difficulty as PrototypeDifficulty) ||

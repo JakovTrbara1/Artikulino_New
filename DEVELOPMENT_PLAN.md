@@ -4,8 +4,7 @@
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
   services, and backend-backed local prototype progress.
-- Milestones 0–13 are complete and merged into `main`; Milestone 14 is implemented on
-  `codex/thesis-prototype-qa`.
+- Milestones 0–14 are complete and merged into `main`.
 - The consolidated Angular, Express, Python, and formatting gate passes through
   `npm run prototype:check`.
 - The frontend-only MVP has no confirmed technical blocker, but real-device accessibility,
@@ -35,6 +34,16 @@ not authoritative.
 - `docs/design/gameplay-recording-desktop.png`
 - `docs/design/gameplay-recording-mobile.png`
 - `docs/design/therapist-review-desktop.png`
+- `docs/design/mentor-catalog-desktop.png`
+- `docs/design/mentor-catalog-mobile.png`
+- `docs/design/mentor-pronunciation-desktop.png`
+- `docs/design/mentor-pronunciation-mobile.png`
+- `docs/design/mentor-parent-feedback-desktop.png`
+- `docs/design/mentor-parent-feedback-mobile.png`
+
+The mentor concepts control layout and visual direction only. The pronunciation screen must use
+the code-native heading `Poslušaj i izgovori riječ.` or `Poslušaj i izgovori glas.`; sample image
+copy and sample content are not authoritative.
 
 ## 4. Prioritized roadmap
 
@@ -47,6 +56,9 @@ not authoritative.
 5. Completed: expand parent progress with transcription and therapist-review details.
 6. Completed: add therapist recording review.
 7. Completed: run integrated thesis-prototype QA and document the demonstration workflow.
+8. Implemented: align the game taxonomy and content contract with mentor feedback.
+9. Next: simplify recognition games, add dedicated pronunciation practice, split parent progress,
+   and repeat integrated QA.
 
 ## 5. Milestones
 
@@ -218,6 +230,51 @@ git diff --check
 - Use fictional adult-generated Croatian recordings only.
 - Document IntelliJ run configurations for Angular, Express, and the Python worker.
 - Update the handoff with credentials, reset procedure, limitations, and final validation results.
+
+### Milestone 15 — Mentor-aligned content model
+
+- Branch: `codex/mentor-content-model`
+- Add `pronunciation-practice` as the fourth game type.
+- Add explicit `DETECT`/`DISCRIMINATE` recognition modes and `SOUND`/`WORD` pronunciation modes.
+- Allow packages that do not practise a sound to omit target-sound metadata.
+- Validate binary answer counts, detection answers, discrimination pairs, pronunciation prompts,
+  sound occurrences, and professional-review status.
+- Remove misleading sound metadata from listening packages and minimally migrate demo content so
+  the stricter contract passes.
+- Preserve the approved mentor-feedback concepts in `docs/design/`.
+- Validate with `npm run prototype:check` and `git diff --check`.
+
+### Milestone 16 — Recognition-game cleanup and dynamic filters
+
+- Branch: `codex/mentor-recognition-cleanup`
+- Remove recording controls from the three recognition categories.
+- Keep binary games to two meaningful answers; retain three positions only where required.
+- Add category-aware catalog filters and a `Vrsta vježbe` filter for detection versus
+  discrimination.
+- Validate gameplay, filtering, accessibility, and responsive layouts.
+
+### Milestone 17 — Dedicated pronunciation practice
+
+- Branch: `codex/pronunciation-practice-games`
+- Add data-driven sound and whole-word practice for R, L, S, Z, Š, Ž, C, Č, and Ć.
+- Require one local recording per round while providing a safe exit after microphone failure.
+- Keep isolated-sound feedback to recording/replay success; use non-numeric text-recognition
+  feedback for whole words.
+- Add compatible backend persistence and transcription states without clinical claims.
+
+### Milestone 18 — Parent progress sections
+
+- Branch: `codex/parent-progress-sections`
+- Split `/napredak` into `Napredak djeteta` and `Feedback terapeuta`.
+- Show only attempts with saved therapist feedback in the therapist-feedback section.
+- Preserve historical recordings created before the recognition-game cleanup.
+
+### Milestone 19 — Mentor-feedback integrated QA
+
+- Branch: `codex/mentor-feedback-qa`
+- Verify the corrected content matrix, all four game types, recording boundaries, failure states,
+  parent views, therapist visibility, migrations, accessibility, and responsive layouts.
+- Update README, IntelliJ instructions, QA evidence, and this handoff.
 
 ## 6. Interfaces and API
 

@@ -33,6 +33,6 @@ export class CatalogGameCard {
   protected practiceTarget(contentPackage: ContentPackage): string {
     return contentPackage.soundPair
       ? `${contentPackage.soundPair.primary} / ${contentPackage.soundPair.contrast}`
-      : contentPackage.targetSound;
+      : (contentPackage.targetSound ?? contentPackage.theme);
   }
 }

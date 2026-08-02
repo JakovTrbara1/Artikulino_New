@@ -29,8 +29,13 @@
         <h3 [id]="'package-info-title-' + package.id">Vježba: {{ practiceTarget(package) }}</h3>
         <dl>
           <div>
-            <dt>Ciljni glas</dt>
-            <dd>{{ practiceTarget(package) }}</dd>
+            @if (package.targetSound) {
+              <dt>Ciljni glas</dt>
+              <dd>{{ practiceTarget(package) }}</dd>
+            } @else {
+              <dt>Tema</dt>
+              <dd>{{ package.theme }}</dd>
+            }
           </div>
           <div>
             <dt>Razina</dt>

@@ -15,10 +15,14 @@ export type ContentValidationIssueCode =
   | 'required-text'
   | 'missing-questions'
   | 'insufficient-answers'
+  | 'invalid-answer-count'
   | 'missing-correct-answer'
   | 'unknown-correct-answer'
   | 'unsupported-sound'
   | 'invalid-sound-pair'
+  | 'missing-game-mode'
+  | 'unexpected-game-mode'
+  | 'invalid-sound-classification'
   | 'invalid-scoring'
   | 'missing-image-source'
   | 'missing-image-alt'
@@ -69,12 +73,6 @@ export function validateContentPackages(
       `${packagePath}.objective`,
       'Cilj paketa',
     );
-    validateRequiredText(
-      issues,
-      contentPackage.targetSound,
-      `${packagePath}.targetSound`,
-      'Ciljni glas',
-    );
     validateRequiredText(issues, contentPackage.theme, `${packagePath}.theme`, 'Tema paketa');
     if (contentPackage.catalogImage) {
       validateImage(
@@ -97,7 +95,15 @@ export function validateContentPackages(
       packageIds.add(contentPackage.id);
     }
 
-    validateSound(issues, contentPackage.targetSound, `${packagePath}.targetSound`);
+    if (contentPackage.targetSound !== undefined) {
+      validateRequiredText(
+        issues,
+        contentPackage.targetSound,
+        `${packagePath}.targetSound`,
+        'Ciljni glas',
+      );
+      validateSound(issues, contentPackage.targetSound, `${packagePath}.targetSound`);
+    }
     if (contentPackage.contrastSound !== undefined) {
       validateRequiredText(
         issues,
@@ -108,6 +114,7 @@ export function validateContentPackages(
       validateSound(issues, contentPackage.contrastSound, `${packagePath}.contrastSound`);
     }
     validateSoundPair(issues, contentPackage, packagePath);
+    validateGameConfiguration(issues, contentPackage, packagePath);
     validateScoring(issues, contentPackage.scoring, `${packagePath}.scoring`);
     validateProfessionalReview(
       issues,
@@ -168,7 +175,7 @@ export function validateContentPackages(
         validateImage(issues, question.image, `${questionPath}.image`, 'Slika pitanja');
       }
 
-      if (question.answers.length < 2) {
+      if (contentPackage.gameType !== 'pronunciation-practice' && question.answers.length < 2) {
         addIssue(
           issues,
           'insufficient-answers',
@@ -196,7 +203,10 @@ export function validateContentPackages(
         }
       });
 
-      if (question.correctAnswerIds.length === 0) {
+      if (
+        contentPackage.gameType !== 'pronunciation-practice' &&
+        question.correctAnswerIds.length === 0
+      ) {
         addIssue(
           issues,
           'missing-correct-answer',
@@ -216,14 +226,7 @@ export function validateContentPackages(
         }
       });
 
-      if (contentPackage.gameType === 'sound-position' && question.spokenText.trim()) {
-        validateTargetOccurrence(
-          issues,
-          question.spokenText,
-          question.targetSound ?? contentPackage.targetSound,
-          questionPath,
-        );
-      }
+      validateQuestionContract(issues, contentPackage, questionIndex, questionPath);
     });
   });
 
@@ -295,6 +298,247 @@ function validateSoundPair(
       `Par glasova "${pair}" nije podržan ili nije usklađen s ciljnim i kontrastnim glasom paketa.`,
     );
   }
+}
+
+function validateGameConfiguration(
+  issues: ContentValidationIssue[],
+  contentPackage: ContentPackage,
+  packagePath: string,
+): void {
+  const hasRecognitionMode = contentPackage.recognitionMode !== undefined;
+  const hasPracticeMode = contentPackage.practiceMode !== undefined;
+
+  if (contentPackage.gameType === 'catch-the-sound') {
+    requireTargetSound(issues, contentPackage, packagePath);
+    if (!hasRecognitionMode) {
+      addIssue(
+        issues,
+        'missing-game-mode',
+        `${packagePath}.recognitionMode`,
+        'Igra prepoznavanja mora odrediti hvata li jedan glas ili razlikuje dva glasa.',
+      );
+    }
+    if (hasPracticeMode) {
+      addIssue(
+        issues,
+        'unexpected-game-mode',
+        `${packagePath}.practiceMode`,
+        'Način vježbanja izgovora dopušten je samo u igri izgovora.',
+      );
+    }
+
+    if (
+      contentPackage.recognitionMode === 'DETECT' &&
+      (contentPackage.contrastSound !== undefined || contentPackage.soundPair !== undefined)
+    ) {
+      addIssue(
+        issues,
+        'unexpected-game-mode',
+        `${packagePath}.recognitionMode`,
+        'Igra hvatanja jednog glasa ne smije imati kontrastni par.',
+      );
+    }
+    if (
+      contentPackage.recognitionMode === 'DISCRIMINATE' &&
+      (!contentPackage.contrastSound || !contentPackage.soundPair)
+    ) {
+      addIssue(
+        issues,
+        'missing-game-mode',
+        `${packagePath}.soundPair`,
+        'Igra razlikovanja mora imati ciljni i kontrastni glas te usklađen par.',
+      );
+    }
+    return;
+  }
+
+  if (contentPackage.gameType === 'pronunciation-practice') {
+    requireTargetSound(issues, contentPackage, packagePath);
+    if (!hasPracticeMode) {
+      addIssue(
+        issues,
+        'missing-game-mode',
+        `${packagePath}.practiceMode`,
+        'Igra izgovora mora odrediti vježba li se glas ili cijela riječ.',
+      );
+    }
+    if (hasRecognitionMode) {
+      addIssue(
+        issues,
+        'unexpected-game-mode',
+        `${packagePath}.recognitionMode`,
+        'Način prepoznavanja nije dopušten u igri izgovora.',
+      );
+    }
+    return;
+  }
+
+  if (hasRecognitionMode) {
+    addIssue(
+      issues,
+      'unexpected-game-mode',
+      `${packagePath}.recognitionMode`,
+      'Način prepoznavanja dopušten je samo u igri Uhvati glas.',
+    );
+  }
+  if (hasPracticeMode) {
+    addIssue(
+      issues,
+      'unexpected-game-mode',
+      `${packagePath}.practiceMode`,
+      'Način vježbanja izgovora dopušten je samo u igri izgovora.',
+    );
+  }
+  if (contentPackage.gameType === 'sound-position') {
+    requireTargetSound(issues, contentPackage, packagePath);
+  }
+}
+
+function requireTargetSound(
+  issues: ContentValidationIssue[],
+  contentPackage: ContentPackage,
+  packagePath: string,
+): void {
+  if (!contentPackage.targetSound?.trim()) {
+    addIssue(
+      issues,
+      'required-text',
+      `${packagePath}.targetSound`,
+      'Polje "Ciljni glas" obvezno je za ovu vrstu igre.',
+    );
+  }
+}
+
+function validateQuestionContract(
+  issues: ContentValidationIssue[],
+  contentPackage: ContentPackage,
+  questionIndex: number,
+  questionPath: string,
+): void {
+  const question = contentPackage.questions[questionIndex];
+  if (!question) {
+    return;
+  }
+
+  if (
+    (contentPackage.gameType === 'listen-and-decide' ||
+      contentPackage.gameType === 'catch-the-sound') &&
+    question.answers.length !== 2
+  ) {
+    addIssue(
+      issues,
+      'invalid-answer-count',
+      `${questionPath}.answers`,
+      'Ova vrsta pitanja mora imati točno dva smislena odgovora.',
+    );
+  }
+
+  if (contentPackage.gameType === 'sound-position' && ![2, 3].includes(question.answers.length)) {
+    addIssue(
+      issues,
+      'invalid-answer-count',
+      `${questionPath}.answers`,
+      'Igra položaja mora imati dvije ili tri ponuđene pozicije.',
+    );
+  }
+
+  if (contentPackage.gameType === 'pronunciation-practice') {
+    if (question.answers.length !== 0 || question.correctAnswerIds.length !== 0) {
+      addIssue(
+        issues,
+        'invalid-answer-count',
+        `${questionPath}.answers`,
+        'Igra izgovora nema ponuđene ni točne odgovore.',
+      );
+    }
+    validatePronunciationPrompt(issues, contentPackage, question.spokenText, questionPath);
+    return;
+  }
+
+  if (contentPackage.gameType === 'sound-position' && question.spokenText.trim()) {
+    const targetSound = question.targetSound ?? contentPackage.targetSound;
+    if (targetSound) {
+      validateTargetOccurrence(issues, question.spokenText, targetSound, questionPath);
+    }
+  }
+
+  if (contentPackage.gameType !== 'catch-the-sound' || !contentPackage.targetSound) {
+    return;
+  }
+
+  if (contentPackage.recognitionMode === 'DETECT') {
+    const containsTarget = containsSound(question.spokenText, contentPackage.targetSound);
+    const expectedAnswer = containsTarget ? 'yes' : 'no';
+    if (question.correctAnswerIds.length !== 1 || question.correctAnswerIds[0] !== expectedAnswer) {
+      addIssue(
+        issues,
+        'invalid-sound-classification',
+        `${questionPath}.correctAnswerIds`,
+        `Točan odgovor mora odgovarati tome čuje li se glas ${contentPackage.targetSound} u tekstu.`,
+      );
+    }
+  }
+
+  if (contentPackage.recognitionMode === 'DISCRIMINATE' && contentPackage.contrastSound) {
+    const hasTarget = containsSound(question.spokenText, contentPackage.targetSound);
+    const hasContrast = containsSound(question.spokenText, contentPackage.contrastSound);
+    if (hasTarget === hasContrast) {
+      addIssue(
+        issues,
+        'invalid-sound-classification',
+        `${questionPath}.spokenText`,
+        `Tekst mora sadržavati točno jedan glas iz para ${contentPackage.targetSound}/${contentPackage.contrastSound}.`,
+      );
+      return;
+    }
+
+    const expectedAnswer = hasTarget ? contentPackage.targetSound : contentPackage.contrastSound;
+    if (question.correctAnswerIds.length !== 1 || question.correctAnswerIds[0] !== expectedAnswer) {
+      addIssue(
+        issues,
+        'invalid-sound-classification',
+        `${questionPath}.correctAnswerIds`,
+        `Točan odgovor mora odgovarati glasu koji se čuje u tekstu.`,
+      );
+    }
+  }
+}
+
+function validatePronunciationPrompt(
+  issues: ContentValidationIssue[],
+  contentPackage: ContentPackage,
+  spokenText: string,
+  questionPath: string,
+): void {
+  const targetSound = contentPackage.targetSound;
+  if (!targetSound || !supportedSounds.has(targetSound) || !spokenText.trim()) {
+    return;
+  }
+
+  if (
+    contentPackage.practiceMode === 'SOUND' &&
+    spokenText.toLocaleLowerCase('hr-HR').trim() !== targetSound.toLocaleLowerCase('hr-HR')
+  ) {
+    addIssue(
+      issues,
+      'invalid-target-occurrence',
+      `${questionPath}.spokenText`,
+      `Vježba pojedinog glasa mora izgovarati samo glas ${targetSound}.`,
+    );
+  }
+
+  if (contentPackage.practiceMode === 'WORD' && !containsSound(spokenText, targetSound)) {
+    addIssue(
+      issues,
+      'invalid-target-occurrence',
+      `${questionPath}.spokenText`,
+      `Riječ za vježbu izgovora mora sadržavati glas ${targetSound}.`,
+    );
+  }
+}
+
+function containsSound(text: string, sound: string): boolean {
+  return text.toLocaleLowerCase('hr-HR').includes(sound.toLocaleLowerCase('hr-HR'));
 }
 
 function validateScoring(

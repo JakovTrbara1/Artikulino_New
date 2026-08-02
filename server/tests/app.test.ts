@@ -244,6 +244,25 @@ describe('prototype API', () => {
     expect(listed.body.sessions[0].packageName).toBe('Što jedemo?');
   });
 
+  it('accepts listening sessions without misleading target-sound metadata', async () => {
+    const authorization = await parentAuthorization();
+    const response = await request(app)
+      .post('/api/sessions')
+      .set(authorization)
+      .send({
+        childId: 'demo-child-luka',
+        packageId: 'slusaj-hrana-lagano',
+        packageName: 'Što jedemo?',
+        gameType: 'listen-and-decide',
+        theme: 'Hrana',
+        difficulty: 'EASY',
+        questionCount: 4,
+      })
+      .expect(201);
+
+    expect(response.body.session.targetSound).toBe('');
+  });
+
   it('lists completed sessions and their attempts only for the demo therapist', async () => {
     const parent = await parentAuthorization();
     const completedId = (await createGameSession(parent)).body.session.id as string;

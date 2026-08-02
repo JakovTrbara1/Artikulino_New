@@ -61,10 +61,10 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/thesis-prototype-qa`
+- Current implementation branch: `codex/mentor-content-model`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `0af8fed`
-- Milestone 14 checkpoint: `d2e2ef3 Add integrated prototype quality gate`
+- Base: `origin/main` at merge commit `a898c53`
+- Milestone 14 is merged through pull request #21.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -76,10 +76,14 @@ npx prettier . --check
 - Parent/progress page at `/napredak`.
 - Therapist review page at `/pregled-terapeuta`, protected by the therapist role.
 - Shared header with logo and navigation.
-- Three configurable games:
+- Three currently playable configurable games:
   - `listen-and-decide`: category decision from heard word/sentence.
   - `catch-the-sound`: detect whether a word contains a target sound.
   - `sound-position`: identify beginning, middle, or end of a word using a train UI.
+- The content contract now reserves a fourth `pronunciation-practice` type with explicit
+  `SOUND`/`WORD` modes. Playable packages and the dedicated recording flow belong to Milestone 17.
+- `catch-the-sound` packages explicitly declare `DETECT` or `DISCRIMINATE`; listening packages no
+  longer claim a target sound that they do not practise.
 - Shared game session flow: play/listen, replay, answer, feedback, scoring, next question, final result.
 - Configurable scoring per content package.
 - Backend-backed progress for the active fictional demo profile. The legacy local progress service
@@ -182,6 +186,13 @@ npx prettier . --check
 - `docs/design/gameplay-recording-desktop.png`: approved desktop gameplay/recording direction.
 - `docs/design/gameplay-recording-mobile.png`: approved mobile gameplay/recording direction.
 - `docs/design/therapist-review-desktop.png`: approved therapist-review direction.
+- `docs/design/mentor-catalog-desktop.png` and `mentor-catalog-mobile.png`: four-category catalog
+  direction.
+- `docs/design/mentor-pronunciation-desktop.png` and `mentor-pronunciation-mobile.png`: dedicated
+  listen-record-retry direction. Sample copy is non-authoritative; production headings are
+  `Poslušaj i izgovori riječ.` or `Poslušaj i izgovori glas.`
+- `docs/design/mentor-parent-feedback-desktop.png` and `mentor-parent-feedback-mobile.png`: split
+  parent progress and therapist-feedback direction.
 
 ## Architecture Overview
 
@@ -246,6 +257,16 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   horizontal overflow. Detailed evidence and remaining physical-device checks are in
   `docs/THESIS_PROTOTYPE_QA.md`.
 
+## Milestone 15 Validation
+
+- `npm run prototype:check` passed: 20 frontend files / 82 tests, 3 server files / 22 tests, and
+  5 Python worker tests (109 tests total), plus the production build and Prettier.
+- Reusable validation now covers game-specific modes, binary answer counts, detection answers,
+  discrimination pairs, pronunciation contracts, target occurrences, and professional-review
+  metadata.
+- Listening packages no longer expose unrelated target sounds; the local API accepts those
+  sessions without inventing sound metadata.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
@@ -277,10 +298,11 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review and merge the Milestone 14 integrated QA pull request.
-2. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
+1. Review and merge the Milestone 15 content-model pull request.
+2. Continue with Milestone 16 recognition-game cleanup and category-aware filters.
+3. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
    screen-reader checks on the target device.
-3. Record any thesis demonstration observations without expanding this prototype into production
+4. Record any thesis demonstration observations without expanding this prototype into production
    or clinical scope.
 
 ## Do Not Change Without Asking

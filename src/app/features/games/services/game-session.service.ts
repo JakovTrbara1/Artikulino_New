@@ -153,7 +153,7 @@ export class GameSessionService {
       packageId: contentPackage.id,
       packageName: contentPackage.name,
       gameType: contentPackage.gameType,
-      targetSound: contentPackage.targetSound,
+      targetSound: contentPackage.targetSound ?? '',
       theme: contentPackage.theme,
       difficulty: contentPackage.difficulty,
       questionCount: contentPackage.questions.length,

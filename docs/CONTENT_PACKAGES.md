@@ -7,12 +7,18 @@ Ovaj dokument služi kao kratka kontrolna lista pri dodavanju sadržaja.
 - `schemaVersion` mora biti `1`.
 - `professionalReview` mora izričito bilježiti status stručne provjere.
 - `id` paketa i pitanja mora biti jedinstven u cijeloj kolekciji i stabilan.
-- `answers.id` mora biti jedinstven unutar pitanja, a svako pitanje mora imati najmanje dva
-  ponuđena odgovora.
+- `answers.id` mora biti jedinstven unutar pitanja.
 - `spokenText` je jedini izvor za Speech Synthesis fallback.
-- `correctAnswerIds` mora sadržavati najmanje jedan ID i svaki mora upućivati na postojeći
-  `answers.id`.
-- Ciljni i kontrastni glasovi moraju biti podržani, a `soundPair` mora odgovarati tim glasovima.
+- Igre odabira i prepoznavanja moraju imati točno dva smislena odgovora. Igra položaja smije imati
+  dvije ili tri pozicije. Igra izgovora nema ponuđene odgovore.
+- Osim u igri izgovora, `correctAnswerIds` mora sadržavati najmanje jedan ID i svaki mora upućivati
+  na postojeći `answers.id`.
+- Ciljni glas nije obvezan za `listen-and-decide`. Ostale vrste moraju koristiti podržani glas, a
+  `soundPair` mora odgovarati ciljnom i kontrastnom glasu.
+- `catch-the-sound` mora postaviti `recognitionMode` na `DETECT` ili `DISCRIMINATE`. Kod
+  razlikovanja tekst mora sadržavati točno jedan glas iz deklariranog para.
+- `pronunciation-practice` mora postaviti `practiceMode` na `SOUND` ili `WORD`. Vježba glasa
+  izgovara samo deklarirani glas, a riječ mora sadržavati deklarirani glas.
 - `basePoints` mora biti veći od nule; množitelj drugog pokušaja mora biti između 0 i 1;
   `streakLength` i `maxAttempts` moraju biti pozitivni cijeli brojevi; bonus i kazna moraju biti
   konačni nenegativni brojevi.

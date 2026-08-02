@@ -38,6 +38,7 @@ const createPackage = (overrides: Partial<ContentPackage> = {}): ContentPackage 
   description: 'Prepoznaj glas S.',
   objective: 'Slušno prepoznavanje glasa S.',
   targetSound: 'S',
+  recognitionMode: 'DETECT',
   theme: 'hrana',
   difficulty: 'EASY',
   scoring: defaultScoring,
@@ -198,6 +199,132 @@ describe('content package validation', () => {
     expect(issues.filter((issue) => issue.code === 'invalid-sound-pair')).toHaveLength(2);
   });
 
+  it('allows listening packages without misleading sound metadata', () => {
+    const contentPackage = createPackage({
+      gameType: 'listen-and-decide',
+      targetSound: undefined,
+      recognitionMode: undefined,
+    });
+
+    expect(validateContentPackages([contentPackage])).toEqual([]);
+  });
+
+  it('requires game-specific modes and sound metadata', () => {
+    const packages = [
+      createPackage({
+        recognitionMode: undefined,
+      }),
+      createPackage({
+        id: 'package-2',
+        gameType: 'pronunciation-practice',
+        recognitionMode: undefined,
+        practiceMode: undefined,
+      }),
+      createPackage({
+        id: 'package-3',
+        gameType: 'listen-and-decide',
+        recognitionMode: 'DETECT',
+      }),
+    ];
+
+    const issues = validateContentPackages(packages);
+
+    expect(issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'missing-game-mode',
+          path: 'packages[0].recognitionMode',
+        }),
+        expect.objectContaining({
+          code: 'missing-game-mode',
+          path: 'packages[1].practiceMode',
+        }),
+        expect.objectContaining({
+          code: 'unexpected-game-mode',
+          path: 'packages[2].recognitionMode',
+        }),
+      ]),
+    );
+  });
+
+  it('validates binary answer counts and detected sounds', () => {
+    const contentPackage = createPackage({
+      questions: [
+        createQuestion({
+          spokenText: 'sir',
+          answers: [...answers, { id: 'maybe', label: 'Možda' }],
+          correctAnswerIds: ['no'],
+        }),
+      ],
+    });
+
+    const issues = validateContentPackages([contentPackage]);
+
+    expect(issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'invalid-answer-count',
+          path: 'packages[0].questions[0].answers',
+        }),
+        expect.objectContaining({
+          code: 'invalid-sound-classification',
+          path: 'packages[0].questions[0].correctAnswerIds',
+        }),
+      ]),
+    );
+  });
+
+  it('requires discrimination prompts to contain exactly one sound from the pair', () => {
+    const contentPackage = createPackage({
+      recognitionMode: 'DISCRIMINATE',
+      contrastSound: 'Š',
+      soundPair: { primary: 'S', contrast: 'Š' },
+      questions: [
+        createQuestion({
+          spokenText: 'vlak',
+          answers: [
+            { id: 'S', label: 'Čujem glas S' },
+            { id: 'Š', label: 'Čujem glas Š' },
+          ],
+          correctAnswerIds: ['S'],
+        }),
+      ],
+    });
+
+    expect(validateContentPackages([contentPackage])).toContainEqual(
+      expect.objectContaining({
+        code: 'invalid-sound-classification',
+        path: 'packages[0].questions[0].spokenText',
+      }),
+    );
+  });
+
+  it('accepts sound and word pronunciation contracts without answer choices', () => {
+    const pronunciationQuestion = createQuestion({
+      spokenText: 'sunce',
+      answers: [],
+      correctAnswerIds: [],
+      explanation: 'Poslušaj svoju snimku i pokušaj ponovno ako želiš.',
+    });
+    const packages = [
+      createPackage({
+        gameType: 'pronunciation-practice',
+        recognitionMode: undefined,
+        practiceMode: 'WORD',
+        questions: [pronunciationQuestion],
+      }),
+      createPackage({
+        id: 'package-2',
+        gameType: 'pronunciation-practice',
+        recognitionMode: undefined,
+        practiceMode: 'SOUND',
+        questions: [{ ...pronunciationQuestion, id: 'question-2', spokenText: 'S' }],
+      }),
+    ];
+
+    expect(validateContentPackages(packages)).toEqual([]);
+  });
+
   it('reports every invalid scoring field', () => {
     const invalidScoring: ScoringRules = {
       basePoints: 0,
@@ -304,6 +431,7 @@ describe('content package validation', () => {
   it('reports missing and repeated target sounds in position questions', () => {
     const positionPackage = createPackage({
       gameType: 'sound-position',
+      recognitionMode: undefined,
       questions: [
         createQuestion({ id: 'missing-sound', spokenText: 'riba' }),
         createQuestion({ id: 'repeated-sound', spokenText: 'salsa' }),

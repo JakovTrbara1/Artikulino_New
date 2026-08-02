@@ -67,7 +67,10 @@
                 <span class="session-heading">
                   <strong>{{ session.packageName }}</strong>
                   <span>
-                    {{ gameTypeLabels[session.gameType] }} · glas {{ session.targetSound }} ·
+                    {{ gameTypeLabels[session.gameType] }} ·
+                    @if (session.targetSound) {
+                      glas {{ session.targetSound }} ·
+                    }
                     {{ session.theme }}
                   </span>
                   <time [attr.datetime]="session.completedAt || session.startedAt">
