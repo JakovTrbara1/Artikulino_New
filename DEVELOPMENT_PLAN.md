@@ -57,8 +57,8 @@ copy and sample content are not authoritative.
 6. Completed: add therapist recording review.
 7. Completed: run integrated thesis-prototype QA and document the demonstration workflow.
 8. Implemented: align the game taxonomy and content contract with mentor feedback.
-9. Next: simplify recognition games, add dedicated pronunciation practice, split parent progress,
-   and repeat integrated QA.
+9. Implemented: simplify recognition games and add category-aware filters.
+10. Next: add dedicated pronunciation practice, split parent progress, and repeat integrated QA.
 
 ## 5. Milestones
 

@@ -34,6 +34,59 @@ describe('GameCatalogPage', () => {
     );
   });
 
+  it('shows only filters that are meaningful for the selected game type', () => {
+    expect(query<HTMLSelectElement>('select[data-filter="sound"]')).not.toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="theme"]')).not.toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="difficulty"]')).not.toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="recognition-mode"]')).toBeNull();
+
+    requireElement<HTMLButtonElement>('button[data-type="listen-and-decide"]').click();
+    fixture.detectChanges();
+    expect(query<HTMLSelectElement>('select[data-filter="sound"]')).toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="theme"]')).not.toBeNull();
+    expect(queryAll<HTMLSelectElement>('.filters select')).toHaveLength(2);
+
+    requireElement<HTMLButtonElement>('button[data-type="catch-the-sound"]').click();
+    fixture.detectChanges();
+    expect(query<HTMLSelectElement>('select[data-filter="sound"]')).not.toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="theme"]')).toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="recognition-mode"]')).not.toBeNull();
+    expect(queryAll<HTMLSelectElement>('.filters select')).toHaveLength(3);
+
+    requireElement<HTMLButtonElement>('button[data-type="sound-position"]').click();
+    fixture.detectChanges();
+    expect(query<HTMLSelectElement>('select[data-filter="theme"]')).toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="recognition-mode"]')).toBeNull();
+    expect(queryAll<HTMLSelectElement>('.filters select')).toHaveLength(2);
+  });
+
+  it('filters recognition games by detection mode and resets incompatible filters', () => {
+    requireElement<HTMLButtonElement>('button[data-type="catch-the-sound"]').click();
+    fixture.detectChanges();
+
+    const modeSelect = requireElement<HTMLSelectElement>('select[data-filter="recognition-mode"]');
+    modeSelect.value = 'DISCRIMINATE';
+    modeSelect.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(queryAll<HTMLElement>('.package-card')).toHaveLength(
+      content.filter({
+        gameType: 'catch-the-sound',
+        recognitionMode: 'DISCRIMINATE',
+      }).length,
+    );
+
+    requireElement<HTMLButtonElement>('button[data-type="listen-and-decide"]').click();
+    fixture.detectChanges();
+    expect(query<HTMLSelectElement>('select[data-filter="recognition-mode"]')).toBeNull();
+
+    requireElement<HTMLButtonElement>('button[data-type="catch-the-sound"]').click();
+    fixture.detectChanges();
+    expect(requireElement<HTMLSelectElement>('select[data-filter="recognition-mode"]').value).toBe(
+      '',
+    );
+  });
+
   it('filters by game type and clears the filter when the selected type is activated again', () => {
     const type: GameType = 'catch-the-sound';
     const toggle = requireElement<HTMLButtonElement>(`button[data-type="${type}"]`);
