@@ -16,8 +16,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { PrototypeGameSession } from '../../../core/models/prototype-session.model';
 import { PrototypeSessionService } from '../../../core/services/prototype-session.service';
-import { MicrophonePractice } from '../../../shared/components/microphone-practice/microphone-practice';
-import { RecordedAttempt } from '../../../shared/models/recorded-attempt.model';
 import { AudioPlaybackService } from '../../../shared/services/audio-playback.service';
 import { CatchSoundBoard } from '../components/catch-sound-board/catch-sound-board';
 import { ListenDecideBoard } from '../components/listen-decide-board/listen-decide-board';
@@ -32,7 +30,7 @@ import { GameSessionService } from '../services/game-session.service';
 
 @Component({
   selector: 'app-game-player-page',
-  imports: [RouterLink, ListenDecideBoard, CatchSoundBoard, SoundPositionBoard, MicrophonePractice],
+  imports: [RouterLink, ListenDecideBoard, CatchSoundBoard, SoundPositionBoard],
   templateUrl: './game-player.page.html',
   styleUrl: './game-player.page.css',
   providers: [GameSessionService],
@@ -56,7 +54,6 @@ export class GamePlayerPage implements OnDestroy {
   protected readonly hasListened = signal(false);
   protected readonly selectedAnswer = signal<string | null>(null);
   protected readonly audioMessage = signal('');
-  protected readonly latestRecordedAttempt = signal<RecordedAttempt | null>(null);
   protected readonly persistenceMessage = signal('');
   protected readonly listenLabel = computed(() =>
     this.hasListened() ? 'Poslušaj ponovno' : 'Poslušaj',
@@ -125,32 +122,6 @@ export class GamePlayerPage implements OnDestroy {
     this.session.submitAnswer(answerId);
   }
 
-  protected readonly saveRecordedAttempt = async (
-    attempt: RecordedAttempt,
-  ): Promise<{ readonly id: string }> => {
-    this.latestRecordedAttempt.set(attempt);
-    const contentPackage = this.contentPackage();
-    const question = contentPackage?.questions.find((item) => item.id === attempt.questionId);
-    if (!contentPackage || !question) {
-      throw new Error('Pitanje za snimku nije pronađeno.');
-    }
-    const prototypeSession = await this.ensurePrototypeSession(contentPackage);
-    return this.prototypeSessions.uploadAttempt(prototypeSession.id, attempt, question.spokenText);
-  };
-
-  protected readonly deleteRecordedAttempt = async (attemptId: string): Promise<void> => {
-    await this.prototypeSessions.deleteAttempt(attemptId);
-    this.latestRecordedAttempt.set(null);
-  };
-
-  protected receiveRecordedAttempt(attempt: RecordedAttempt): void {
-    this.latestRecordedAttempt.set(attempt);
-  }
-
-  protected clearRecordedAttempt(): void {
-    this.latestRecordedAttempt.set(null);
-  }
-
   protected nextQuestion(): void {
     this.audio.stop();
     this.session.next();
@@ -178,7 +149,6 @@ export class GamePlayerPage implements OnDestroy {
     this.hasListened.set(false);
     this.selectedAnswer.set(null);
     this.audioMessage.set('');
-    this.latestRecordedAttempt.set(null);
   }
 
   private startPrototypeSession(contentPackage: ContentPackage): void {

@@ -61,17 +61,20 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/mentor-content-model`
+- Current implementation branch: `codex/mentor-recognition-cleanup`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `a898c53`
-- Milestone 14 is merged through pull request #21.
+- Base: `origin/main` at merge commit `8b6733d`
+- Milestone 15 is merged through pull request #22.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
 
 - Home page at `/` with a short path into exercises.
-- Game catalog at `/igre` with accessible toggle filtering by game type plus sound, theme, and
-  difficulty filters.
+- Game catalog at `/igre` with accessible game-type toggles and category-aware filters:
+  - all games: sound, theme, and difficulty;
+  - `listen-and-decide`: theme and difficulty;
+  - `catch-the-sound`: sound, detection/discrimination mode, and difficulty;
+  - `sound-position`: sound and difficulty.
 - Game player at `/igre/:packageId`.
 - Parent/progress page at `/napredak`.
 - Therapist review page at `/pregled-terapeuta`, protected by the therapist role.
@@ -94,12 +97,9 @@ npx prettier . --check
 - Therapist review lists completed sessions for fictional demo profiles, streams recordings
   through the authenticated API, and stores one of three review states plus an optional
   400-character comment, reviewer, and timestamp.
-- A visible optional microphone panel is placed between each question's prompt/media and answers.
-  It supports permission, recording, stopped/replay, delete, asynchronous saving/saved, and retry
-  presentation without automatic speech scoring.
-- Each question ID resets the local microphone state. A stopped recording emits a typed
-  `RecordedAttempt` with its blob, MIME type, duration, question ID, and per-question attempt
-  number for the later prototype backend boundary.
+- The three recognition categories do not show recording controls. The shared microphone component
+  and typed `RecordedAttempt` boundary remain available for the dedicated pronunciation flow in
+  Milestone 17.
 - Browser Speech Synthesis as the supported MVP path for spoken prompts when no approved local
   recording is available.
 - Demo content packages for required sounds, pairs, themes, and difficulty levels.
@@ -267,6 +267,22 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Listening packages no longer expose unrelated target sounds; the local API accepts those
   sessions without inventing sound metadata.
 
+## Milestone 16 Validation
+
+- `npm run prototype:check` passed: 20 frontend files / 84 tests, 3 server files / 22 tests, and
+  5 Python worker tests (111 tests total), plus the production build and Prettier.
+- `git diff --check` passed.
+- Recognition gameplay tests confirm that listening, sound-recognition, and sound-position
+  packages no longer render the microphone practice component.
+- Catalog tests cover category-specific filter visibility and both recognition modes.
+- They also cover clearing incompatible filters when the category changes.
+- Live browser QA passed at 1440×1000 and 390×844: the catalog toggles and dynamic filters work,
+  all 16 packages return after deselection, the mobile layout has no horizontal overflow, and
+  the browser console remains clear.
+- Visual comparison against the approved catalog concepts found no material Milestone 16
+  mismatch. The fourth pronunciation category is intentionally deferred until Milestone 17 has
+  playable packages.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
@@ -298,8 +314,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review and merge the Milestone 15 content-model pull request.
-2. Continue with Milestone 16 recognition-game cleanup and category-aware filters.
+1. Review and merge the Milestone 16 recognition-game cleanup pull request.
+2. Continue with Milestone 17 dedicated pronunciation practice.
 3. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
    screen-reader checks on the target device.
 4. Record any thesis demonstration observations without expanding this prototype into production

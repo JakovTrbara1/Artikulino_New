@@ -4,8 +4,19 @@ import {
   ContentPackage,
   Difficulty,
   GameType,
+  PronunciationPracticeMode,
+  RecognitionMode,
   SUPPORTED_TARGET_SOUNDS,
 } from '../models/content-package.model';
+
+export interface ContentPackageFilters {
+  readonly gameType?: GameType;
+  readonly difficulty?: Difficulty;
+  readonly theme?: string;
+  readonly sound?: string;
+  readonly recognitionMode?: RecognitionMode;
+  readonly practiceMode?: PronunciationPracticeMode;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ContentPackagesService {
@@ -28,17 +39,14 @@ export class ContentPackagesService {
     return this.packages().find((item) => item.id === id);
   }
 
-  filter(filters: {
-    gameType?: GameType;
-    difficulty?: Difficulty;
-    theme?: string;
-    sound?: string;
-  }): readonly ContentPackage[] {
+  filter(filters: ContentPackageFilters): readonly ContentPackage[] {
     return this.packages().filter(
       (item) =>
         (!filters.gameType || item.gameType === filters.gameType) &&
         (!filters.difficulty || item.difficulty === filters.difficulty) &&
         (!filters.theme || item.theme === filters.theme) &&
+        (!filters.recognitionMode || item.recognitionMode === filters.recognitionMode) &&
+        (!filters.practiceMode || item.practiceMode === filters.practiceMode) &&
         (!filters.sound ||
           item.targetSound === filters.sound ||
           item.contrastSound === filters.sound),

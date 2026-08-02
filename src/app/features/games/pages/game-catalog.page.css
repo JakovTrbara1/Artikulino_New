@@ -64,6 +64,10 @@ app-game-type-filter,
   gap: 0.75rem;
 }
 
+.filters[data-count='2'] {
+  grid-template-columns: repeat(2, minmax(8rem, 10.5rem));
+}
+
 .filters label {
   min-width: 0;
   color: var(--color-navy-700);
@@ -139,6 +143,10 @@ app-game-type-filter,
   .filters {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.45rem;
+  }
+
+  .filters[data-count='2'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .filters label {

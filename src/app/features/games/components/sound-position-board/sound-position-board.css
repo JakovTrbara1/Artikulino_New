@@ -3,7 +3,6 @@
   grid-template-areas:
     'word'
     'train'
-    'recording'
     'help';
   text-align: center;
 }
@@ -52,10 +51,6 @@
   display: grid;
   grid-template-columns: 38.5fr 29fr 32.5fr;
   align-items: center;
-}
-
-.recording-slot {
-  grid-area: recording;
 }
 
 .answer-hint-slot {

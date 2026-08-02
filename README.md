@@ -96,6 +96,10 @@ odobrenim koracima; trenutačno još nije ponuđena u katalogu.
 Paketi `Uhvati glas` izričito razlikuju način `DETECT` od načina `DISCRIMINATE`. Paketi
 `Slušaj i odluči` ne navode ciljni glas kada ga zadatak stvarno ne vježba.
 
+Katalog prikazuje samo filtre koji imaju smisla za odabranu vrstu igre. `Slušaj i odluči` koristi
+temu i razinu, `Uhvati glas` koristi glas, vrstu vježbe i razinu, a `Gdje je glas?` koristi glas i
+razinu. Povratak na prikaz svih igara vraća zajedničke filtre glasa, teme i razine.
+
 Model izravno podržava glasove R, L, S, Z, Š, Ž, C, Č i Ć te parove S/Š, Z/Ž, L/R, C/Č i Č/Ć. Engine nema logiku vezanu uz pojedini glas, pa se novi glas aktivira dodavanjem paketa.
 
 ## Sadržajni paketi
@@ -166,9 +170,13 @@ kvaliteta hrvatskog glasa ovise o uređaju.
 
 ## Mikrofon i privatnost
 
-Mikrofon se aktivira isključivo nakon korisnikova klika. Vidljivi, neobavezni panel nalazi se između
-pojma i ponuđenih odgovora. `MediaRecorder` omogućuje djetetu da snimi riječ, posluša snimku i
-izbriše je. Prelaskom na novo pitanje panel se vraća u početno stanje.
+Kategorije `Slušaj i odluči`, `Uhvati glas` i `Gdje je glas?` ne koriste mikrofon. Snimanje je
+rezervirano za zasebnu kategoriju `Vježbaj izgovor`, koja se dodaje u sljedećem razvojnom koraku.
+Postojeće povijesne testne snimke ostaju dostupne u pregledima roditelja i terapeuta.
+
+Kada je panel za izgovor dostupan, mikrofon se aktivira isključivo nakon korisnikova klika.
+`MediaRecorder` omogućuje djetetu da snimi riječ, posluša snimku i izbriše je. Prelaskom na novo
+pitanje panel se vraća u početno stanje.
 
 - snimka se asinkrono šalje samo lokalnom demonstracijskom poslužitelju;
 - više pokušaja za isto pitanje ostaje spremljeno uz sesiju aktivnog demo profila;

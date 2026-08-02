@@ -1,7 +1,7 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { AudioPlaybackService } from '../../../shared/services/audio-playback.service';
 import { PrototypeSessionService } from '../../../core/services/prototype-session.service';
 import { GameSessionService } from '../services/game-session.service';
@@ -10,16 +10,16 @@ import { GamePlayerPage } from './game-player.page';
 describe('GamePlayerPage accessibility', () => {
   let fixture: ComponentFixture<GamePlayerPage>;
   let session: GameSessionService;
+  let routeParams: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
   const prototypeSessions = {
     create: vi.fn().mockResolvedValue({ id: 'prototype-session-1' }),
     complete: vi.fn().mockResolvedValue({ id: 'prototype-session-1' }),
-    uploadAttempt: vi.fn().mockResolvedValue({ id: 'recording-1' }),
-    deleteAttempt: vi.fn().mockResolvedValue(undefined),
   };
 
   beforeEach(async () => {
     localStorage.clear();
     Object.values(prototypeSessions).forEach((method) => method.mockClear());
+    routeParams = new BehaviorSubject(convertToParamMap({ packageId: 'slusaj-hrana-s-lagano' }));
     await TestBed.configureTestingModule({
       imports: [GamePlayerPage],
       providers: [
@@ -27,7 +27,7 @@ describe('GamePlayerPage accessibility', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            paramMap: of(convertToParamMap({ packageId: 'slusaj-hrana-s-lagano' })),
+            paramMap: routeParams,
           },
         },
         {
@@ -60,22 +60,20 @@ describe('GamePlayerPage accessibility', () => {
     expect(progress.getAttribute('aria-valuetext')).toBe('Pitanje 1 od 4');
   });
 
-  it('places the visible optional recording panel before the answer controls', () => {
-    const recorder = fixture.nativeElement.querySelector(
-      'app-microphone-practice',
-    ) as HTMLElement | null;
-    const answers = fixture.nativeElement.querySelector('[role="group"]') as HTMLElement | null;
+  it('does not render recording controls in any recognition game category', async () => {
+    for (const packageId of [
+      'slusaj-hrana-s-lagano',
+      'uhvati-zivotinje-r-lagano',
+      'pozicija-hrana-s-lagano',
+    ]) {
+      routeParams.next(convertToParamMap({ packageId }));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
 
-    expect(recorder).not.toBeNull();
-    expect(answers).not.toBeNull();
-    if (!recorder || !answers) {
-      throw new Error('Panel za snimanje ili odgovori nisu prikazani.');
+      expect(fixture.nativeElement.querySelector('app-microphone-practice')).toBeNull();
+      expect(fixture.nativeElement.querySelector('[role="group"]')).not.toBeNull();
     }
-    expect(recorder?.querySelector('details')).toBeNull();
-    expect(recorder?.textContent).toContain('Snimi svoj glas');
-    expect(
-      Boolean(recorder.compareDocumentPosition(answers) & Node.DOCUMENT_POSITION_FOLLOWING),
-    ).toBe(true);
   });
 
   it('moves focus to the next question heading after advancing', async () => {

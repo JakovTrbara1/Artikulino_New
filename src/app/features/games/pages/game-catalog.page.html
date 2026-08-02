@@ -23,25 +23,61 @@
     <h2 id="packages-title" class="sr-only">Dostupne igre</h2>
 
     <div class="browser-tools">
-      <div class="filters" aria-label="Filtriraj sadržajne pakete">
-        <label>
-          <span>Glas</span>
-          <select data-filter="sound" [value]="sound()" (change)="setTextFilter('sound', $event)">
-            <option value="">Svi glasovi</option>
-            @for (item of content.sounds(); track item) {
-              <option [value]="item">{{ item }}</option>
-            }
-          </select>
-        </label>
-        <label>
-          <span>Tema</span>
-          <select data-filter="theme" [value]="theme()" (change)="setTextFilter('theme', $event)">
-            <option value="">Sve teme</option>
-            @for (item of content.themes(); track item) {
-              <option [value]="item">{{ item }}</option>
-            }
-          </select>
-        </label>
+      <div
+        class="filters"
+        aria-label="Filtriraj sadržajne pakete"
+        [attr.data-count]="activeFilterCount()"
+      >
+        @if (gameType() !== 'listen-and-decide') {
+          <label>
+            <span>Glas</span>
+            <select data-filter="sound" [value]="sound()" (change)="setTextFilter('sound', $event)">
+              <option value="">Svi glasovi</option>
+              @for (item of content.sounds(); track item) {
+                <option [value]="item">{{ item }}</option>
+              }
+            </select>
+          </label>
+        }
+        @if (!gameType() || gameType() === 'listen-and-decide') {
+          <label>
+            <span>Tema</span>
+            <select data-filter="theme" [value]="theme()" (change)="setTextFilter('theme', $event)">
+              <option value="">Sve teme</option>
+              @for (item of content.themes(); track item) {
+                <option [value]="item">{{ item }}</option>
+              }
+            </select>
+          </label>
+        }
+        @if (gameType() === 'catch-the-sound') {
+          <label>
+            <span>Vrsta vježbe</span>
+            <select
+              data-filter="recognition-mode"
+              [value]="recognitionMode()"
+              (change)="setRecognitionMode($event)"
+            >
+              <option value="">Sve vrste</option>
+              <option value="DETECT">Uhvati glas</option>
+              <option value="DISCRIMINATE">Razlikuj glasove</option>
+            </select>
+          </label>
+        }
+        @if (gameType() === 'pronunciation-practice') {
+          <label>
+            <span>Vrsta izgovora</span>
+            <select
+              data-filter="practice-mode"
+              [value]="practiceMode()"
+              (change)="setPracticeMode($event)"
+            >
+              <option value="">Sve vrste</option>
+              <option value="SOUND">Pojedini glas</option>
+              <option value="WORD">Cijela riječ</option>
+            </select>
+          </label>
+        }
         <label>
           <span>Razina</span>
           <select data-filter="difficulty" [value]="difficulty()" (change)="setDifficulty($event)">
