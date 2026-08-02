@@ -68,7 +68,7 @@ export class GamePlayerPage implements OnDestroy {
       return '';
     }
 
-    const sound = question.targetSound ?? contentPackage.targetSound;
+    const sound = question.targetSound ?? contentPackage.targetSound ?? '';
     if (contentPackage.gameType === 'sound-position') {
       return `Gdje čuješ glas ${sound}?`;
     }

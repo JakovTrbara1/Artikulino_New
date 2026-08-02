@@ -4,7 +4,11 @@ import { validateContentPackages } from '../models/content-package.validation';
 describe('demonstration content packages', () => {
   it('covers the requested sounds, pairs, themes and difficulty levels', () => {
     const sounds = new Set(
-      DEMO_CONTENT_PACKAGES.flatMap((item) => [item.targetSound, item.contrastSound]),
+      DEMO_CONTENT_PACKAGES.flatMap((item) =>
+        [item.targetSound, item.contrastSound].filter(
+          (sound): sound is string => sound !== undefined,
+        ),
+      ),
     );
     const pairs = new Set(
       DEMO_CONTENT_PACKAGES.filter((item) => item.soundPair).map(
@@ -40,6 +44,29 @@ describe('demonstration content packages', () => {
   it('marks every demonstration package as not professionally reviewed', () => {
     for (const contentPackage of DEMO_CONTENT_PACKAGES) {
       expect(contentPackage.professionalReview).toEqual({ status: 'NOT_REVIEWED' });
+    }
+  });
+
+  it('keeps listening packages independent from target-sound metadata', () => {
+    const listeningPackages = DEMO_CONTENT_PACKAGES.filter(
+      (contentPackage) => contentPackage.gameType === 'listen-and-decide',
+    );
+
+    expect(listeningPackages).not.toHaveLength(0);
+    for (const contentPackage of listeningPackages) {
+      expect(contentPackage.targetSound).toBeUndefined();
+      expect(contentPackage.contrastSound).toBeUndefined();
+      expect(contentPackage.soundPair).toBeUndefined();
+    }
+  });
+
+  it('classifies every sound-recognition package as detection or discrimination', () => {
+    const recognitionPackages = DEMO_CONTENT_PACKAGES.filter(
+      (contentPackage) => contentPackage.gameType === 'catch-the-sound',
+    );
+
+    for (const contentPackage of recognitionPackages) {
+      expect(['DETECT', 'DISCRIMINATE']).toContain(contentPackage.recognitionMode);
     }
   });
 

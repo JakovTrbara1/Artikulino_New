@@ -1,6 +1,9 @@
-export type GameType = 'listen-and-decide' | 'catch-the-sound' | 'sound-position';
+export type GameType =
+  'listen-and-decide' | 'catch-the-sound' | 'sound-position' | 'pronunciation-practice';
 
 export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
+export type RecognitionMode = 'DETECT' | 'DISCRIMINATE';
+export type PronunciationPracticeMode = 'SOUND' | 'WORD';
 
 export const SUPPORTED_TARGET_SOUNDS = ['R', 'L', 'S', 'Z', 'Š', 'Ž', 'C', 'Č', 'Ć'] as const;
 
@@ -61,9 +64,11 @@ export interface ContentPackage {
   readonly description: string;
   readonly objective: string;
   readonly catalogImage?: ContentImage;
-  readonly targetSound: string;
+  readonly targetSound?: string;
   readonly contrastSound?: string;
   readonly soundPair?: SoundPair;
+  readonly recognitionMode?: RecognitionMode;
+  readonly practiceMode?: PronunciationPracticeMode;
   readonly theme: string;
   readonly difficulty: Difficulty;
   readonly scoring: ScoringRules;
@@ -100,10 +105,12 @@ export const GAME_TYPE_LABELS: Readonly<Record<GameType, string>> = {
   'listen-and-decide': 'Slušaj i odluči',
   'catch-the-sound': 'Uhvati glas',
   'sound-position': 'Gdje je glas?',
+  'pronunciation-practice': 'Vježbaj izgovor',
 };
 
 export const GAME_TYPE_DESCRIPTIONS: Readonly<Record<GameType, string>> = {
   'listen-and-decide': 'Poslušaj pojam ili rečenicu i svrsti je u odgovarajuću kategoriju.',
   'catch-the-sound': 'Prepoznaj ciljni glas ili razlikuj dva akustički slična glasa.',
   'sound-position': 'Odredi nalazi li se glas na početku, u sredini ili na kraju riječi.',
+  'pronunciation-practice': 'Poslušaj glas ili riječ, snimi svoj izgovor i poslušaj snimku.',
 };

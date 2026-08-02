@@ -89,6 +89,13 @@ Implementirane su tri različite mehanike:
 
 Sve igre koriste isti zajednički tijek, bodovanje i praćenje sesije, ali imaju zasebne komponente za prikaz odgovora. Sadržaj nije ugrađen u komponente igre.
 
+Model sadržaja također definira četvrtu vrstu, **Vježbaj izgovor**, s načinima vježbanja pojedinog
+glasa ili cijele riječi. Sadržaj i posebno sučelje te vrste dodaju se u sljedećim mentorom
+odobrenim koracima; trenutačno još nije ponuđena u katalogu.
+
+Paketi `Uhvati glas` izričito razlikuju način `DETECT` od načina `DISCRIMINATE`. Paketi
+`Slušaj i odluči` ne navode ciljni glas kada ga zadatak stvarno ne vježba.
+
 Model izravno podržava glasove R, L, S, Z, Š, Ž, C, Č i Ć te parove S/Š, Z/Ž, L/R, C/Č i Č/Ć. Engine nema logiku vezanu uz pojedini glas, pa se novi glas aktivira dodavanjem paketa.
 
 ## Sadržajni paketi
@@ -98,7 +105,9 @@ Model paketa nalazi se u `src/app/features/games/models/content-package.model.ts
 Novi paket dodaje se kao novi `ContentPackage` objekt. Nije potrebno stvarati novu stranicu, rutu ili game engine. Paket definira:
 
 - vrstu igre, naziv, opis i cilj;
-- ciljni i opcionalni kontrastni glas;
+- opcionalni ciljni i kontrastni glas, samo kada ih igra stvarno vježba;
+- način prepoznavanja (`DETECT` ili `DISCRIMINATE`) odnosno budući način izgovora (`SOUND` ili
+  `WORD`);
 - par glasova, temu i razinu;
 - tekst zadatka i tekst koji se izgovara;
 - opcionalni `audioSrc`, ilustraciju pitanja i `catalogImage` za karticu kataloga;
@@ -116,6 +125,7 @@ const packageExample: ContentPackage = {
   description: 'Pronađi glas C u riječima o odjeći.',
   objective: 'Slušno prepoznavanje glasa C.',
   targetSound: 'C',
+  recognitionMode: 'DETECT',
   theme: 'odjeća',
   difficulty: 'EASY',
   catalogImage: {

@@ -88,9 +88,11 @@
             {{ package.theme }}
           </p>
           <h1 #gameTitle id="game-title" tabindex="-1">{{ taskTitle() }}</h1>
-          <p class="goal">
-            Ciljni glas: <strong>{{ question.targetSound || package.targetSound }}</strong>
-          </p>
+          @if (question.targetSound || package.targetSound) {
+            <p class="goal">
+              Ciljni glas: <strong>{{ question.targetSound || package.targetSound }}</strong>
+            </p>
+          }
         </div>
 
         <button

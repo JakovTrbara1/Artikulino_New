@@ -88,7 +88,7 @@ describe('GameCatalogPage', () => {
 
     expect(infoButtons[0].getAttribute('aria-expanded')).toBe('true');
     expect(queryAll<HTMLElement>('.info-popover')).toHaveLength(1);
-    expect(requireElement<HTMLElement>('.info-popover').textContent).toContain('Ciljni glas');
+    expect(requireElement<HTMLElement>('.info-popover').textContent).toContain('Tema');
     expect(requireElement<HTMLElement>('.info-popover').textContent).toContain('Razina');
     expect(requireElement<HTMLElement>('.info-popover').textContent).toContain(
       GAME_TYPE_DESCRIPTIONS['listen-and-decide'],
