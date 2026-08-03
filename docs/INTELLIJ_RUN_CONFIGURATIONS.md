@@ -78,3 +78,17 @@ Create two additional **npm** configurations using the project-root `package.jso
 
 Reset removes the Git-ignored runtime database and test recordings, invalidates demo sessions, and
 reseeds the predefined parent, therapist, Luka, and Mia demo data.
+
+## Final mentor-feedback QA
+
+After `Artikulino - Full prototype` is running:
+
+1. open `/igre` and verify all four game categories and their category-aware filters;
+2. sign in as the demo parent, select Luka, and confirm that recognition games have no recorder;
+3. open a `Vježbaj izgovor` package and confirm recording unlocks only after listening;
+4. open `/napredak` and check both `Napredak djeteta` and `Feedback terapeuta`;
+5. sign in as the demo therapist and open `/pregled-terapeuta`;
+6. run `Artikulino - Full quality gate`.
+
+Use only fictional or adult-generated recordings. The remaining real-device microphone, audio,
+keyboard, and screen-reader checks are listed in `THESIS_PROTOTYPE_QA.md`.

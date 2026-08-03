@@ -61,10 +61,10 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/parent-progress-sections`
+- Current implementation branch: `codex/mentor-feedback-qa`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `ef25595`
-- Milestone 17 is merged through pull request #24.
+- Base: `origin/main` at merge commit `e31b920`
+- Milestone 18 is merged through pull request #25.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -323,6 +323,25 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   mismatch. The existing prototype notice/header and additional adult-facing transcript metadata
   are intentional retained elements.
 
+## Milestone 19 Validation
+
+- `npm run prototype:check` passed: 20 frontend files / 93 tests, 3 server files / 24 tests, and
+  5 Python worker tests (122 tests total), plus the production builds and Prettier.
+- `git diff --check` passed.
+- The final acceptance matrix covers the corrected content contract, all four game categories,
+  category-aware filters, recognition/pronunciation recording boundaries, failure states,
+  migrations, parent sections, therapist visibility, and role restrictions.
+- Live Browser QA passed at 1440×1000 and 390×844 without horizontal overflow, framework overlay,
+  or browser-console warning/error.
+- Recognition gameplay exposes two meaningful answers and no recording control. Pronunciation
+  unlocks recording only after listening and does not show child-facing transcript, percentage,
+  points, or automated pronunciation quality.
+- Visual comparison against the approved catalog, pronunciation, parent-feedback, and therapist
+  concepts found no material mismatch. Automated praise and text-match results from the generated
+  pronunciation concept remain intentionally excluded from child gameplay.
+- Full evidence and the remaining real-device checks are documented in
+  `docs/THESIS_PROTOTYPE_QA.md`.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
@@ -354,11 +373,10 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review the Milestone 18 parent-progress-sections pull request.
-2. Continue with Milestone 19 integrated mentor-feedback QA after Milestone 18 is merged.
-3. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
+1. Review the Milestone 19 mentor-feedback integrated-QA pull request.
+2. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
    screen-reader checks on the target device.
-4. Record any thesis demonstration observations without expanding this prototype into production
+3. Record any thesis demonstration observations without expanding this prototype into production
    or clinical scope.
 
 ## Do Not Change Without Asking

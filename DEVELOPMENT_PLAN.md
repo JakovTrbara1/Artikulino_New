@@ -4,7 +4,7 @@
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
   services, and backend-backed local prototype progress.
-- Milestones 0–17 are complete and merged into `main`.
+- Milestones 0–18 are complete and merged into `main`.
 - The consolidated Angular, Express, Python, and formatting gate passes through
   `npm run prototype:check`.
 - The frontend-only MVP has no confirmed technical blocker, but real-device accessibility,
@@ -59,8 +59,8 @@ copy and sample content are not authoritative.
 8. Completed: align the game taxonomy and content contract with mentor feedback.
 9. Completed: simplify recognition games and add category-aware filters.
 10. Completed: add dedicated pronunciation practice.
-11. In progress: split parent progress into child activity and therapist feedback.
-12. Next: repeat integrated mentor-feedback QA.
+11. Completed: split parent progress into child activity and therapist feedback.
+12. In progress: repeat integrated mentor-feedback QA and publish its evidence.
 
 ## 5. Milestones
 
@@ -268,7 +268,7 @@ git diff --check
 ### Milestone 18 — Parent progress sections
 
 - Branch: `codex/parent-progress-sections`
-- Status: implemented on the milestone branch; review is pending.
+- Status: complete and merged through pull request #25.
 - Split `/napredak` into `Napredak djeteta` and `Feedback terapeuta`.
 - Show only attempts with saved therapist feedback in the therapist-feedback section.
 - Preserve historical recordings created before the recognition-game cleanup.
@@ -276,6 +276,7 @@ git diff --check
 ### Milestone 19 — Mentor-feedback integrated QA
 
 - Branch: `codex/mentor-feedback-qa`
+- Status: implemented and validated on the milestone branch; review is pending.
 - Verify the corrected content matrix, all four game types, recording boundaries, failure states,
   parent views, therapist visibility, migrations, accessibility, and responsive layouts.
 - Update README, IntelliJ instructions, QA evidence, and this handoff.

@@ -101,7 +101,8 @@ Paketi `Uhvati glas` izričito razlikuju način `DETECT` od načina `DISCRIMINAT
 
 Katalog prikazuje samo filtre koji imaju smisla za odabranu vrstu igre. `Slušaj i odluči` koristi
 temu i razinu, `Uhvati glas` koristi glas, vrstu vježbe i razinu, a `Gdje je glas?` koristi glas i
-razinu. Povratak na prikaz svih igara vraća zajedničke filtre glasa, teme i razine.
+razinu. `Vježbaj izgovor` koristi glas, vrstu izgovora i razinu. Povratak na prikaz svih igara
+vraća zajedničke filtre glasa, teme i razine.
 
 Model izravno podržava glasove R, L, S, Z, Š, Ž, C, Č i Ć te parove S/Š, Z/Ž, L/R, C/Č i Č/Ć. Engine nema logiku vezanu uz pojedini glas, pa se novi glas aktivira dodavanjem paketa.
 
@@ -298,10 +299,11 @@ Odobrene vizualne reference nalaze se u `docs/design/`:
 Optimizirane transparentne soft-toy ilustracije za osam tema nalaze se u
 `public/assets/games/themes/`, a nenametljive rubne dekoracije u
 `public/assets/games/decorations/`. Katalog povezuje tematske ilustracije s karticama, boji ih prema
-vrsti igre i koristi tri pristupačna preklopna gumba kao prvi filtar.
+vrsti igre i koristi četiri pristupačna preklopna gumba kao prvi filtar.
 
 Lokalni backend, testni računi, izmišljeni profili, sesije, višestruki pokušaji snimanja, lokalni
-hrvatski prijepis, prošireni roditeljski pregled i terapeutski pregled sada su implementirani.
-Završna integrirana provjera prototipa također je implementirana i dokumentirana u
+hrvatski prijepis, četiri mentorom usklađene vrste igara, podijeljeni roditeljski pregled i
+terapeutski pregled sada su implementirani. Završna mentor-feedback provjera prototipa također je
+implementirana i dokumentirana u
 [`docs/THESIS_PROTOTYPE_QA.md`](docs/THESIS_PROTOTYPE_QA.md). Detaljne upute za Python worker nalaze se u
 [`transcription/README.md`](transcription/README.md).
