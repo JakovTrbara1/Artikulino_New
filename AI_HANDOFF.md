@@ -61,10 +61,10 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/pronunciation-practice-games`
+- Current implementation branch: `codex/parent-progress-sections`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `7044e60`
-- Milestone 16 is merged through pull request #23.
+- Base: `origin/main` at merge commit `ef25595`
+- Milestone 17 is merged through pull request #24.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -77,7 +77,7 @@ npx prettier . --check
   - `sound-position`: sound and difficulty;
   - `pronunciation-practice`: sound, isolated-sound/whole-word mode, and difficulty.
 - Game player at `/igre/:packageId`.
-- Parent/progress page at `/napredak`.
+- Parent/progress page at `/napredak`, split into child-progress and therapist-feedback sections.
 - Therapist review page at `/pregled-terapeuta`, protected by the therapist role.
 - Shared header with logo and navigation.
 - Four currently playable configurable games:
@@ -93,9 +93,10 @@ npx prettier . --check
 - Configurable scoring per content package.
 - Backend-backed progress for the active fictional demo profile. The legacy local progress service
   remains only to clear the old non-migrated browser key during deletion.
-- Adult-facing progress expands each backend session into all saved recording attempts, including
-  expected text, transcript state, `Podudarnost teksta`, authenticated playback, and the full
-  therapist-review state/comment. It never exposes those automated details in child gameplay.
+- The `Napredak djeteta` section keeps every historical backend session and recording attempt,
+  including expected text, transcript state, `Podudarnost teksta`, authenticated playback, and
+  therapist-review state/comment. `Feedback terapeuta` groups only attempts from completed sessions
+  with a saved therapist review. Automated details never appear in child gameplay.
 - Therapist review lists completed sessions for fictional demo profiles, streams recordings
   through the authenticated API, and stores one of three review states plus an optional
   400-character comment, reviewer, and timestamp.
@@ -165,7 +166,8 @@ npx prettier . --check
 - `src/app/features/games/pages/`: catalog and player pages.
 - `src/app/features/games/components/`: game board renderers plus catalog card and type-filter
   components.
-- `src/app/features/progress/`: backend-backed parent session view.
+- `src/app/features/progress/`: backend-backed parent session view with child-progress and
+  therapist-feedback sections.
 - `src/app/features/therapist/`: therapist-only completed-session and recording-review interface.
 - `src/main.css`: global styles, tokens, colors, typography, reset.
 - `server/`: separate Express/SQLite service, API tests, seed/reset workflow, and ignored runtime
@@ -304,6 +306,23 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   remain human checks on the target device because browser permission was not granted during
   automated QA.
 
+## Milestone 18 Validation
+
+- `npm run prototype:check` passed: 20 frontend files / 93 tests, 3 server files / 24 tests, and
+  5 Python worker tests (122 tests total), plus the production builds and Prettier.
+- `git diff --check` passed.
+- Focused parent-progress tests cover section selection, arrow-key tab navigation, saved-review
+  filtering, and retention of historical attempts in the child-progress section.
+- The therapist-feedback section is read-only and reuses authenticated playback without changing
+  the session, recording, transcription, or review persistence contracts.
+- Live Browser QA passed at 1440×1000 and 390×844 with no horizontal overflow or browser-console
+  warning/error. The local demo data confirmed that only six reviewed attempts appeared in
+  `Feedback terapeuta`, while older recognition-game recordings remained available in the
+  child-progress section.
+- Visual comparison against the approved parent-feedback concepts found no material Milestone 18
+  mismatch. The existing prototype notice/header and additional adult-facing transcript metadata
+  are intentional retained elements.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
@@ -335,8 +354,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review the Milestone 17 dedicated pronunciation-practice pull request.
-2. Continue with Milestone 18 parent progress sections after Milestone 17 is merged.
+1. Review the Milestone 18 parent-progress-sections pull request.
+2. Continue with Milestone 19 integrated mentor-feedback QA after Milestone 18 is merged.
 3. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
    screen-reader checks on the target device.
 4. Record any thesis demonstration observations without expanding this prototype into production

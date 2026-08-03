@@ -216,10 +216,12 @@ Završena sesija sprema se pod aktivnim izmišljenim demo profilom na lokalnom p
 - bodove, trajanje i vrijeme završetka;
 - paket, vrstu igre, glas, temu i razinu.
 
-Stranica Napredak za prijavljenog demo roditelja čita te sesije iz API-ja. Proširivi detalji sesije
-prikazuju svaki pokušaj s očekivanim i prepoznatim tekstom, stanjem prijepisa, `Podudarnosti
-teksta`, zaštićenom reprodukcijom i spremljenim osvrtom terapeuta. Ti podaci ostaju u prikazu za
-odrasle i ne pojavljuju se tijekom dječje igre.
+Stranica Napredak za prijavljenog demo roditelja čita te sesije iz API-ja i dijeli ih u dva
+odjeljka. `Napredak djeteta` čuva potpuni povijesni pregled sesija i svih snimljenih pokušaja, dok
+`Feedback terapeuta` prikazuje samo pokušaje iz završenih sesija za koje je spremljen osvrt
+terapeuta. Detalji uključuju očekivani i prepoznati tekst, stanje prijepisa, `Podudarnost teksta`,
+zaštićenu reprodukciju te potpuni spremljeni osvrt. Ti podaci ostaju u prikazu za odrasle i ne
+pojavljuju se tijekom dječje igre.
 
 Brisanje sesije uklanja metapodatke i povezane audiodatoteke. Roditelj može potvrditi i potpuno
 brisanje aktivnog demo profila sa svim sesijama, prijepisima i snimkama. Obje radnje čiste stari

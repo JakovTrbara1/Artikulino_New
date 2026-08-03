@@ -12,10 +12,43 @@
   font-size: clamp(2.2rem, 5vw, 4rem);
 }
 
+.progress-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: rgb(255 255 255 / 76%);
+  padding: 0.4rem;
+}
+
+.progress-tabs button {
+  min-height: 3.35rem;
+  border: 0;
+  border-radius: calc(var(--radius-md) - 0.4rem);
+  background: transparent;
+  color: var(--color-navy-700);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.progress-tabs button[aria-selected='true'] {
+  background: var(--color-white);
+  color: var(--color-navy-900);
+  box-shadow: 0 0.24rem 0 #bdd8ea;
+}
+
+.progress-tabs button:focus-visible {
+  outline: 3px solid var(--color-yellow);
+  outline-offset: 2px;
+}
+
 .header-context p,
 .match-explanation,
 .clinical-note p,
-.privacy-strip p {
+.privacy-strip p,
+.feedback-intro p,
+.feedback-help p {
   color: var(--color-muted);
 }
 
@@ -132,6 +165,10 @@
 
 .activity-mark[data-game='sound-position'] {
   background: var(--color-sky-500);
+}
+
+.activity-mark[data-game='pronunciation-practice'] {
+  background: #a881db;
 }
 
 .session-heading,
@@ -278,7 +315,8 @@
 }
 
 .recommendation,
-.clinical-note {
+.clinical-note,
+.feedback-help {
   border-radius: var(--radius-md);
   padding: 1.5rem;
 }
@@ -295,6 +333,110 @@
 .clinical-note {
   border: 1px solid var(--color-border);
   background: #f8fbfd;
+}
+
+.feedback-intro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin: 0 0 1.5rem;
+}
+
+.feedback-intro p:not(.eyebrow) {
+  max-width: 42rem;
+  margin: 0.45rem 0 0;
+}
+
+.feedback-intro > span {
+  flex: 0 0 auto;
+  color: var(--color-navy-700);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.feedback-session-list,
+.feedback-attempt-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.feedback-session {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.feedback-session-header {
+  display: grid;
+  grid-template-columns: 0.65rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  padding: 1.2rem;
+}
+
+.feedback-session-header p {
+  margin: 0;
+  color: var(--color-coral);
+  font-weight: 900;
+}
+
+.feedback-session-header h3 {
+  margin: 0;
+}
+
+.feedback-attempt-list {
+  padding: 1.2rem;
+}
+
+.feedback-attempt {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(16rem, 0.9fr);
+  gap: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+}
+
+.feedback-attempt h4 {
+  margin: 0.1rem 0 0.75rem;
+}
+
+.feedback-result {
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin: 0 0 1rem;
+}
+
+.therapist-comment {
+  border: 1px solid #acd9ca;
+  border-radius: var(--radius-sm);
+  background: #effaf6;
+  padding: 1rem;
+}
+
+.therapist-comment[data-review='PRACTICE_AGAIN'] {
+  border-color: #f0cf7d;
+  background: #fff9e8;
+}
+
+.therapist-comment > span {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #caeee1;
+  padding: 0.35rem 0.65rem;
+  color: #17654e;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.therapist-comment[data-review='PRACTICE_AGAIN'] > span {
+  background: #ffe4a3;
+  color: #805300;
+}
+
+.therapist-comment p {
+  margin: 0.8rem 0;
+  line-height: 1.55;
 }
 
 .progress-notice {
@@ -338,12 +480,33 @@ button:disabled {
   .progress-layout {
     grid-template-columns: 1fr;
   }
+
+  .feedback-layout .side-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 42rem) {
   .progress-header,
-  .attempt-results {
+  .attempt-results,
+  .feedback-attempt {
     grid-template-columns: 1fr;
+  }
+
+  .progress-header {
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .progress-tabs {
+    margin-inline: -0.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .progress-tabs button {
+    min-height: 3rem;
+    padding-inline: 0.45rem;
+    font-size: 0.9rem;
   }
 
   .summary {
@@ -375,5 +538,28 @@ button:disabled {
   .privacy-strip {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .feedback-intro {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .feedback-session-header {
+    grid-template-columns: 0.5rem minmax(0, 1fr);
+  }
+
+  .feedback-session-header > strong {
+    grid-column: 2;
+  }
+
+  .feedback-attempt-list {
+    padding: 0.75rem;
+  }
+
+  .feedback-result,
+  .feedback-layout .side-column {
+    grid-template-columns: 1fr;
   }
 }

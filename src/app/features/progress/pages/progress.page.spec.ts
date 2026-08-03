@@ -146,6 +146,69 @@ describe('ProgressPage', () => {
     expect(text).toContain('Nije ocjena izgovora ni klinički rezultat.');
   });
 
+  it('splits parent progress into accessible child-progress and therapist-feedback tabs', async () => {
+    await createPage();
+    const childTab = fixture.nativeElement.querySelector(
+      '#child-progress-tab',
+    ) as HTMLButtonElement;
+    const feedbackTab = fixture.nativeElement.querySelector(
+      '#therapist-feedback-tab',
+    ) as HTMLButtonElement;
+    const childPanel = fixture.nativeElement.querySelector('#child-progress-panel') as HTMLElement;
+    const feedbackPanel = fixture.nativeElement.querySelector(
+      '#therapist-feedback-panel',
+    ) as HTMLElement;
+
+    expect(childTab.getAttribute('aria-selected')).toBe('true');
+    expect(childPanel.hidden).toBe(false);
+    expect(feedbackPanel.hidden).toBe(true);
+
+    feedbackTab.click();
+    fixture.detectChanges();
+
+    expect(feedbackTab.getAttribute('aria-selected')).toBe('true');
+    expect(childPanel.hidden).toBe(true);
+    expect(feedbackPanel.hidden).toBe(false);
+  });
+
+  it('shows only saved therapist reviews while retaining historical attempts in child progress', async () => {
+    await createPage();
+    const childPanel = fixture.nativeElement.querySelector('#child-progress-panel') as HTMLElement;
+    const feedbackTab = fixture.nativeElement.querySelector(
+      '#therapist-feedback-tab',
+    ) as HTMLButtonElement;
+    const feedbackPanel = fixture.nativeElement.querySelector(
+      '#therapist-feedback-panel',
+    ) as HTMLElement;
+
+    expect(childPanel.textContent).toContain('salata');
+
+    feedbackTab.click();
+    fixture.detectChanges();
+
+    expect(feedbackPanel.textContent).toContain('2 pregledanih pokušaja');
+    expect(feedbackPanel.textContent).toContain('kruška');
+    expect(feedbackPanel.textContent).toContain('sir');
+    expect(feedbackPanel.textContent).not.toContain('salata');
+    expect(feedbackPanel.textContent).toContain('Jasan testni primjer. Nastavite istim tempom.');
+  });
+
+  it('supports arrow-key navigation between progress tabs', async () => {
+    await createPage();
+    const childTab = fixture.nativeElement.querySelector(
+      '#child-progress-tab',
+    ) as HTMLButtonElement;
+    const feedbackTab = fixture.nativeElement.querySelector(
+      '#therapist-feedback-tab',
+    ) as HTMLButtonElement;
+
+    childTab.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(feedbackTab.getAttribute('aria-selected')).toBe('true');
+    expect(document.activeElement).toBe(feedbackTab);
+  });
+
   it('loads protected audio as a local object URL on demand', async () => {
     await createPage();
     const button = fixture.nativeElement.querySelector('.load-audio') as HTMLButtonElement;

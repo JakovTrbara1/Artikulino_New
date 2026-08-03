@@ -20,6 +20,8 @@ import { PrototypeAuthService } from '../../../core/services/prototype-auth.serv
 import { PrototypeSessionService } from '../../../core/services/prototype-session.service';
 import { DIFFICULTY_LABELS, GAME_TYPE_LABELS } from '../../games/models/content-package.model';
 
+type ProgressSection = 'child-progress' | 'therapist-feedback';
+
 const TRANSCRIPTION_LABELS: Record<TranscriptionStatus, string> = {
   PENDING: 'Prijepis u tijeku',
   COMPLETED: 'Prijepis dovršen',
@@ -55,6 +57,7 @@ export class ProgressPage implements OnInit, OnDestroy {
   protected readonly audioUrls = signal<Readonly<Record<string, string>>>({});
   protected readonly audioErrors = signal<Readonly<Record<string, string>>>({});
   protected readonly errorMessage = signal('');
+  protected readonly activeSection = signal<ProgressSection>('child-progress');
   protected readonly transcriptionLabels = TRANSCRIPTION_LABELS;
   protected readonly reviewLabels = REVIEW_LABELS;
   protected readonly completedSessions = computed(() =>
@@ -82,6 +85,20 @@ export class ProgressPage implements OnInit, OnDestroy {
       ),
     ),
   );
+  protected readonly feedbackSessions = computed(() =>
+    this.sessions()
+      .filter((session) => Boolean(session.completedAt))
+      .map((session) => ({
+        ...session,
+        recordingAttempts: session.recordingAttempts.filter(
+          (attempt) => attempt.therapistReview.status !== 'NOT_REVIEWED',
+        ),
+      }))
+      .filter((session) => session.recordingAttempts.length > 0),
+  );
+  protected readonly reviewedAttemptCount = computed(() =>
+    this.feedbackSessions().reduce((total, session) => total + session.recordingAttempts.length, 0),
+  );
 
   async ngOnInit(): Promise<void> {
     await this.loadSessions();
@@ -93,6 +110,41 @@ export class ProgressPage implements OnInit, OnDestroy {
 
   protected async refreshSessions(): Promise<void> {
     await this.loadSessions();
+  }
+
+  protected selectSection(section: ProgressSection): void {
+    this.activeSection.set(section);
+  }
+
+  protected handleSectionKeydown(event: KeyboardEvent): void {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+      return;
+    }
+
+    const current = event.currentTarget as HTMLButtonElement;
+    const tabs = Array.from(
+      current.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? [],
+    );
+    if (tabs.length === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    const currentIndex = Math.max(0, tabs.indexOf(current));
+    const nextIndex =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? tabs.length - 1
+          : event.key === 'ArrowRight'
+            ? (currentIndex + 1) % tabs.length
+            : (currentIndex - 1 + tabs.length) % tabs.length;
+    const nextTab = tabs[nextIndex];
+    const nextSection = nextTab.dataset['section'] as ProgressSection | undefined;
+    if (nextSection) {
+      this.selectSection(nextSection);
+      nextTab.focus();
+    }
   }
 
   protected async loadAttemptAudio(attempt: PrototypeRecordingAttempt): Promise<void> {
