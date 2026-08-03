@@ -5,7 +5,8 @@ import { dirname } from 'node:path';
 import { hashBearerToken, hashPassword } from './security.js';
 
 export type DemoRole = 'PARENT' | 'THERAPIST';
-export type PrototypeGameType = 'listen-and-decide' | 'catch-the-sound' | 'sound-position';
+export type PrototypeGameType =
+  'listen-and-decide' | 'catch-the-sound' | 'sound-position' | 'pronunciation-practice';
 export type PrototypeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
 export type TranscriptionStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 export type TherapistReviewStatus = 'NOT_REVIEWED' | 'LOOKS_GOOD' | 'PRACTICE_AGAIN';
@@ -190,6 +191,37 @@ interface TherapistSessionDatabaseRow extends GameSessionDatabaseRow {
 
 const PARENT_ID = 'demo-parent';
 const THERAPIST_ID = 'demo-therapist';
+
+function createGameSessionsTable(tableName: string): string {
+  return `
+    CREATE TABLE IF NOT EXISTS ${tableName} (
+      id TEXT PRIMARY KEY,
+      child_id TEXT NOT NULL REFERENCES demo_children(id) ON DELETE CASCADE,
+      package_id TEXT NOT NULL,
+      package_name TEXT NOT NULL,
+      game_type TEXT NOT NULL CHECK (
+        game_type IN (
+          'listen-and-decide',
+          'catch-the-sound',
+          'sound-position',
+          'pronunciation-practice'
+        )
+      ),
+      target_sound TEXT NOT NULL,
+      theme TEXT NOT NULL,
+      difficulty TEXT NOT NULL CHECK (difficulty IN ('EASY', 'MEDIUM', 'HARD')),
+      question_count INTEGER NOT NULL CHECK (question_count > 0),
+      correct_answers INTEGER NOT NULL DEFAULT 0,
+      attempts INTEGER NOT NULL DEFAULT 0,
+      replays INTEGER NOT NULL DEFAULT 0,
+      longest_streak INTEGER NOT NULL DEFAULT 0,
+      total_points INTEGER NOT NULL DEFAULT 0,
+      duration_seconds INTEGER NOT NULL DEFAULT 0,
+      started_at INTEGER NOT NULL,
+      completed_at INTEGER
+    );
+  `;
+}
 
 export class PrototypeDatabase {
   private readonly sqlite: Database.Database;
@@ -729,27 +761,7 @@ export class PrototypeDatabase {
         created_at INTEGER NOT NULL
       );
 
-      CREATE TABLE IF NOT EXISTS game_sessions (
-        id TEXT PRIMARY KEY,
-        child_id TEXT NOT NULL REFERENCES demo_children(id) ON DELETE CASCADE,
-        package_id TEXT NOT NULL,
-        package_name TEXT NOT NULL,
-        game_type TEXT NOT NULL CHECK (
-          game_type IN ('listen-and-decide', 'catch-the-sound', 'sound-position')
-        ),
-        target_sound TEXT NOT NULL,
-        theme TEXT NOT NULL,
-        difficulty TEXT NOT NULL CHECK (difficulty IN ('EASY', 'MEDIUM', 'HARD')),
-        question_count INTEGER NOT NULL CHECK (question_count > 0),
-        correct_answers INTEGER NOT NULL DEFAULT 0,
-        attempts INTEGER NOT NULL DEFAULT 0,
-        replays INTEGER NOT NULL DEFAULT 0,
-        longest_streak INTEGER NOT NULL DEFAULT 0,
-        total_points INTEGER NOT NULL DEFAULT 0,
-        duration_seconds INTEGER NOT NULL DEFAULT 0,
-        started_at INTEGER NOT NULL,
-        completed_at INTEGER
-      );
+      ${createGameSessionsTable('game_sessions')}
 
       CREATE TABLE IF NOT EXISTS recording_attempts (
         id TEXT PRIMARY KEY,
@@ -782,9 +794,51 @@ export class PrototypeDatabase {
       CREATE INDEX IF NOT EXISTS idx_recording_attempts_session
         ON recording_attempts(session_id, created_at);
     `);
+    this.ensurePronunciationGameType();
+    this.sqlite.exec(`
+      CREATE INDEX IF NOT EXISTS idx_game_sessions_child
+        ON game_sessions(child_id, completed_at DESC);
+    `);
     this.ensureRecordingAttemptColumn('transcription_status', "TEXT NOT NULL DEFAULT 'PENDING'");
     this.ensureRecordingAttemptColumn('transcript', 'TEXT');
     this.ensureRecordingAttemptColumn('text_match', 'INTEGER');
+  }
+
+  private ensurePronunciationGameType(): void {
+    const table = this.sqlite
+      .prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'game_sessions'")
+      .get() as { readonly sql: string } | undefined;
+    if (table?.sql.includes("'pronunciation-practice'")) {
+      return;
+    }
+
+    this.sqlite.pragma('foreign_keys = OFF');
+    try {
+      this.sqlite.exec(`
+        BEGIN;
+        ${createGameSessionsTable('game_sessions_next')}
+        INSERT INTO game_sessions_next (
+          id, child_id, package_id, package_name, game_type, target_sound, theme, difficulty,
+          question_count, correct_answers, attempts, replays, longest_streak, total_points,
+          duration_seconds, started_at, completed_at
+        )
+        SELECT
+          id, child_id, package_id, package_name, game_type, target_sound, theme, difficulty,
+          question_count, correct_answers, attempts, replays, longest_streak, total_points,
+          duration_seconds, started_at, completed_at
+        FROM game_sessions;
+        DROP TABLE game_sessions;
+        ALTER TABLE game_sessions_next RENAME TO game_sessions;
+        COMMIT;
+      `);
+    } catch (error) {
+      if (this.sqlite.inTransaction) {
+        this.sqlite.exec('ROLLBACK');
+      }
+      throw error;
+    } finally {
+      this.sqlite.pragma('foreign_keys = ON');
+    }
   }
 
   private ensureRecordingAttemptColumn(name: string, definition: string): void {

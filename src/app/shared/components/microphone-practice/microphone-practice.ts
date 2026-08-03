@@ -24,10 +24,14 @@ type RetryAction = 'save' | 'delete';
 })
 export class MicrophonePractice implements OnDestroy {
   readonly questionId = input.required<string>();
+  readonly required = input(false);
+  readonly promptKind = input<'sound' | 'word'>('word');
+  readonly disabled = input(false);
   readonly saveAttempt = input<(attempt: RecordedAttempt) => Promise<{ readonly id: string }>>();
   readonly deleteSavedAttempt = input<(attemptId: string) => Promise<void>>();
   readonly recordedAttempt = output<RecordedAttempt>();
-  readonly recordingDeleted = output<void>();
+  readonly recordingDeleted = output<number>();
+  readonly skipRequested = output<void>();
 
   protected readonly recorder: MicrophoneRecorderService;
   protected readonly deliveryStatus = signal<AttemptDeliveryStatus>('idle');
@@ -75,6 +79,9 @@ export class MicrophonePractice implements OnDestroy {
   }
 
   protected async startRecording(): Promise<void> {
+    if (this.disabled()) {
+      return;
+    }
     this.deliveryStatus.set('idle');
     this.latestAttempt = undefined;
     this.handledRecording = undefined;
@@ -114,7 +121,7 @@ export class MicrophonePractice implements OnDestroy {
     this.latestAttempt = undefined;
     this.handledRecording = undefined;
     this.savedAttemptId = undefined;
-    this.recordingDeleted.emit();
+    this.recordingDeleted.emit(Math.max(0, this.attemptNumber - 1));
   }
 
   protected retryDelivery(): void {
@@ -134,6 +141,10 @@ export class MicrophonePractice implements OnDestroy {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  protected promptNoun(): string {
+    return this.promptKind() === 'sound' ? 'glas' : 'riječ';
   }
 
   private async deliverAttempt(): Promise<void> {

@@ -228,6 +228,10 @@
   gap: 0.75rem;
 }
 
+.result-stats.is-pronunciation {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .result-stats div {
   border-radius: var(--radius-md);
   background: var(--color-sky-100);
@@ -260,7 +264,6 @@
   }
 
   .game-toolbar div {
-    display: block;
     text-align: center;
   }
 
@@ -282,5 +285,16 @@
 
   .result-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .result-stats.is-pronunciation {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-track span {
+    transition: none;
+    transform: none !important;
   }
 }

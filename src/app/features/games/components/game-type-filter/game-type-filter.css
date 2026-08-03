@@ -4,7 +4,7 @@
 
 .game-types {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
 }
 
@@ -51,6 +51,14 @@
   --background: #eaf6ff;
   --icon-background: #c9e8ff;
   --ink: #155a8f;
+}
+
+.game-type-toggle[data-type='pronunciation-practice'] {
+  --accent: #a881db;
+  --shadow: #7650ad;
+  --background: #f3ebff;
+  --icon-background: #dfcdf7;
+  --ink: #573086;
 }
 
 .game-type-toggle:hover,
@@ -145,6 +153,12 @@
   font-size: 0.88rem;
   font-weight: 700;
   text-align: center;
+}
+
+@media (max-width: 68rem) {
+  .game-types {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 58rem) {

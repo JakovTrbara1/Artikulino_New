@@ -36,6 +36,7 @@ const GAME_TYPES = new Set<PrototypeGameType>([
   'listen-and-decide',
   'catch-the-sound',
   'sound-position',
+  'pronunciation-practice',
 ]);
 const DIFFICULTIES = new Set<PrototypeDifficulty>(['EASY', 'MEDIUM', 'HARD']);
 const REVIEW_STATUSES = new Set<TherapistReviewStatus>([

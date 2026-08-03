@@ -61,10 +61,10 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/mentor-recognition-cleanup`
+- Current implementation branch: `codex/pronunciation-practice-games`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `8b6733d`
-- Milestone 15 is merged through pull request #22.
+- Base: `origin/main` at merge commit `7044e60`
+- Milestone 16 is merged through pull request #23.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -74,17 +74,19 @@ npx prettier . --check
   - all games: sound, theme, and difficulty;
   - `listen-and-decide`: theme and difficulty;
   - `catch-the-sound`: sound, detection/discrimination mode, and difficulty;
-  - `sound-position`: sound and difficulty.
+  - `sound-position`: sound and difficulty;
+  - `pronunciation-practice`: sound, isolated-sound/whole-word mode, and difficulty.
 - Game player at `/igre/:packageId`.
 - Parent/progress page at `/napredak`.
 - Therapist review page at `/pregled-terapeuta`, protected by the therapist role.
 - Shared header with logo and navigation.
-- Three currently playable configurable games:
+- Four currently playable configurable games:
   - `listen-and-decide`: category decision from heard word/sentence.
   - `catch-the-sound`: detect whether a word contains a target sound.
   - `sound-position`: identify beginning, middle, or end of a word using a train UI.
-- The content contract now reserves a fourth `pronunciation-practice` type with explicit
-  `SOUND`/`WORD` modes. Playable packages and the dedicated recording flow belong to Milestone 17.
+  - `pronunciation-practice`: listen, record, replay, retry, and continue through isolated-sound or
+    whole-word rounds without child-facing automated scores.
+- Pronunciation content includes `SOUND` and `WORD` packages for R, L, S, Z, Š, Ž, C, Č, and Ć.
 - `catch-the-sound` packages explicitly declare `DETECT` or `DISCRIMINATE`; listening packages no
   longer claim a target sound that they do not practise.
 - Shared game session flow: play/listen, replay, answer, feedback, scoring, next question, final result.
@@ -97,9 +99,9 @@ npx prettier . --check
 - Therapist review lists completed sessions for fictional demo profiles, streams recordings
   through the authenticated API, and stores one of three review states plus an optional
   400-character comment, reviewer, and timestamp.
-- The three recognition categories do not show recording controls. The shared microphone component
-  and typed `RecordedAttempt` boundary remain available for the dedicated pronunciation flow in
-  Milestone 17.
+- The three recognition categories do not show recording controls. The dedicated pronunciation
+  board requires listening before recording, resets for each question, preserves typed
+  `RecordedAttempt` uploads, and provides a safe continuation only after microphone failure.
 - Browser Speech Synthesis as the supported MVP path for spoken prompts when no approved local
   recording is available.
 - Demo content packages for required sounds, pairs, themes, and difficulty levels.
@@ -283,6 +285,25 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   mismatch. The fourth pronunciation category is intentionally deferred until Milestone 17 has
   playable packages.
 
+## Milestone 17 Validation
+
+- `npm run prototype:check` passed: 20 frontend files / 90 tests, 3 server files / 24 tests, and
+  5 Python worker tests (119 tests total), plus the production builds and Prettier.
+- Frontend tests cover all 18 pronunciation packages, catalog filtering, no-points session
+  behavior, the listen-before-recording gate, per-question recording reset, and safe continuation
+  after microphone denial.
+- The local API accepts `pronunciation-practice` sessions and keeps their recording attempts
+  compatible with the existing persistence and transcription pipeline. A migration test verifies
+  that the pre-Milestone-17 SQLite game-session table is upgraded without resetting runtime data.
+- Live Browser QA passed at 1440×1000 and 390×844 with no horizontal overflow, framework overlay,
+  or console warning/error. The fourth catalog toggle returns 18 packages and the pronunciation
+  player disables recording until the example is played.
+- The isolated-sound and whole-word screens use the required code-native Croatian headings and do
+  not render answer controls, points, accuracy, or child-facing automated percentages.
+- Actual microphone permission, recording, replay, retry, and audible Croatian prompt quality
+  remain human checks on the target device because browser permission was not granted during
+  automated QA.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
@@ -314,8 +335,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review and merge the Milestone 16 recognition-game cleanup pull request.
-2. Continue with Milestone 17 dedicated pronunciation practice.
+1. Review the Milestone 17 dedicated pronunciation-practice pull request.
+2. Continue with Milestone 18 parent progress sections after Milestone 17 is merged.
 3. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
    screen-reader checks on the target device.
 4. Record any thesis demonstration observations without expanding this prototype into production

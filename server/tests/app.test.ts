@@ -1,3 +1,4 @@
+import Database from 'better-sqlite3';
 import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -261,6 +262,78 @@ describe('prototype API', () => {
       .expect(201);
 
     expect(response.body.session.targetSound).toBe('');
+  });
+
+  it('accepts pronunciation sessions for persisted recording attempts', async () => {
+    const authorization = await parentAuthorization();
+    const response = await request(app)
+      .post('/api/sessions')
+      .set(authorization)
+      .send({
+        childId: 'demo-child-luka',
+        packageId: 'izgovor-rijeci-s',
+        packageName: 'Izgovori riječi s glasom S',
+        gameType: 'pronunciation-practice',
+        targetSound: 'S',
+        theme: 'Priroda',
+        difficulty: 'MEDIUM',
+        questionCount: 4,
+      })
+      .expect(201);
+
+    expect(response.body.session).toMatchObject({
+      gameType: 'pronunciation-practice',
+      targetSound: 'S',
+    });
+  });
+
+  it('upgrades an existing game-session table before saving pronunciation sessions', () => {
+    const legacyFile = join(directory, 'legacy.sqlite');
+    const legacy = new Database(legacyFile);
+    legacy.exec(`
+      CREATE TABLE game_sessions (
+        id TEXT PRIMARY KEY,
+        child_id TEXT NOT NULL,
+        package_id TEXT NOT NULL,
+        package_name TEXT NOT NULL,
+        game_type TEXT NOT NULL CHECK (
+          game_type IN ('listen-and-decide', 'catch-the-sound', 'sound-position')
+        ),
+        target_sound TEXT NOT NULL,
+        theme TEXT NOT NULL,
+        difficulty TEXT NOT NULL CHECK (difficulty IN ('EASY', 'MEDIUM', 'HARD')),
+        question_count INTEGER NOT NULL CHECK (question_count > 0),
+        correct_answers INTEGER NOT NULL DEFAULT 0,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        replays INTEGER NOT NULL DEFAULT 0,
+        longest_streak INTEGER NOT NULL DEFAULT 0,
+        total_points INTEGER NOT NULL DEFAULT 0,
+        duration_seconds INTEGER NOT NULL DEFAULT 0,
+        started_at INTEGER NOT NULL,
+        completed_at INTEGER
+      );
+    `);
+    legacy.close();
+
+    const upgraded = new PrototypeDatabase(legacyFile);
+    const parent = upgraded.findUserByEmail('parent@artikulino.test');
+    expect(parent).toBeDefined();
+    const session = upgraded.createGameSession(parent!.id, {
+      childId: 'demo-child-luka',
+      packageId: 'izgovor-glas-r',
+      packageName: 'Izgovori glas R',
+      gameType: 'pronunciation-practice',
+      targetSound: 'R',
+      theme: 'Igračke',
+      difficulty: 'EASY',
+      questionCount: 4,
+    });
+    upgraded.close();
+
+    expect(session).toMatchObject({
+      gameType: 'pronunciation-practice',
+      packageId: 'izgovor-glas-r',
+    });
   });
 
   it('lists completed sessions and their attempts only for the demo therapist', async () => {

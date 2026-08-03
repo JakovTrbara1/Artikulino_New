@@ -138,6 +138,23 @@ describe('MicrophonePractice', () => {
     expect(requireButton('Započni snimanje')).toBeTruthy();
   });
 
+  it('offers a safe exit after denied access when recording is required', async () => {
+    const skipped = vi.fn();
+    fixture.componentRef.setInput('required', true);
+    fixture.componentInstance.skipRequested.subscribe(skipped);
+    getUserMedia.mockRejectedValueOnce(new DOMException('Denied', 'NotAllowedError'));
+
+    requireButton('Započni snimanje').click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain(
+      'Snimi najmanje jedan pokušaj do 15 sekundi za nastavak.',
+    );
+    requireButton('Nastavi bez snimanja').click();
+    expect(skipped).toHaveBeenCalledOnce();
+  });
+
   it('retains a failed local recording for retry and deletes a saved server attempt', async () => {
     const saveAttempt = vi
       .fn()

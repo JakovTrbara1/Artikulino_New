@@ -16,9 +16,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { PrototypeGameSession } from '../../../core/models/prototype-session.model';
 import { PrototypeSessionService } from '../../../core/services/prototype-session.service';
+import { MicrophonePractice } from '../../../shared/components/microphone-practice/microphone-practice';
+import { RecordedAttempt } from '../../../shared/models/recorded-attempt.model';
 import { AudioPlaybackService } from '../../../shared/services/audio-playback.service';
 import { CatchSoundBoard } from '../components/catch-sound-board/catch-sound-board';
 import { ListenDecideBoard } from '../components/listen-decide-board/listen-decide-board';
+import { PronunciationPracticeBoard } from '../components/pronunciation-practice-board/pronunciation-practice-board';
 import { SoundPositionBoard } from '../components/sound-position-board/sound-position-board';
 import {
   ContentPackage,
@@ -30,7 +33,14 @@ import { GameSessionService } from '../services/game-session.service';
 
 @Component({
   selector: 'app-game-player-page',
-  imports: [RouterLink, ListenDecideBoard, CatchSoundBoard, SoundPositionBoard],
+  imports: [
+    RouterLink,
+    ListenDecideBoard,
+    CatchSoundBoard,
+    SoundPositionBoard,
+    PronunciationPracticeBoard,
+    MicrophonePractice,
+  ],
   templateUrl: './game-player.page.html',
   styleUrl: './game-player.page.css',
   providers: [GameSessionService],
@@ -72,8 +82,29 @@ export class GamePlayerPage implements OnDestroy {
     if (contentPackage.gameType === 'catch-the-sound') {
       return contentPackage.soundPair ? 'Koji glas čuješ?' : `Čuješ li glas ${sound}?`;
     }
+    if (contentPackage.gameType === 'pronunciation-practice') {
+      return contentPackage.practiceMode === 'SOUND'
+        ? 'Poslušaj i izgovori glas.'
+        : 'Poslušaj i izgovori riječ.';
+    }
     return question.taskText;
   });
+
+  protected readonly saveRecordedAttempt = async (
+    attempt: RecordedAttempt,
+  ): Promise<{ readonly id: string }> => {
+    const contentPackage = this.contentPackage();
+    const question = this.session.currentQuestion();
+    if (!contentPackage || !question) {
+      throw new Error('Pitanje za snimanje nije dostupno.');
+    }
+    const prototypeSession = await this.ensurePrototypeSession(contentPackage);
+    return this.prototypeSessions.uploadAttempt(prototypeSession.id, attempt, question.spokenText);
+  };
+
+  protected readonly deleteRecordedAttempt = async (attemptId: string): Promise<void> => {
+    await this.prototypeSessions.deleteAttempt(attemptId);
+  };
 
   constructor(
     private readonly packages: ContentPackagesService,
@@ -120,6 +151,21 @@ export class GamePlayerPage implements OnDestroy {
     }
     this.selectedAnswer.set(answerId);
     this.session.submitAnswer(answerId);
+  }
+
+  protected receiveRecordedAttempt(): void {
+    this.session.registerPracticeAttempt();
+    this.session.completePracticeRound();
+  }
+
+  protected clearRecordedAttempt(remainingAttempts: number): void {
+    if (remainingAttempts === 0) {
+      this.session.reopenPracticeRound();
+    }
+  }
+
+  protected skipPronunciationRecording(): void {
+    this.session.completePracticeRound(true);
   }
 
   protected nextQuestion(): void {

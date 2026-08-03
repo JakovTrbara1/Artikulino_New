@@ -39,4 +39,45 @@ describe('GameSessionService', () => {
     expect(service.replays()).toBe(1);
     expect(service.totalPoints()).toBe(7);
   });
+
+  it('completes pronunciation rounds after recording without awarding points', () => {
+    const contentPackage = DEMO_CONTENT_PACKAGES.find((item) => item.id === 'izgovor-rijeci-s');
+    expect(contentPackage).toBeDefined();
+    service.start(contentPackage!);
+
+    service.registerReplay();
+    service.registerPracticeAttempt();
+    service.completePracticeRound();
+
+    expect(service.isAnswered()).toBe(true);
+    expect(service.attempts()).toBe(1);
+    expect(service.replays()).toBe(1);
+    expect(service.correctAnswers()).toBe(0);
+    expect(service.totalPoints()).toBe(0);
+    expect(service.feedback()).toMatchObject({
+      kind: 'success',
+      message: 'Snimka je spremljena za tekstualno prepoznavanje.',
+      explanation: 'Prepoznavanje teksta nije procjena kvalitete izgovora.',
+    });
+
+    service.reopenPracticeRound();
+    expect(service.isAnswered()).toBe(false);
+    expect(service.feedback()).toBeNull();
+  });
+
+  it('allows a safe pronunciation exit after microphone failure without a fake score', () => {
+    const contentPackage = DEMO_CONTENT_PACKAGES.find((item) => item.id === 'izgovor-glas-r');
+    expect(contentPackage).toBeDefined();
+    service.start(contentPackage!);
+
+    service.completePracticeRound(true);
+
+    expect(service.isAnswered()).toBe(true);
+    expect(service.attempts()).toBe(0);
+    expect(service.totalPoints()).toBe(0);
+    expect(service.feedback()).toMatchObject({
+      kind: 'reveal',
+      message: 'Nastavljamo bez snimke.',
+    });
+  });
 });

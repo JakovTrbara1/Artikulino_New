@@ -21,5 +21,6 @@ export class GameTypeFilter {
     'listen-and-decide',
     'catch-the-sound',
     'sound-position',
+    'pronunciation-practice',
   ];
 }
