@@ -1,11 +1,11 @@
 # Thesis Prototype QA
 
-Verification date: 2026-07-28
+Verification date: 2026-08-03
 
 ## Result
 
-The localhost thesis prototype passed the consolidated automated gate and the integrated parent
-and therapist workflows. This result applies only to fictional profiles and fictional or
+The mentor-aligned localhost thesis prototype passed the consolidated automated gate and the live
+desktop/mobile verification. The result applies only to fictional profiles and fictional or
 adult-generated test recordings. It is not a production-security, clinical, or pronunciation
 validation.
 
@@ -22,52 +22,88 @@ The verified gate covered:
 
 | Area                                                        | Result                     |
 | ----------------------------------------------------------- | -------------------------- |
-| Angular production build and frontend tests                 | Passed: 20 files, 75 tests |
-| Express build, API, database, and integrated workflow tests | Passed: 3 files, 21 tests  |
+| Angular production build and frontend tests                 | Passed: 20 files, 93 tests |
+| Express build, API, database, and integrated workflow tests | Passed: 3 files, 24 tests  |
 | FastAPI transcription tests                                 | Passed: 5 tests            |
 | Prettier and whitespace validation                          | Passed                     |
 
 The integrated server workflow signs in as both demo roles, creates a fictional child session,
-preserves two attempts for one question, completes transcription, streams authenticated audio,
-saves a therapist review, exposes it to the parent, and verifies cascade deletion of metadata and
-audio files.
+preserves multiple attempts, completes transcription, streams authenticated audio, saves a
+therapist review, exposes it to the parent, and verifies cascade deletion of metadata and files.
 
-## Integrated workflow verification
+## Mentor-feedback acceptance matrix
 
-| Scenario                                                                | Verification                                          |
-| ----------------------------------------------------------------------- | ----------------------------------------------------- |
-| Parent login and fictional child selection                              | Passed in the running Angular application             |
-| Complete four-question game and save progress                           | Passed; result was 4/4 and visible in parent progress |
-| Multiple attempts and asynchronous persistence                          | Passed in the integrated API test                     |
-| Therapist session, transcript, text match, playback request, and review | Passed in the running application and API test        |
-| Full therapist comment visible to parent                                | Passed in the running application                     |
-| Unavailable or failed transcription worker                              | Passed by server failure-path tests                   |
-| Denied or unsupported microphone and failed upload retry                | Passed by frontend service/component tests            |
-| Empty, unsupported, oversized, or overlong audio                        | Passed by server and worker tests                     |
-| Session/profile deletion and physical-file cleanup                      | Passed by API and integrated workflow tests           |
-| Expired login and parent/therapist role restrictions                    | Passed by API, auth-service, and route-guard tests    |
+| Requirement                                    | Verification                                                                      |
+| ---------------------------------------------- | --------------------------------------------------------------------------------- |
+| Four distinct game categories                  | Catalog and content tests plus live desktop/mobile checks passed                  |
+| Content matches the declared sound or pair     | Content validation covers sound occurrences, pairs, modes, and every demo package |
+| No recording in recognition games              | Component and live recognition-game checks passed                                 |
+| Recording only in sound/word pronunciation     | Player and session tests plus live pronunciation checks passed                    |
+| Two meaningful answers for binary recognition  | Validation and live `Uhvati glas` checks passed                                   |
+| Detection versus discrimination filter         | Catalog tests and live `Vrsta vježbe` filter check passed                         |
+| Theme removed where it is not meaningful       | Live category-aware filter checks passed                                          |
+| Parent progress split into two sections        | Component, keyboard, and live desktop/mobile checks passed                        |
+| Therapist review remains visible to the parent | API, workflow, component, and live checks passed                                  |
+| Historical attempts remain available           | Migration/API tests and live child-progress data check passed                     |
 
-Browser Speech Synthesis successfully drove the live four-question parent flow. The in-app browser
-confirmed the authenticated playback control and response state, but it cannot prove that sound
-was audible through the physical output device.
+## Failure-path and boundary verification
 
-## Visual and responsive verification
+| Scenario                                               | Verification                                         |
+| ------------------------------------------------------ | ---------------------------------------------------- |
+| Unavailable or failed transcription worker             | Server failure-path tests                            |
+| Denied or unsupported microphone and safe continuation | Frontend service, component, and session tests       |
+| Failed recording upload with retry/delete support      | Frontend component and service tests                 |
+| Empty, unsupported, oversized, or overlong audio       | Server and worker tests                              |
+| Expired login and parent/therapist role restrictions   | API, auth-service, route-guard, and live role checks |
+| Session/profile deletion and physical-file cleanup     | API and integrated workflow tests                    |
+| Upgrade of pre-pronunciation SQLite data               | Server migration test                                |
+| Text matching does not affect points                   | Session and content tests                            |
 
-The catalog and gameplay screens were compared with the five references in `docs/design/` at
-1440 × 1000 and 390 × 844. The therapist review was checked at the same desktop and mobile widths.
-All checked pages remained usable without horizontal overflow.
+## Live browser verification
 
-- Catalog: preserves the three colored game-type toggles, soft-toy theme artwork, rounded depth,
-  accessible information control, and responsive single-column layout.
-- Gameplay: preserves the central activity card, restrained edge decorations, clear prompt/media,
-  and the visible optional recording panel before the answers.
-- Therapist review: preserves the calm master-detail hierarchy on desktop and stacks the profile,
-  session, and attempt areas on narrow screens.
-- Intentional differences from the generated concepts include code-native Croatian copy, real
-  package data, simplified navigation, and accessible HTML controls instead of image-rendered UI.
+Environment:
 
-No application console errors were observed during the live parent, catalog, gameplay, progress,
-or therapist checks.
+- Angular: `http://localhost:4200`;
+- desktop viewport: 1440 × 1000;
+- mobile viewport: 390 × 844;
+- local demo accounts and fictional profiles only.
+
+Verified interactions:
+
+- `/igre`: all four accessible type toggles select and clear correctly; each type exposes only its
+  relevant filters; the information popover opens and closes; 34 packages render with local
+  artwork.
+- Recognition gameplay: `Uhvati glas R` renders only `Čujem glas R` and `Ne čujem glas R`, enables
+  them after `Poslušaj`, and renders no recording control.
+- Pronunciation gameplay: recording is disabled until the example is played, no answer controls or
+  points are shown, and no transcript, text-match percentage, or automatic pronunciation rating is
+  shown to the child.
+- `/napredak`: `Napredak djeteta` is the default section; `Feedback terapeuta` shows only saved
+  therapist reviews while historical attempts remain in child progress.
+- `/pregled-terapeuta`: therapist login, demo-child switching, completed sessions, all attempts,
+  authenticated playback controls, text-match data, and saved review states are visible.
+- Parent access to the therapist route is rejected.
+
+No framework error overlay, horizontal overflow, or browser-console warning/error was observed on
+the checked routes.
+
+## Visual comparison
+
+The catalog, pronunciation, parent-feedback, and therapist screens were compared with their
+approved references in `docs/design/`.
+
+- Catalog: preserves the four colored type toggles, soft-toy artwork, rounded depth, accessible
+  information controls, and responsive single-column cards.
+- Pronunciation: preserves the listen-first hierarchy and prominent recording panel.
+- Parent progress: preserves the two-section adult-facing hierarchy and readable review cards.
+- Therapist review: preserves the calm master-detail desktop layout and stacked mobile layout.
+
+Intentional differences from generated concepts:
+
+- production copy and demo data remain code-native Croatian rather than image-rendered sample text;
+- navigation and decoration remain restrained for accessibility and responsive space;
+- the child pronunciation screen does not show a transcript, percentage, `Odlično!`, or any other
+  automated quality conclusion; text matching remains adult-facing and explicitly non-clinical.
 
 ## Remaining human-device checks
 
