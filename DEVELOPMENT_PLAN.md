@@ -4,24 +4,25 @@
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
   services, and backend-backed local prototype progress.
-- Milestones 0–18 are complete and merged into `main`.
+- Milestones 0–19 are complete and merged into `main`.
 - The consolidated Angular, Express, Python, and formatting gate passes through
   `npm run prototype:check`.
 - The frontend-only MVP has no confirmed technical blocker, but real-device accessibility,
   microphone, and Croatian voice checks remain documented in `docs/MVP_READINESS.md`.
-- The next phase is a local master’s-thesis prototype. It may add demo accounts, a local backend,
-  retained fictional recordings, and local Croatian transcription under the boundaries below.
+- The next phase improves the existing local master’s-thesis prototype with reliable persistence,
+  varied pronunciation rounds, child-facing text-match rewards, unique catalog artwork, and clearer
+  product wording under the boundaries below.
 
 ## 2. Main development goal
 
-Build a clearly labeled, localhost-only thesis prototype with two coordinated tracks:
+Continue the localhost-only thesis prototype with two coordinated tracks:
 
-1. redesign the catalog and gameplay experience using the approved soft-toy 3D direction;
-2. add a local prototype backend, fictional parent/child profiles, saved recording attempts,
-   Croatian transcription, adult progress, and therapist review.
+1. make pronunciation practice, persistence, and recording feedback dependable and motivating;
+2. finish the approved soft-toy 3D direction with unique artwork and cleaner adult/child wording.
 
 `Podudarnost` measures normalized expected-text versus recognized-text similarity. It is not
-pronunciation quality, a clinical score, a diagnosis, or a therapist conclusion.
+pronunciation quality, a clinical score, a diagnosis, or a therapist conclusion. In pronunciation
+games only, it may drive proportional game points as a playful text-recognition reward.
 
 ## 3. Approved design references
 
@@ -40,6 +41,7 @@ not authoritative.
 - `docs/design/mentor-pronunciation-mobile.png`
 - `docs/design/mentor-parent-feedback-desktop.png`
 - `docs/design/mentor-parent-feedback-mobile.png`
+- `docs/design/observation-improvements-concept.png`
 
 The mentor concepts control layout and visual direction only. The pronunciation screen must use
 the code-native heading `Poslušaj i izgovori riječ.` or `Poslušaj i izgovori glas.`; sample image
@@ -60,7 +62,13 @@ copy and sample content are not authoritative.
 9. Completed: simplify recognition games and add category-aware filters.
 10. Completed: add dedicated pronunciation practice.
 11. Completed: split parent progress into child activity and therapist feedback.
-12. In progress: repeat integrated mentor-feedback QA and publish its evidence.
+12. Completed: repeat integrated mentor-feedback QA and publish its evidence.
+13. Lock the observation-driven persistence, pronunciation, and visual roadmap.
+14. Repair persistence and prevent stale API/frontend contract mismatches.
+15. Add varied syllable rounds and proportional pronunciation-game points.
+16. Replace repeated catalog artwork and enlarge decorative background elements.
+17. Add the approved child-facing result celebration and redesigned completion screen.
+18. Run integrated persistence, recording, accessibility, and responsive QA.
 
 ## 5. Milestones
 
@@ -276,10 +284,94 @@ git diff --check
 ### Milestone 19 — Mentor-feedback integrated QA
 
 - Branch: `codex/mentor-feedback-qa`
-- Status: implemented and validated on the milestone branch; review is pending.
+- Status: complete and merged through pull request #26.
 - Verify the corrected content matrix, all four game types, recording boundaries, failure states,
   parent views, therapist visibility, migrations, accessibility, and responsive layouts.
 - Update README, IntelliJ instructions, QA evidence, and this handoff.
+
+### Milestone 20 — Lock the observation-driven roadmap
+
+- Branch: `codex/observation-improvement-roadmap`
+- Update this roadmap and `AI_HANDOFF.md`.
+- Preserve the approved result, completion, and catalog concept in `docs/design/`.
+- Record that `Podudarnost teksta` may produce proportional points only in pronunciation games
+  without becoming a pronunciation or clinical score.
+- Keep this milestone documentation-only.
+- Validate with:
+
+```bash
+npx prettier DEVELOPMENT_PLAN.md AI_HANDOFF.md --check
+git diff --check
+```
+
+### Milestone 21 — Persistence recovery and API compatibility
+
+- Branch: `codex/persistence-contract-guard`
+- Restart Express in watch mode without resetting or deleting runtime data.
+- Add an API contract version and supported game types to `GET /api/health`.
+- Add parent-owned `GET /api/attempts/:id` status polling without exposing storage paths.
+- Detect stale or incompatible API processes in Angular and show an actionable Croatian restart
+  message.
+- Verify a new pronunciation session, recording, completion, and progress entry.
+- Update local and IntelliJ instructions to use `npm run server:dev` during development.
+- Validate with `npm --prefix server test`, `npm run test:ci`, `npm run prototype:check`, and
+  `git diff --check`.
+
+### Milestone 22 — Varied pronunciation rounds and proportional scoring
+
+- Branch: `codex/pronunciation-round-scoring`
+- Replace repeated isolated sounds with four syllables using A/E/I/O:
+  - R: RA, RE, RI, RO;
+  - L: LA, LE, LI, LO;
+  - S, Z, Š, Ž, C, Č, and Ć follow the same pattern.
+- Keep whole-word pronunciation games unchanged.
+- Poll a saved attempt once per second for up to 30 seconds.
+- Calculate points with `round(basePoints × textMatch / 100)`.
+- Preserve every retry, count only the best attempt per question, and never reduce earned points.
+- Let the child retry or continue with zero points when transcription fails or times out.
+- Add a typed `PracticeRoundResult` for attempt status, percentage, and round/best points.
+- Validate focused content/session tests, `npm run prototype:check`, and `git diff --check`.
+
+### Milestone 23 — Unique artwork and larger decorations
+
+- Branch: `codex/unique-game-artwork`
+- Generate one distinct optimized WebP illustration for every game.
+- Assign artwork by package rather than sharing one image per theme.
+- Replace the pronunciation category symbol with an unmistakable code-native lips SVG.
+- Increase desktop side decorations by about 50 percent while keeping them behind content.
+- Hide or simplify decorations on narrow screens.
+- Update media provenance and test unique image paths, alt text, and missing assets.
+- Validate with `npm run check`, focused image/content tests, desktop/mobile visual review, and
+  `git diff --check`.
+
+### Milestone 24 — Pronunciation celebration and completion UX
+
+- Branch: `codex/pronunciation-celebration-ui`
+- Show an accessible centered modal while transcription is pending and after every result.
+- Show `Podudarnost teksta`, percentage, best round points, encouraging copy, retry, and continue.
+- Preserve recordings and allow continuation when the result is unavailable.
+- Use brief confetti and character reactions without sound and with reduced-motion support.
+- Redesign completion around total points, average best match, recording count, and the existing
+  navigation actions.
+- Remove visible `demo`, `prototip`, `paket`, and `testne snimke` product wording and the global
+  warning banner.
+- Retain one concise adult-only local-storage/privacy notice and non-clinical explanations.
+- Keep internal model names such as `ContentPackage` and `DemoUser`.
+- Exclude pronunciation sessions from recognition accuracy summaries.
+- Validate component/accessibility tests, `npm run prototype:check`, 1440 × 1000 and 390 × 844
+  browser checks, and `git diff --check`.
+
+### Milestone 25 — Observation-driven integrated QA
+
+- Branch: `codex/observation-improvement-qa`
+- Verify login → child → pronunciation → retry → score → completion → progress.
+- Confirm new sessions and recordings remain after service restarts without resetting runtime data.
+- Recheck therapist playback and review, stale API detection, unavailable/failed transcription,
+  denied microphone, deletion, retry scoring, and mobile layouts.
+- Use only fictional profiles and fictional/adult-generated Croatian recordings.
+- Update README, QA evidence, and this handoff.
+- Validate with `npm run prototype:check`, `git diff --check`, and documented live browser and
+  microphone checks.
 
 ## 6. Interfaces and API
 
@@ -302,6 +394,7 @@ Minimum local API:
 - `GET|POST|DELETE /api/sessions`
 - `POST /api/sessions/:id/complete`
 - `POST /api/sessions/:id/attempts`
+- `GET /api/attempts/:id`
 - `DELETE /api/attempts/:id`
 - `GET /api/attempts/:id/audio`
 - `GET /api/therapist/sessions`
@@ -329,7 +422,8 @@ Detailed automated, integrated, visual, and remaining human-device checks are re
 - Localhost demonstration only; no public deployment or production-security claim.
 - Use only fictional profiles and fictional/adult-generated recordings.
 - No diagnosis, phoneme-level error detection, clinical scoring, or automated therapist conclusion.
-- `Podudarnost` never affects game points.
+- `Podudarnost` may affect only pronunciation-game points through the documented proportional
+  formula. It must never be presented as pronunciation quality or a clinical result.
 - No external ASR provider or cloud storage.
 - No packaged WAV prompts, analytics, email, password recovery, exports, downloads, medical data,
   or account administration.
@@ -344,6 +438,10 @@ Detailed automated, integrated, visual, and remaining human-device checks are re
   FFmpeg remains useful for diagnostics.
 - CPU-only `small` Whisper inference may be slow; recordings remain short and transcription is
   serialized.
+- Short Croatian syllables may be less reliable than whole words in Whisper. The child flow must
+  time out safely and allow continuation without a score.
+- Long-lived non-watch Express processes can become incompatible with a hot-reloaded frontend.
+  Contract-version checks must make that mismatch explicit.
 - Generated visual assets need consistent art direction, transparency validation, optimization,
   and provenance.
 - A transcript match does not establish articulation quality.
@@ -355,5 +453,6 @@ Detailed automated, integrated, visual, and remaining human-device checks are re
 - Do not use real children’s names, profiles, or recordings.
 - Do not send recordings outside localhost.
 - Do not expose database paths, recording paths, passwords, or session tokens in UI or logs.
-- Do not let recording, transcription, or therapist feedback change game scoring.
+- Do not let recording, transcription, or therapist feedback change recognition-game scoring.
+- Do not let therapist feedback change any game score.
 - Do not begin a later milestone before its dependency is merged and validated.

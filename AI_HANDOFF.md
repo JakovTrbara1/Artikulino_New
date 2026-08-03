@@ -61,10 +61,12 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/mentor-feedback-qa`
+- Current implementation branch: `codex/observation-improvement-roadmap`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `e31b920`
-- Milestone 18 is merged through pull request #25.
+- Base: `origin/main` at merge commit `08fc3ba`.
+- Milestone 19 is merged through pull request #26.
+- Milestone 20 is documentation-only and locks the approved roadmap for persistence recovery,
+  varied pronunciation rounds, proportional text-match points, unique artwork, and celebration UX.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -197,6 +199,8 @@ npx prettier . --check
   `Poslušaj i izgovori riječ.` or `Poslušaj i izgovori glas.`
 - `docs/design/mentor-parent-feedback-desktop.png` and `mentor-parent-feedback-mobile.png`: split
   parent progress and therapist-feedback direction.
+- `docs/design/observation-improvements-concept.png`: approved child-facing pronunciation result,
+  completion-screen, unique catalog-art, and larger-decoration direction for Milestones 20–25.
 
 ## Architecture Overview
 
@@ -228,7 +232,9 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - For the approved thesis-prototype phase only, a local Express/SQLite service and local
   faster-whisper worker may process fictional/adult-generated recordings on localhost.
 - Label normalized expected-text versus transcript similarity only as `Podudarnost teksta`. It must
-  not affect points or be presented as pronunciation quality, an error score, or a clinical result.
+  not be presented as pronunciation quality, an error score, or a clinical result. The current
+  implementation does not award points for it; the approved Milestone 22 change may use it only for
+  proportional pronunciation-game points.
 - The thesis prototype may use predefined demo parent/therapist credentials and fictional child
   display names. It must not claim production security or accept real children’s data.
 - Demo passwords are hashed with scrypt. Random bearer tokens last eight hours, are hashed in
@@ -346,6 +352,18 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
   and integrated cross-service/failure-path QA are implemented.
+- The process observed during roadmap planning had Angular and Express running since 28 July while
+  newer pronunciation code was present in the repository. A stale non-watch Express process can
+  reject `pronunciation-practice` session creation with an invalid-game-data response even though
+  the current server source accepts that type. Milestone 21 must restart Express without resetting
+  runtime data, verify persistence, and add an API contract-version guard.
+- Isolated-sound pronunciation packages currently repeat the same sound in all four rounds.
+  Milestone 22 replaces them with A/E/I/O syllables while leaving whole-word packages unchanged.
+- Catalog cards currently reuse one image per theme. Milestone 23 assigns a distinct optimized
+  illustration to every package and enlarges edge decorations.
+- Child pronunciation gameplay currently shows neither transcription status, text-match points,
+  nor a result modal. Milestone 24 implements the approved non-clinical reward flow after the
+  persistence and scoring contracts are merged.
 - No external ASR provider or automatic articulation error detection is implemented. The original
   browser transcription port remains disabled; Express alone calls the localhost worker.
 - No approved controller, legal basis, guardian verification, ASR provider, exact provider
@@ -373,11 +391,12 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review the Milestone 19 mentor-feedback integrated-QA pull request.
-2. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
-   screen-reader checks on the target device.
-3. Record any thesis demonstration observations without expanding this prototype into production
-   or clinical scope.
+1. Merge Milestone 20 after its documentation and approved-design PR passes review.
+2. Implement Milestone 21 on `codex/persistence-contract-guard`: restart Express in watch mode,
+   preserve runtime data, verify pronunciation persistence, and add health/attempt APIs.
+3. Implement Milestones 22–25 sequentially only after each dependency is merged and validated.
+4. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
+   screen-reader checks on the target device during Milestone 25.
 
 ## Do Not Change Without Asking
 
@@ -398,6 +417,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - MVP uses microphone recording only for replay/self-monitoring.
 - Adding a new sound, sound pair, theme, level, audio file, image, or question should be possible by adding or editing content packages.
 - Scoring must remain configurable and never produce negative points.
+- Pronunciation text-match scoring must use the package base points, count only the best attempt per
+  question, and allow continuation without points when transcription is unavailable.
 - Replay does not reduce points by default.
 - Positive, non-punitive feedback is required.
 - Multiple correct answers are supported by the model when explicitly needed.
