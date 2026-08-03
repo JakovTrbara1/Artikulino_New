@@ -4,7 +4,7 @@
 
 - Angular 21 standalone application with lazy routes, content-driven games, shared session/scoring
   services, and backend-backed local prototype progress.
-- Milestones 0–14 are complete and merged into `main`.
+- Milestones 0–16 are complete and merged into `main`.
 - The consolidated Angular, Express, Python, and formatting gate passes through
   `npm run prototype:check`.
 - The frontend-only MVP has no confirmed technical blocker, but real-device accessibility,
@@ -56,9 +56,10 @@ copy and sample content are not authoritative.
 5. Completed: expand parent progress with transcription and therapist-review details.
 6. Completed: add therapist recording review.
 7. Completed: run integrated thesis-prototype QA and document the demonstration workflow.
-8. Implemented: align the game taxonomy and content contract with mentor feedback.
-9. Implemented: simplify recognition games and add category-aware filters.
-10. Next: add dedicated pronunciation practice, split parent progress, and repeat integrated QA.
+8. Completed: align the game taxonomy and content contract with mentor feedback.
+9. Completed: simplify recognition games and add category-aware filters.
+10. In progress: add dedicated pronunciation practice.
+11. Next: split parent progress and repeat integrated QA.
 
 ## 5. Milestones
 
@@ -256,6 +257,7 @@ git diff --check
 ### Milestone 17 — Dedicated pronunciation practice
 
 - Branch: `codex/pronunciation-practice-games`
+- Status: implemented and validated on the milestone branch; review is pending.
 - Add data-driven sound and whole-word practice for R, L, S, Z, Š, Ž, C, Č, and Ć.
 - Require one local recording per round while providing a safe exit after microphone failure.
 - Keep isolated-sound feedback to recording/replay success; use non-numeric text-recognition

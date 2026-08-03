@@ -23,23 +23,41 @@
           <p class="audio-notice" role="status">{{ persistenceMessage() }}</p>
         }
 
-        <dl class="result-stats">
-          <div>
-            <dt>Točno</dt>
-            <dd>{{ session.correctAnswers() }} / {{ package.questions.length }}</dd>
-          </div>
-          <div>
-            <dt>Bodovi</dt>
-            <dd>{{ session.totalPoints() }}</dd>
-          </div>
-          <div>
-            <dt>Najdulji niz</dt>
-            <dd>{{ session.longestStreak() }}</dd>
-          </div>
-          <div>
-            <dt>Ponovna slušanja</dt>
-            <dd>{{ session.replays() }}</dd>
-          </div>
+        <dl
+          class="result-stats"
+          [class.is-pronunciation]="package.gameType === 'pronunciation-practice'"
+        >
+          @if (package.gameType === 'pronunciation-practice') {
+            <div>
+              <dt>Krugovi</dt>
+              <dd>{{ package.questions.length }}</dd>
+            </div>
+            <div>
+              <dt>Snimljeni pokušaji</dt>
+              <dd>{{ session.attempts() }}</dd>
+            </div>
+            <div>
+              <dt>Ponovna slušanja</dt>
+              <dd>{{ session.replays() }}</dd>
+            </div>
+          } @else {
+            <div>
+              <dt>Točno</dt>
+              <dd>{{ session.correctAnswers() }} / {{ package.questions.length }}</dd>
+            </div>
+            <div>
+              <dt>Bodovi</dt>
+              <dd>{{ session.totalPoints() }}</dd>
+            </div>
+            <div>
+              <dt>Najdulji niz</dt>
+              <dd>{{ session.longestStreak() }}</dd>
+            </div>
+            <div>
+              <dt>Ponovna slušanja</dt>
+              <dd>{{ session.replays() }}</dd>
+            </div>
+          }
         </dl>
 
         <div class="result-actions">
@@ -58,12 +76,26 @@
             <strong>{{ session.currentIndex() + 1 }} od {{ package.questions.length }}</strong>
           </div>
           <div>
-            <span>Bodovi</span>
-            <strong>{{ session.totalPoints() }}</strong>
+            <span>{{ package.gameType === 'pronunciation-practice' ? 'Snimke' : 'Bodovi' }}</span>
+            <strong>
+              {{
+                package.gameType === 'pronunciation-practice'
+                  ? session.attempts()
+                  : session.totalPoints()
+              }}
+            </strong>
           </div>
           <div>
-            <span>Niz</span>
-            <strong>{{ session.currentStreak() }}</strong>
+            <span>
+              {{ package.gameType === 'pronunciation-practice' ? 'Slušanja' : 'Niz' }}
+            </span>
+            <strong>
+              {{
+                package.gameType === 'pronunciation-practice'
+                  ? session.replays()
+                  : session.currentStreak()
+              }}
+            </strong>
           </div>
         </div>
 
@@ -95,70 +127,99 @@
           }
         </div>
 
-        <button
-          class="listen-button"
-          type="button"
-          [disabled]="audio.isPlaying()"
-          (click)="playPrompt()"
-        >
-          <span class="speaker" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="34" height="34">
-              <path
-                d="M5 10v4h4l5 4V6L9 10H5Zm12-1a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+        @if (package.gameType === 'pronunciation-practice') {
+          <div class="answer-region pronunciation-region">
+            <app-pronunciation-practice-board
+              [question]="question"
+              [isPlaying]="audio.isPlaying()"
+              [listenLabel]="
+                listenLabel() + (package.practiceMode === 'SOUND' ? ' glas' : ' riječ')
+              "
+              (listen)="playPrompt()"
+            >
+              @if (audioMessage()) {
+                <p audioNotice class="audio-notice" role="status">{{ audioMessage() }}</p>
+              }
+              <app-microphone-practice
+                recordingPanel
+                [questionId]="question.id"
+                [required]="true"
+                [disabled]="!hasListened()"
+                [promptKind]="package.practiceMode === 'SOUND' ? 'sound' : 'word'"
+                [saveAttempt]="saveRecordedAttempt"
+                [deleteSavedAttempt]="deleteRecordedAttempt"
+                (recordedAttempt)="receiveRecordedAttempt()"
+                (recordingDeleted)="clearRecordedAttempt($event)"
+                (skipRequested)="skipPronunciationRecording()"
               />
-            </svg>
-          </span>
-          {{ audio.isPlaying() ? 'Slušaj…' : listenLabel() }}
-        </button>
-        @if (audioMessage()) {
-          <p class="audio-notice" role="status">{{ audioMessage() }}</p>
-        }
-
-        <div class="answer-region" [class.waiting]="!hasListened()">
-          @switch (package.gameType) {
-            @case ('listen-and-decide') {
-              <app-listen-decide-board
-                [question]="question"
-                [disabled]="!hasListened() || session.isAnswered()"
-                [selectedId]="selectedAnswer()"
-                (answer)="chooseAnswer($event)"
-              >
-                @if (!hasListened()) {
-                  <p answerHint class="listen-hint">Najprije pritisni „Poslušaj”.</p>
-                }
-              </app-listen-decide-board>
-            }
-            @case ('catch-the-sound') {
-              <app-catch-sound-board
-                [question]="question"
-                [disabled]="!hasListened() || session.isAnswered()"
-                [selectedId]="selectedAnswer()"
-                (answer)="chooseAnswer($event)"
-              >
-                @if (!hasListened()) {
-                  <p answerHint class="listen-hint">Najprije pritisni „Poslušaj”.</p>
-                }
-              </app-catch-sound-board>
-            }
-            @case ('sound-position') {
-              <app-sound-position-board
-                [question]="question"
-                [disabled]="!hasListened() || session.isAnswered()"
-                [selectedId]="selectedAnswer()"
-                (answer)="chooseAnswer($event)"
-              >
-                @if (!hasListened()) {
-                  <p answerHint class="listen-hint">Najprije pritisni „Poslušaj”.</p>
-                }
-              </app-sound-position-board>
-            }
+            </app-pronunciation-practice-board>
+          </div>
+        } @else {
+          <button
+            class="listen-button"
+            type="button"
+            [disabled]="audio.isPlaying()"
+            (click)="playPrompt()"
+          >
+            <span class="speaker" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="34" height="34">
+                <path
+                  d="M5 10v4h4l5 4V6L9 10H5Zm12-1a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+            {{ audio.isPlaying() ? 'Slušaj…' : listenLabel() }}
+          </button>
+          @if (audioMessage()) {
+            <p class="audio-notice" role="status">{{ audioMessage() }}</p>
           }
-        </div>
+
+          <div class="answer-region" [class.waiting]="!hasListened()">
+            @switch (package.gameType) {
+              @case ('listen-and-decide') {
+                <app-listen-decide-board
+                  [question]="question"
+                  [disabled]="!hasListened() || session.isAnswered()"
+                  [selectedId]="selectedAnswer()"
+                  (answer)="chooseAnswer($event)"
+                >
+                  @if (!hasListened()) {
+                    <p answerHint class="listen-hint">Najprije pritisni „Poslušaj”.</p>
+                  }
+                </app-listen-decide-board>
+              }
+              @case ('catch-the-sound') {
+                <app-catch-sound-board
+                  [question]="question"
+                  [disabled]="!hasListened() || session.isAnswered()"
+                  [selectedId]="selectedAnswer()"
+                  (answer)="chooseAnswer($event)"
+                >
+                  @if (!hasListened()) {
+                    <p answerHint class="listen-hint">Najprije pritisni „Poslušaj”.</p>
+                  }
+                </app-catch-sound-board>
+              }
+              @case ('sound-position') {
+                <app-sound-position-board
+                  [question]="question"
+                  [disabled]="!hasListened() || session.isAnswered()"
+                  [selectedId]="selectedAnswer()"
+                  (answer)="chooseAnswer($event)"
+                >
+                  @if (!hasListened()) {
+                    <p answerHint class="listen-hint">Najprije pritisni „Poslušaj”.</p>
+                  }
+                </app-sound-position-board>
+              }
+            }
+          </div>
+        }
 
         @if (session.feedback(); as feedback) {
           <div
@@ -183,8 +244,14 @@
           <button class="button button--primary next-button" type="button" (click)="nextQuestion()">
             {{
               session.currentIndex() === package.questions.length - 1
-                ? 'Prikaži rezultat'
-                : 'Sljedeće pitanje'
+                ? package.gameType === 'pronunciation-practice'
+                  ? 'Prikaži sažetak'
+                  : 'Prikaži rezultat'
+                : package.gameType === 'pronunciation-practice'
+                  ? package.practiceMode === 'SOUND'
+                    ? 'Sljedeći glas'
+                    : 'Sljedeća riječ'
+                  : 'Sljedeće pitanje'
             }}
             <span aria-hidden="true">→</span>
           </button>

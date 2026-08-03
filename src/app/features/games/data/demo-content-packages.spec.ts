@@ -70,6 +70,33 @@ describe('demonstration content packages', () => {
     }
   });
 
+  it('offers isolated-sound and whole-word pronunciation practice for every supported sound', () => {
+    const pronunciationPackages = DEMO_CONTENT_PACKAGES.filter(
+      (contentPackage) => contentPackage.gameType === 'pronunciation-practice',
+    );
+
+    expect(pronunciationPackages).toHaveLength(18);
+    for (const sound of ['R', 'L', 'S', 'Z', 'Š', 'Ž', 'C', 'Č', 'Ć']) {
+      const packagesForSound = pronunciationPackages.filter(
+        (contentPackage) => contentPackage.targetSound === sound,
+      );
+      expect(packagesForSound.map((contentPackage) => contentPackage.practiceMode).sort()).toEqual([
+        'SOUND',
+        'WORD',
+      ]);
+    }
+
+    for (const contentPackage of pronunciationPackages) {
+      expect(contentPackage.questions).toHaveLength(4);
+      expect(contentPackage.questions.every((question) => question.answers.length === 0)).toBe(
+        true,
+      );
+      expect(
+        contentPackage.questions.every((question) => question.correctAnswerIds.length === 0),
+      ).toBe(true);
+    }
+  });
+
   it('uses the optimized catalog illustration for every supported theme', () => {
     const expectedSources = new Map([
       ['hrana', '/assets/games/themes/food.webp'],

@@ -104,6 +104,178 @@ const withImageSrc = (question: ContentQuestion, src: string): ContentQuestion =
 const categoryOptions = (...labels: string[]): readonly AnswerOption[] =>
   labels.map((label) => ({ id: label.toLocaleLowerCase('hr-HR'), label }));
 
+interface PronunciationWordPrompt {
+  readonly id: string;
+  readonly text: string;
+  readonly emoji: string;
+}
+
+interface PronunciationSoundSet {
+  readonly sound: string;
+  readonly slug: string;
+  readonly theme: string;
+  readonly words: readonly PronunciationWordPrompt[];
+}
+
+const PRONUNCIATION_SOUND_SETS: readonly PronunciationSoundSet[] = [
+  {
+    sound: 'R',
+    slug: 'r',
+    theme: 'životinje',
+    words: [
+      { id: 'riba', text: 'riba', emoji: '🐟' },
+      { id: 'rak', text: 'rak', emoji: '🦀' },
+      { id: 'roda', text: 'roda', emoji: '🐦' },
+      { id: 'tigar', text: 'tigar', emoji: '🐯' },
+    ],
+  },
+  {
+    sound: 'L',
+    slug: 'l',
+    theme: 'igračke',
+    words: [
+      { id: 'lopta', text: 'lopta', emoji: '⚽' },
+      { id: 'lutka', text: 'lutka', emoji: '🪆' },
+      { id: 'balon', text: 'balon', emoji: '🎈' },
+      { id: 'vlak', text: 'vlak', emoji: '🚂' },
+    ],
+  },
+  {
+    sound: 'S',
+    slug: 's',
+    theme: 'priroda',
+    words: [
+      { id: 'sunce', text: 'sunce', emoji: '☀️' },
+      { id: 'rosa', text: 'rosa', emoji: '💧' },
+      { id: 'list', text: 'list', emoji: '🍃' },
+      { id: 'snijeg', text: 'snijeg', emoji: '❄️' },
+    ],
+  },
+  {
+    sound: 'Z',
+    slug: 'z',
+    theme: 'životinje',
+    words: [
+      { id: 'zec', text: 'zec', emoji: '🐇' },
+      { id: 'koza', text: 'koza', emoji: '🐐' },
+      { id: 'zebra', text: 'zebra', emoji: '🦓' },
+      { id: 'zmija', text: 'zmija', emoji: '🐍' },
+    ],
+  },
+  {
+    sound: 'Š',
+    slug: 'sh',
+    theme: 'škola',
+    words: [
+      { id: 'skola', text: 'škola', emoji: '🏫' },
+      { id: 'skare', text: 'škare', emoji: '✂️' },
+      { id: 'sestar', text: 'šestar', emoji: '📐' },
+      { id: 'mis', text: 'miš', emoji: '🖱️' },
+    ],
+  },
+  {
+    sound: 'Ž',
+    slug: 'zh',
+    theme: 'životinje',
+    words: [
+      { id: 'zaba', text: 'žaba', emoji: '🐸' },
+      { id: 'puz', text: 'puž', emoji: '🐌' },
+      { id: 'jez', text: 'jež', emoji: '🦔' },
+      { id: 'zirafa', text: 'žirafa', emoji: '🦒' },
+    ],
+  },
+  {
+    sound: 'C',
+    slug: 'c',
+    theme: 'odjeća',
+    words: [
+      { id: 'cipele', text: 'cipele', emoji: '👟' },
+      { id: 'majica', text: 'majica', emoji: '👕' },
+      { id: 'rukavice', text: 'rukavice', emoji: '🧤' },
+      { id: 'kapica', text: 'kapica', emoji: '🧢' },
+    ],
+  },
+  {
+    sound: 'Č',
+    slug: 'ch',
+    theme: 'hrana',
+    words: [
+      { id: 'caj', text: 'čaj', emoji: '🫖' },
+      { id: 'kolac', text: 'kolač', emoji: '🍰' },
+      { id: 'naranca', text: 'naranča', emoji: '🍊' },
+      { id: 'cokolada', text: 'čokolada', emoji: '🍫' },
+    ],
+  },
+  {
+    sound: 'Ć',
+    slug: 'cj',
+    theme: 'kuća',
+    words: [
+      { id: 'kuca', text: 'kuća', emoji: '🏠' },
+      { id: 'svijeca', text: 'svijeća', emoji: '🕯️' },
+      { id: 'vreca', text: 'vreća', emoji: '🛍️' },
+      { id: 'pec', text: 'peć', emoji: '🔥' },
+    ],
+  },
+];
+
+const pronunciationPackages = PRONUNCIATION_SOUND_SETS.flatMap(({ sound, slug, theme, words }) => [
+  {
+    schemaVersion: 1,
+    id: `izgovor-glas-${slug}`,
+    gameType: 'pronunciation-practice',
+    name: `Izgovori glas ${sound}`,
+    description: `Poslušaj, snimi i poslušaj svoj glas ${sound}.`,
+    objective: `Vježbanje samostalnog izgovora glasa ${sound}.`,
+    targetSound: sound,
+    practiceMode: 'SOUND',
+    theme: 'igračke',
+    difficulty: 'EASY',
+    scoring: rules('EASY'),
+    questions: Array.from({ length: 4 }, (_, index): ContentQuestion => ({
+      id: `izgovor-${slug}-glas-${index + 1}`,
+      taskText: 'Poslušaj i izgovori glas.',
+      spokenText: sound,
+      displayText: sound,
+      targetSound: sound,
+      image: {
+        emoji: '🗣️',
+        alt: `Vježba izgovora glasa ${sound}`,
+      },
+      answers: [],
+      correctAnswerIds: [],
+      explanation: `Snimka glasa ${sound} spremna je za slušanje i samostalnu usporedbu.`,
+    })),
+  },
+  {
+    schemaVersion: 1,
+    id: `izgovor-rijeci-${slug}`,
+    gameType: 'pronunciation-practice',
+    name: `Izgovori riječi s glasom ${sound}`,
+    description: `Poslušaj i snimi četiri riječi koje sadrže glas ${sound}.`,
+    objective: `Vježbanje izgovora glasa ${sound} u cijelim riječima.`,
+    targetSound: sound,
+    practiceMode: 'WORD',
+    theme,
+    difficulty: 'MEDIUM',
+    scoring: rules('MEDIUM'),
+    questions: words.map((word): ContentQuestion => ({
+      id: `izgovor-${slug}-${word.id}`,
+      taskText: 'Poslušaj i izgovori riječ.',
+      spokenText: word.text,
+      displayText: word.text,
+      targetSound: sound,
+      image: {
+        emoji: word.emoji,
+        alt: `Ilustracija za riječ ${word.text}`,
+      },
+      answers: [],
+      correctAnswerIds: [],
+      explanation: `Snimka riječi ${word.text} spremljena je za tekstualno prepoznavanje.`,
+    })),
+  },
+]) satisfies readonly Omit<ContentPackage, 'catalogImage' | 'professionalReview'>[];
+
 const DEMO_CONTENT_PACKAGE_DEFINITIONS = [
   {
     schemaVersion: 1,
@@ -552,6 +724,7 @@ const DEMO_CONTENT_PACKAGE_DEFINITIONS = [
       ),
     ],
   },
+  ...pronunciationPackages,
 ] satisfies readonly Omit<ContentPackage, 'professionalReview'>[];
 
 export const DEMO_CONTENT_PACKAGES: readonly ContentPackage[] =

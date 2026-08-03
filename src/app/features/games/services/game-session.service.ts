@@ -129,6 +129,54 @@ export class GameSessionService {
     });
   }
 
+  registerPracticeAttempt(): void {
+    if (this.packageState()?.gameType !== 'pronunciation-practice' || this.completeState()) {
+      return;
+    }
+    this.attemptsState.update((count) => count + 1);
+  }
+
+  completePracticeRound(skipped = false): void {
+    const contentPackage = this.packageState();
+    const question = this.currentQuestion();
+    if (
+      contentPackage?.gameType !== 'pronunciation-practice' ||
+      !question ||
+      this.completeState()
+    ) {
+      return;
+    }
+
+    this.answeredState.set(true);
+    this.feedbackState.set(
+      skipped
+        ? {
+            kind: 'reveal',
+            message: 'Nastavljamo bez snimke.',
+            explanation: 'Snimanje možeš ponovno isprobati u sljedećem krugu.',
+          }
+        : {
+            kind: 'success',
+            message:
+              contentPackage.practiceMode === 'SOUND'
+                ? 'Snimka je spremna za slušanje.'
+                : 'Snimka je spremljena za tekstualno prepoznavanje.',
+            explanation:
+              contentPackage.practiceMode === 'SOUND'
+                ? 'Poslušaj svoj pokušaj i usporedi ga s primjerom.'
+                : 'Prepoznavanje teksta nije procjena kvalitete izgovora.',
+          },
+    );
+  }
+
+  reopenPracticeRound(): void {
+    if (this.packageState()?.gameType !== 'pronunciation-practice' || this.completeState()) {
+      return;
+    }
+    this.answeredState.set(false);
+    this.feedbackState.set(null);
+  }
+
   next(): void {
     const contentPackage = this.packageState();
     if (!contentPackage || !this.answeredState()) {

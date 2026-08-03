@@ -14,6 +14,8 @@ describe('GamePlayerPage accessibility', () => {
   const prototypeSessions = {
     create: vi.fn().mockResolvedValue({ id: 'prototype-session-1' }),
     complete: vi.fn().mockResolvedValue({ id: 'prototype-session-1' }),
+    uploadAttempt: vi.fn().mockResolvedValue({ id: 'attempt-1' }),
+    deleteAttempt: vi.fn().mockResolvedValue(undefined),
   };
 
   beforeEach(async () => {
@@ -74,6 +76,43 @@ describe('GamePlayerPage accessibility', () => {
       expect(fixture.nativeElement.querySelector('app-microphone-practice')).toBeNull();
       expect(fixture.nativeElement.querySelector('[role="group"]')).not.toBeNull();
     }
+  });
+
+  it('requires listening and one recording in a pronunciation round without answer controls', async () => {
+    routeParams.next(convertToParamMap({ packageId: 'izgovor-rijeci-s' }));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(
+      (fixture.nativeElement.querySelector('#game-title') as HTMLElement).textContent,
+    ).toContain('Poslušaj i izgovori riječ.');
+    expect(fixture.nativeElement.querySelector('[role="group"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('app-microphone-practice')).not.toBeNull();
+    expect(
+      (fixture.nativeElement.querySelector('.microphone-button') as HTMLButtonElement).disabled,
+    ).toBe(true);
+    expect(fixture.nativeElement.querySelector('.next-button')).toBeNull();
+
+    (
+      fixture.nativeElement.querySelector(
+        '.pronunciation-board .listen-button',
+      ) as HTMLButtonElement
+    ).click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(
+      (fixture.nativeElement.querySelector('.microphone-button') as HTMLButtonElement).disabled,
+    ).toBe(false);
+
+    session.registerPracticeAttempt();
+    session.completePracticeRound();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.next-button')).not.toBeNull();
+    expect(session.totalPoints()).toBe(0);
+    expect(session.correctAnswers()).toBe(0);
   });
 
   it('moves focus to the next question heading after advancing', async () => {

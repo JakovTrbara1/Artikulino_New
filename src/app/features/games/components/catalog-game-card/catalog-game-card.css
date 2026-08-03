@@ -35,6 +35,13 @@
   --ink: #135d94;
 }
 
+.package-card[data-type='pronunciation-practice'] {
+  --background: #f1e8ff;
+  --border: #a985d9;
+  --shadow: #7651ad;
+  --ink: #573187;
+}
+
 .package-card:hover,
 .package-card:focus-within {
   transform: translateY(-0.3rem);

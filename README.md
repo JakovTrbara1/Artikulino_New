@@ -81,17 +81,20 @@ Detalji API-ja i granica nalaze se u
 
 ## Igre
 
-Implementirane su tri različite mehanike:
+Implementirane su četiri različite mehanike:
 
 1. **Slušaj i odluči** – kategorizacija riječi i rečenica.
 2. **Uhvati glas** – prepoznavanje ciljnog glasa ili razlikovanje kontrastnog para.
 3. **Gdje je glas?** – određivanje početka, sredine ili kraja riječi pomoću interaktivnog vlaka.
+4. **Vježbaj izgovor** – slušanje, snimanje i ponovno slušanje pojedinog glasa ili cijele riječi.
 
-Sve igre koriste isti zajednički tijek, bodovanje i praćenje sesije, ali imaju zasebne komponente za prikaz odgovora. Sadržaj nije ugrađen u komponente igre.
+Sve igre koriste isti zajednički tijek i praćenje sesije, ali imaju zasebne komponente za prikaz
+odgovora ili snimanje. Tri igre prepoznavanja koriste bodovanje, dok `Vježbaj izgovor` ne dodjeljuje
+bodove niti automatski procjenjuje kvalitetu izgovora. Sadržaj nije ugrađen u komponente igre.
 
-Model sadržaja također definira četvrtu vrstu, **Vježbaj izgovor**, s načinima vježbanja pojedinog
-glasa ili cijele riječi. Sadržaj i posebno sučelje te vrste dodaju se u sljedećim mentorom
-odobrenim koracima; trenutačno još nije ponuđena u katalogu.
+Katalog sadrži po jednu vježbu pojedinog glasa i cijelih riječi za R, L, S, Z, Š, Ž, C, Č i Ć.
+Vježba zahtijeva da dijete najprije posluša primjer, a zatim snimi barem jedan pokušaj. Ako
+preglednik odbije ili ne podržava mikrofon, ponuđen je jasan nastavak bez snimanja.
 
 Paketi `Uhvati glas` izričito razlikuju način `DETECT` od načina `DISCRIMINATE`. Paketi
 `Slušaj i odluči` ne navode ciljni glas kada ga zadatak stvarno ne vježba.
@@ -110,8 +113,7 @@ Novi paket dodaje se kao novi `ContentPackage` objekt. Nije potrebno stvarati no
 
 - vrstu igre, naziv, opis i cilj;
 - opcionalni ciljni i kontrastni glas, samo kada ih igra stvarno vježba;
-- način prepoznavanja (`DETECT` ili `DISCRIMINATE`) odnosno budući način izgovora (`SOUND` ili
-  `WORD`);
+- način prepoznavanja (`DETECT` ili `DISCRIMINATE`) odnosno način izgovora (`SOUND` ili `WORD`);
 - par glasova, temu i razinu;
 - tekst zadatka i tekst koji se izgovara;
 - opcionalni `audioSrc`, ilustraciju pitanja i `catalogImage` za karticu kataloga;
@@ -171,19 +173,23 @@ kvaliteta hrvatskog glasa ovise o uređaju.
 ## Mikrofon i privatnost
 
 Kategorije `Slušaj i odluči`, `Uhvati glas` i `Gdje je glas?` ne koriste mikrofon. Snimanje je
-rezervirano za zasebnu kategoriju `Vježbaj izgovor`, koja se dodaje u sljedećem razvojnom koraku.
-Postojeće povijesne testne snimke ostaju dostupne u pregledima roditelja i terapeuta.
+rezervirano za zasebnu kategoriju `Vježbaj izgovor`. Postojeće povijesne testne snimke ostaju
+dostupne u pregledima roditelja i terapeuta.
 
-Kada je panel za izgovor dostupan, mikrofon se aktivira isključivo nakon korisnikova klika.
-`MediaRecorder` omogućuje djetetu da snimi riječ, posluša snimku i izbriše je. Prelaskom na novo
-pitanje panel se vraća u početno stanje.
+U igri izgovora mikrofon se otključava tek nakon slušanja primjera. `MediaRecorder` omogućuje
+djetetu da snimi glas ili riječ, posluša snimku, snimi novi pokušaj i izbriše posljednji pokušaj.
+Prelaskom na novo pitanje panel se vraća u početno stanje.
 
 - snimka se asinkrono šalje samo lokalnom demonstracijskom poslužitelju;
 - više pokušaja za isto pitanje ostaje spremljeno uz sesiju aktivnog demo profila;
-- ne mijenja bodove i ne blokira sljedeće pitanje;
+- ne mijenja bodove; prvi zaustavljeni pokušaj otključava sljedeće pitanje;
 - neuspjelo slanje zadržava lokalnu snimku za ponovni pokušaj ili brisanje;
 - ograničena je na 15 sekundi i 10 MB;
 - aplikacija ne tvrdi da automatski ocjenjuje izgovor.
+
+Za pojedini glas dijete dobiva samo potvrdu spremanja i mogućnost ponovnog slušanja. Za cijelu
+riječ prikazuje se samo nenumerička obavijest da je snimka spremljena za tekstualno prepoznavanje.
+Prijepis i `Podudarnost teksta` ostaju isključivo u odraslim pregledima.
 
 Nakon spremanja Express asinkrono šalje samo audiodatoteku lokalnom FastAPI workeru. Pokušaj ima
 status `PENDING`, `COMPLETED` ili `FAILED`. Uspješan prijepis sprema tekst i cjelobrojnu

@@ -23,10 +23,10 @@ describe('GameCatalogPage', () => {
 
   afterEach(() => TestBed.resetTestingModule());
 
-  it('uses the three game types as toggle filters and removes the game select', () => {
+  it('uses the four game types as toggle filters and removes the game select', () => {
     const typeButtons = queryAll<HTMLButtonElement>('.game-type-toggle');
 
-    expect(typeButtons).toHaveLength(3);
+    expect(typeButtons).toHaveLength(4);
     expect(queryAll<HTMLSelectElement>('.filters select')).toHaveLength(3);
     expect(query<HTMLSelectElement>('select[data-filter="game-type"]')).toBeNull();
     expect(typeButtons.every((button) => button.getAttribute('aria-pressed') === 'false')).toBe(
@@ -58,6 +58,39 @@ describe('GameCatalogPage', () => {
     expect(query<HTMLSelectElement>('select[data-filter="theme"]')).toBeNull();
     expect(query<HTMLSelectElement>('select[data-filter="recognition-mode"]')).toBeNull();
     expect(queryAll<HTMLSelectElement>('.filters select')).toHaveLength(2);
+
+    requireElement<HTMLButtonElement>('button[data-type="pronunciation-practice"]').click();
+    fixture.detectChanges();
+    expect(query<HTMLSelectElement>('select[data-filter="sound"]')).not.toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="practice-mode"]')).not.toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="theme"]')).toBeNull();
+    expect(query<HTMLSelectElement>('select[data-filter="recognition-mode"]')).toBeNull();
+    expect(queryAll<HTMLSelectElement>('.filters select')).toHaveLength(3);
+  });
+
+  it('filters pronunciation games by sound and sound-or-word practice mode', () => {
+    requireElement<HTMLButtonElement>('button[data-type="pronunciation-practice"]').click();
+    fixture.detectChanges();
+
+    const soundSelect = requireElement<HTMLSelectElement>('select[data-filter="sound"]');
+    soundSelect.value = 'S';
+    soundSelect.dispatchEvent(new Event('change'));
+
+    const modeSelect = requireElement<HTMLSelectElement>('select[data-filter="practice-mode"]');
+    modeSelect.value = 'WORD';
+    modeSelect.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const expected = content.filter({
+      gameType: 'pronunciation-practice',
+      sound: 'S',
+      practiceMode: 'WORD',
+    });
+    expect(expected).toHaveLength(1);
+    expect(queryAll<HTMLElement>('.package-card')).toHaveLength(expected.length);
+    expect(requireElement<HTMLElement>('.package-card h3').textContent).toContain(
+      'Izgovori riječi s glasom S',
+    );
   });
 
   it('filters recognition games by detection mode and resets incompatible filters', () => {

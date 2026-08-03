@@ -8,8 +8,16 @@
         </svg>
       </span>
       <div>
-        <h2 id="microphone-title">Snimi svoj glas</h2>
-        <p>Nije obavezno. Za svako pitanje snima se nova snimka do 15 sekundi.</p>
+        <h2 id="microphone-title">
+          {{ required() ? 'Snimi svoj izgovor' : 'Snimi svoj glas' }}
+        </h2>
+        <p>
+          @if (required()) {
+            Snimi najmanje jedan pokušaj do 15 sekundi za nastavak.
+          } @else {
+            Nije obavezno. Za svako pitanje snima se nova snimka do 15 sekundi.
+          }
+        </p>
       </div>
     </div>
 
@@ -59,7 +67,7 @@
         <button
           class="microphone-button"
           type="button"
-          [disabled]="recorder.status() === 'unsupported'"
+          [disabled]="recorder.status() === 'unsupported' || disabled()"
           [attr.aria-label]="recorder.recording() ? 'Snimi novi pokušaj' : 'Započni snimanje'"
           (click)="startRecording()"
         >
@@ -78,7 +86,7 @@
           <strong>Snimanje je u tijeku</strong>
           <span>{{ formatDuration(recorder.durationMs()) }}</span>
         </div>
-        <p class="recording-help">Izgovori riječ, zatim zaustavi snimanje.</p>
+        <p class="recording-help">Izgovori {{ promptNoun() }}, zatim zaustavi snimanje.</p>
       } @else if (recorder.recording(); as recording) {
         <app-recording-preview [recording]="recording" (deleteRequested)="clearRecording()" />
       } @else {
@@ -86,25 +94,50 @@
           <strong>
             @if (recorder.status() === 'requesting') {
               Čekam dopuštenje…
+            } @else if (disabled()) {
+              Najprije poslušaj primjer
             } @else {
-              Dodirni mikrofon i izgovori riječ
+              Dodirni mikrofon i izgovori {{ promptNoun() }}
             }
           </strong>
-          <span>Snimanje ne utječe na bodove niti nastavak igre.</span>
+          <span>
+            @if (required()) {
+              Snimka ne utječe na bodove ni na procjenu kvalitete izgovora.
+            } @else {
+              Snimanje ne utječe na bodove niti nastavak igre.
+            }
+          </span>
         </div>
       }
     </div>
   </div>
 
   @if (recorder.status() === 'denied') {
-    <p class="notice" role="status">
-      Mikrofon nije dopušten. Uključi dopuštenje u postavkama preglednika pa pokušaj ponovno.
-    </p>
+    <div class="notice" role="status">
+      <p>Mikrofon nije dopušten. Uključi dopuštenje u postavkama preglednika pa pokušaj ponovno.</p>
+      @if (required()) {
+        <button class="button button--quiet" type="button" (click)="skipRequested.emit()">
+          Nastavi bez snimanja
+        </button>
+      }
+    </div>
   } @else if (recorder.status() === 'unsupported') {
-    <p class="notice" role="status">
-      Ovaj preglednik ne podržava snimanje. Igru možeš nastaviti bez mikrofona.
-    </p>
+    <div class="notice" role="status">
+      <p>Ovaj preglednik ne podržava snimanje. Igru možeš nastaviti bez mikrofona.</p>
+      @if (required()) {
+        <button class="button button--quiet" type="button" (click)="skipRequested.emit()">
+          Nastavi bez snimanja
+        </button>
+      }
+    </div>
   } @else if (recorder.status() === 'error') {
-    <p class="notice" role="status">Snimanje trenutačno nije dostupno. Pokušaj ponovno.</p>
+    <div class="notice" role="status">
+      <p>Snimanje trenutačno nije dostupno. Pokušaj ponovno.</p>
+      @if (required()) {
+        <button class="button button--quiet" type="button" (click)="skipRequested.emit()">
+          Nastavi bez snimanja
+        </button>
+      }
+    </div>
   }
 </section>

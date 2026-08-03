@@ -1,0 +1,38 @@
+<section class="pronunciation-board" aria-label="Vježba izgovora">
+  <div class="prompt-panel">
+    <div class="listen-area">
+      <p>Najprije poslušaj primjer.</p>
+      <button class="listen-button" type="button" [disabled]="isPlaying()" (click)="listen.emit()">
+        <span class="speaker" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="34" height="34">
+            <path
+              d="M5 10v4h4l5 4V6L9 10H5Zm12-1a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
+        {{ isPlaying() ? 'Slušaj…' : listenLabel() }}
+      </button>
+      <ng-content select="[audioNotice]" />
+    </div>
+
+    <div class="prompt-card">
+      @if (question().image; as image) {
+        <span class="prompt-art">
+          @if (image.src) {
+            <img [src]="image.src" [alt]="image.alt" width="320" height="320" />
+          } @else {
+            <span role="img" [attr.aria-label]="image.alt">{{ image.emoji }}</span>
+          }
+        </span>
+      }
+      <strong>{{ question().displayText || question().spokenText }}</strong>
+    </div>
+  </div>
+
+  <ng-content select="[recordingPanel]" />
+</section>
