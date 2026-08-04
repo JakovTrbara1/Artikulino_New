@@ -40,29 +40,79 @@ describe('GameSessionService', () => {
     expect(service.totalPoints()).toBe(7);
   });
 
-  it('completes pronunciation rounds after recording without awarding points', () => {
+  it('awards proportional pronunciation points and counts only the best retry', () => {
     const contentPackage = DEMO_CONTENT_PACKAGES.find((item) => item.id === 'izgovor-rijeci-s');
     expect(contentPackage).toBeDefined();
     service.start(contentPackage!);
 
     service.registerReplay();
     service.registerPracticeAttempt();
-    service.completePracticeRound();
+    service.markPracticeAttemptPending('attempt-1', 'izgovor-s-sunce');
+    const firstResult = service.resolvePracticeAttempt(
+      'attempt-1',
+      'izgovor-s-sunce',
+      'COMPLETED',
+      80,
+    );
 
     expect(service.isAnswered()).toBe(true);
     expect(service.attempts()).toBe(1);
     expect(service.replays()).toBe(1);
     expect(service.correctAnswers()).toBe(0);
-    expect(service.totalPoints()).toBe(0);
-    expect(service.feedback()).toMatchObject({
-      kind: 'success',
-      message: 'Snimka je spremljena za tekstualno prepoznavanje.',
-      explanation: 'Prepoznavanje teksta nije procjena kvalitete izgovora.',
+    expect(service.totalPoints()).toBe(12);
+    expect(firstResult).toEqual({
+      attemptId: 'attempt-1',
+      questionId: 'izgovor-s-sunce',
+      percentage: 80,
+      roundPoints: 12,
+      bestPoints: 12,
+      status: 'COMPLETED',
     });
 
-    service.reopenPracticeRound();
-    expect(service.isAnswered()).toBe(false);
-    expect(service.feedback()).toBeNull();
+    service.registerPracticeAttempt();
+    service.markPracticeAttemptPending('attempt-2', 'izgovor-s-sunce');
+    const lowerRetry = service.resolvePracticeAttempt(
+      'attempt-2',
+      'izgovor-s-sunce',
+      'COMPLETED',
+      60,
+    );
+
+    expect(service.attempts()).toBe(2);
+    expect(service.totalPoints()).toBe(12);
+    expect(lowerRetry).toMatchObject({ roundPoints: 9, bestPoints: 12 });
+
+    service.registerPracticeAttempt();
+    service.markPracticeAttemptPending('attempt-3', 'izgovor-s-sunce');
+    const betterRetry = service.resolvePracticeAttempt(
+      'attempt-3',
+      'izgovor-s-sunce',
+      'COMPLETED',
+      100,
+    );
+
+    expect(service.attempts()).toBe(3);
+    expect(service.totalPoints()).toBe(15);
+    expect(betterRetry).toMatchObject({ roundPoints: 15, bestPoints: 15 });
+  });
+
+  it('allows continuation with zero new points when transcription fails', () => {
+    const contentPackage = DEMO_CONTENT_PACKAGES.find((item) => item.id === 'izgovor-glas-l');
+    expect(contentPackage).toBeDefined();
+    service.start(contentPackage!);
+
+    service.registerPracticeAttempt();
+    service.markPracticeAttemptPending('attempt-1', 'izgovor-l-slog-a');
+    const result = service.resolvePracticeAttempt('attempt-1', 'izgovor-l-slog-a', 'FAILED');
+
+    expect(service.isAnswered()).toBe(true);
+    expect(service.totalPoints()).toBe(0);
+    expect(result).toMatchObject({
+      roundPoints: 0,
+      bestPoints: 0,
+      status: 'FAILED',
+    });
+    expect(service.feedback()?.message).toBe('Rezultat trenutačno nije dostupan.');
   });
 
   it('allows a safe pronunciation exit after microphone failure without a fake score', () => {
@@ -70,7 +120,7 @@ describe('GameSessionService', () => {
     expect(contentPackage).toBeDefined();
     service.start(contentPackage!);
 
-    service.completePracticeRound(true);
+    service.skipPracticeRound();
 
     expect(service.isAnswered()).toBe(true);
     expect(service.attempts()).toBe(0);

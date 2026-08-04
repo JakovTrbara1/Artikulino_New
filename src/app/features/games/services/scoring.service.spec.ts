@@ -29,4 +29,12 @@ describe('ScoringService', () => {
     expect(service.applyReplayPenalty({ ...rules, replayPenalty: 3 }, 20)).toBe(17);
     expect(service.applyReplayPenalty({ ...rules, replayPenalty: 30 }, 20)).toBe(0);
   });
+
+  it('awards proportional pronunciation points from text match', () => {
+    expect(service.calculatePracticePoints(rules, 83)).toBe(17);
+    expect(service.calculatePracticePoints(rules, 100)).toBe(20);
+    expect(service.calculatePracticePoints(rules, 0)).toBe(0);
+    expect(service.calculatePracticePoints(rules, -20)).toBe(0);
+    expect(service.calculatePracticePoints(rules, 140)).toBe(20);
+  });
 });

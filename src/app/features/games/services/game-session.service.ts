@@ -1,5 +1,9 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ContentPackage, GameSessionResult } from '../models/content-package.model';
+import {
+  PracticeRoundResult,
+  PracticeRoundResultStatus,
+} from '../models/practice-round-result.model';
 import { ScoringService } from './scoring.service';
 
 export interface GameFeedback {
@@ -21,9 +25,11 @@ export class GameSessionService {
   private readonly longestStreakState = signal(0);
   private readonly pointsState = signal(0);
   private readonly feedbackState = signal<GameFeedback | null>(null);
+  private readonly practiceRoundResultState = signal<PracticeRoundResult | null>(null);
   private readonly answeredState = signal(false);
   private readonly completeState = signal(false);
   private readonly completedResultState = signal<GameSessionResult | null>(null);
+  private readonly bestPracticePoints = new Map<string, number>();
   private startedAt = Date.now();
 
   readonly contentPackage = this.packageState.asReadonly();
@@ -39,6 +45,7 @@ export class GameSessionService {
   readonly longestStreak = this.longestStreakState.asReadonly();
   readonly totalPoints = this.pointsState.asReadonly();
   readonly feedback = this.feedbackState.asReadonly();
+  readonly practiceRoundResult = this.practiceRoundResultState.asReadonly();
   readonly isAnswered = this.answeredState.asReadonly();
   readonly isComplete = this.completeState.asReadonly();
   readonly completedResult = this.completedResultState.asReadonly();
@@ -62,9 +69,11 @@ export class GameSessionService {
     this.longestStreakState.set(0);
     this.pointsState.set(0);
     this.feedbackState.set(null);
+    this.practiceRoundResultState.set(null);
     this.answeredState.set(false);
     this.completeState.set(false);
     this.completedResultState.set(null);
+    this.bestPracticePoints.clear();
     this.startedAt = Date.now();
   }
 
@@ -134,9 +143,95 @@ export class GameSessionService {
       return;
     }
     this.attemptsState.update((count) => count + 1);
+    this.answeredState.set(false);
+    this.feedbackState.set(null);
+    this.practiceRoundResultState.set(null);
   }
 
-  completePracticeRound(skipped = false): void {
+  markPracticeAttemptPending(attemptId: string, questionId: string): void {
+    const contentPackage = this.packageState();
+    if (
+      contentPackage?.gameType !== 'pronunciation-practice' ||
+      this.currentQuestion()?.id !== questionId ||
+      this.completeState()
+    ) {
+      return;
+    }
+
+    this.practiceRoundResultState.set({
+      attemptId,
+      questionId,
+      roundPoints: 0,
+      bestPoints: this.bestPracticePoints.get(questionId) ?? 0,
+      status: 'PENDING',
+    });
+  }
+
+  resolvePracticeAttempt(
+    attemptId: string,
+    questionId: string,
+    status: Exclude<PracticeRoundResultStatus, 'PENDING'>,
+    percentage?: number,
+  ): PracticeRoundResult | undefined {
+    const contentPackage = this.packageState();
+    if (
+      contentPackage?.gameType !== 'pronunciation-practice' ||
+      this.currentQuestion()?.id !== questionId ||
+      this.completeState()
+    ) {
+      return undefined;
+    }
+
+    const previousBest = this.bestPracticePoints.get(questionId) ?? 0;
+    if (status !== 'COMPLETED') {
+      const unavailableResult: PracticeRoundResult = {
+        attemptId,
+        questionId,
+        roundPoints: 0,
+        bestPoints: previousBest,
+        status,
+      };
+      this.practiceRoundResultState.set(unavailableResult);
+      this.answeredState.set(true);
+      this.feedbackState.set({
+        kind: 'reveal',
+        message: 'Rezultat trenutačno nije dostupan.',
+        explanation: 'Snimka ostaje spremljena. Možeš pokušati ponovno ili nastaviti bez bodova.',
+        earnedPoints: 0,
+      });
+      return unavailableResult;
+    }
+
+    const normalizedPercentage = Math.min(100, Math.max(0, Math.round(percentage ?? 0)));
+    const roundPoints = this.scoring.calculatePracticePoints(
+      contentPackage.scoring,
+      normalizedPercentage,
+    );
+    const bestPoints = Math.max(previousBest, roundPoints);
+    const addedPoints = bestPoints - previousBest;
+    this.bestPracticePoints.set(questionId, bestPoints);
+    this.pointsState.update((points) => points + addedPoints);
+
+    const completedResult: PracticeRoundResult = {
+      attemptId,
+      questionId,
+      percentage: normalizedPercentage,
+      roundPoints,
+      bestPoints,
+      status,
+    };
+    this.practiceRoundResultState.set(completedResult);
+    this.answeredState.set(true);
+    this.feedbackState.set({
+      kind: 'success',
+      message: `Podudarnost teksta: ${normalizedPercentage}%`,
+      explanation: `Ovaj pokušaj vrijedi ${roundPoints} bodova. Za ovaj krug računamo najbolji rezultat: ${bestPoints}.`,
+      earnedPoints: addedPoints,
+    });
+    return completedResult;
+  }
+
+  skipPracticeRound(): void {
     const contentPackage = this.packageState();
     const question = this.currentQuestion();
     if (
@@ -148,25 +243,12 @@ export class GameSessionService {
     }
 
     this.answeredState.set(true);
-    this.feedbackState.set(
-      skipped
-        ? {
-            kind: 'reveal',
-            message: 'Nastavljamo bez snimke.',
-            explanation: 'Snimanje možeš ponovno isprobati u sljedećem krugu.',
-          }
-        : {
-            kind: 'success',
-            message:
-              contentPackage.practiceMode === 'SOUND'
-                ? 'Snimka je spremna za slušanje.'
-                : 'Snimka je spremljena za tekstualno prepoznavanje.',
-            explanation:
-              contentPackage.practiceMode === 'SOUND'
-                ? 'Poslušaj svoj pokušaj i usporedi ga s primjerom.'
-                : 'Prepoznavanje teksta nije procjena kvalitete izgovora.',
-          },
-    );
+    this.practiceRoundResultState.set(null);
+    this.feedbackState.set({
+      kind: 'reveal',
+      message: 'Nastavljamo bez snimke.',
+      explanation: 'Snimanje možeš ponovno isprobati u sljedećem krugu.',
+    });
   }
 
   reopenPracticeRound(): void {
@@ -175,6 +257,7 @@ export class GameSessionService {
     }
     this.answeredState.set(false);
     this.feedbackState.set(null);
+    this.practiceRoundResultState.set(null);
   }
 
   next(): void {
@@ -191,6 +274,7 @@ export class GameSessionService {
     this.indexState.update((index) => index + 1);
     this.questionAttemptsState.set(0);
     this.feedbackState.set(null);
+    this.practiceRoundResultState.set(null);
     this.answeredState.set(false);
   }
 

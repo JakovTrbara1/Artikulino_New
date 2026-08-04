@@ -56,9 +56,10 @@ The entire `server/runtime/` directory is Git-ignored. Database responses expose
 and authenticated audio endpoints, never physical filesystem paths. Multer is the only new runtime
 dependency; it provides bounded multipart parsing for MediaRecorder uploads.
 
-Every stopped recording is an independent attempt. Uploading is asynchronous and never changes
-game scoring or progression. Session, attempt, and child-profile deletion removes both database
-records and associated audio files.
+Every stopped recording is an independent attempt. Uploading is asynchronous and does not itself
+change game scoring. Pronunciation gameplay may award proportional points only after a completed
+text-match result; recognition-game scoring is unchanged. Session, attempt, and child-profile
+deletion removes both database records and associated audio files.
 
 After upload, an attempt starts as `PENDING`. Express submits only the stored audio to the local
 worker, one attempt at a time. A successful result becomes `COMPLETED` and stores the transcript
@@ -69,7 +70,8 @@ name, package, score, or stable child identifier.
 `Podudarnost teksta` is normalized Levenshtein similarity. Normalization lowercases Croatian text,
 collapses whitespace, removes punctuation, and preserves Croatian diacritics. Exact text is 100;
 an empty transcript is 0. It is not a pronunciation or clinical score and never affects game
-points.
+points outside pronunciation practice. Pronunciation points use
+`round(basePoints × textMatch / 100)`, with only the best retained attempt per question counted.
 
 ## API
 

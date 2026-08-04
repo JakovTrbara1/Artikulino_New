@@ -97,6 +97,38 @@ describe('demonstration content packages', () => {
     }
   });
 
+  it('uses four different A/E/I/O syllables for every isolated-sound package', () => {
+    const soundPackages = DEMO_CONTENT_PACKAGES.filter(
+      (contentPackage) =>
+        contentPackage.gameType === 'pronunciation-practice' &&
+        contentPackage.practiceMode === 'SOUND',
+    );
+
+    for (const contentPackage of soundPackages) {
+      const sound = contentPackage.targetSound;
+      expect(contentPackage.questions.map((question) => question.spokenText)).toEqual([
+        `${sound}A`,
+        `${sound}E`,
+        `${sound}I`,
+        `${sound}O`,
+      ]);
+      expect(new Set(contentPackage.questions.map((question) => question.id)).size).toBe(4);
+    }
+  });
+
+  it('keeps the existing whole-word pronunciation prompts unchanged', () => {
+    const wordsWithL = DEMO_CONTENT_PACKAGES.find(
+      (contentPackage) => contentPackage.id === 'izgovor-rijeci-l',
+    );
+
+    expect(wordsWithL?.questions.map((question) => question.spokenText)).toEqual([
+      'lopta',
+      'lutka',
+      'balon',
+      'vlak',
+    ]);
+  });
+
   it('uses the optimized catalog illustration for every supported theme', () => {
     const expectedSources = new Map([
       ['hrana', '/assets/games/themes/food.webp'],

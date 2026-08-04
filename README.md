@@ -87,15 +87,17 @@ Implementirane su četiri različite mehanike:
 1. **Slušaj i odluči** – kategorizacija riječi i rečenica.
 2. **Uhvati glas** – prepoznavanje ciljnog glasa ili razlikovanje kontrastnog para.
 3. **Gdje je glas?** – određivanje početka, sredine ili kraja riječi pomoću interaktivnog vlaka.
-4. **Vježbaj izgovor** – slušanje, snimanje i ponovno slušanje pojedinog glasa ili cijele riječi.
+4. **Vježbaj izgovor** – slušanje, snimanje i ponovno slušanje slogova ili cijelih riječi.
 
 Sve igre koriste isti zajednički tijek i praćenje sesije, ali imaju zasebne komponente za prikaz
-odgovora ili snimanje. Tri igre prepoznavanja koriste bodovanje, dok `Vježbaj izgovor` ne dodjeljuje
-bodove niti automatski procjenjuje kvalitetu izgovora. Sadržaj nije ugrađen u komponente igre.
+odgovora ili snimanje. Igre prepoznavanja koriste postojeće bodovanje odgovora, dok `Vježbaj
+izgovor` dodjeljuje razmjerne bodove samo iz tekstualne podudarnosti očekivanog i prepoznatog
+teksta. Ta vrijednost nije procjena kvalitete izgovora. Sadržaj nije ugrađen u komponente igre.
 
-Katalog sadrži po jednu vježbu pojedinog glasa i cijelih riječi za R, L, S, Z, Š, Ž, C, Č i Ć.
-Vježba zahtijeva da dijete najprije posluša primjer, a zatim snimi barem jedan pokušaj. Ako
-preglednik odbije ili ne podržava mikrofon, ponuđen je jasan nastavak bez snimanja.
+Katalog sadrži po jednu vježbu slogova i cijelih riječi za R, L, S, Z, Š, Ž, C, Č i Ć. Svaka
+vježba sloga koristi četiri različita poticaja s vokalima A, E, I i O. Vježba zahtijeva da dijete
+najprije posluša primjer, a zatim snimi barem jedan pokušaj. Ako preglednik odbije ili ne podržava
+mikrofon, ponuđen je jasan nastavak bez snimanja.
 
 Paketi `Uhvati glas` izričito razlikuju način `DETECT` od načina `DISCRIMINATE`. Paketi
 `Slušaj i odluči` ne navode ciljni glas kada ga zadatak stvarno ne vježba.
@@ -184,19 +186,22 @@ Prelaskom na novo pitanje panel se vraća u početno stanje.
 
 - snimka se asinkrono šalje samo lokalnom demonstracijskom poslužitelju;
 - više pokušaja za isto pitanje ostaje spremljeno uz sesiju aktivnog demo profila;
-- ne mijenja bodove; prvi zaustavljeni pokušaj otključava sljedeće pitanje;
+- aplikacija provjerava stanje prijepisa jednom u sekundi, najdulje 30 sekundi;
+- bodovi su `round(osnovni bodovi × Podudarnost teksta / 100)`;
+- za pitanje se računa samo najbolji pokušaj, pa slabiji ponovni pokušaj ne smanjuje bodove;
+- neuspjeli ili istekli prijepis ostavlja snimku i dopušta novi pokušaj ili nastavak bez bodova;
 - neuspjelo slanje zadržava lokalnu snimku za ponovni pokušaj ili brisanje;
 - ograničena je na 15 sekundi i 10 MB;
 - aplikacija ne tvrdi da automatski ocjenjuje izgovor.
 
-Za pojedini glas dijete dobiva samo potvrdu spremanja i mogućnost ponovnog slušanja. Za cijelu
-riječ prikazuje se samo nenumerička obavijest da je snimka spremljena za tekstualno prepoznavanje.
-Prijepis i `Podudarnost teksta` ostaju isključivo u odraslim pregledima.
+Nakon obrade dijete vidi samo `Podudarnost teksta` i razmjerne bodove za taj krug; sam prijepis
+ostaje u odraslim pregledima. Rezultat se ne naziva kvalitetom izgovora ni logopedskom procjenom.
 
 Nakon spremanja Express asinkrono šalje samo audiodatoteku lokalnom FastAPI workeru. Pokušaj ima
 status `PENDING`, `COMPLETED` ili `FAILED`. Uspješan prijepis sprema tekst i cjelobrojnu
 `Podudarnost teksta`, dobivenu normaliziranom Levenshteinovom sličnošću. To nije procjena
-izgovora, ne prikazuje se djetetu i ne utječe na bodove. Neuspjeh prijepisa ne briše snimku.
+izgovora. U igri izgovora može utjecati samo na razmjerne bodove prema prethodnoj formuli;
+neuspjeh prijepisa ne briše snimku.
 
 Nakon zaustavljanja panel emitira tipizirani `RecordedAttempt` (audio blob, MIME tip, trajanje, ID
 pitanja i redni broj pokušaja). Metapodaci se spremaju u SQLite, a audio u

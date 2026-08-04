@@ -515,16 +515,22 @@ function validatePronunciationPrompt(
     return;
   }
 
-  if (
-    contentPackage.practiceMode === 'SOUND' &&
-    spokenText.toLocaleLowerCase('hr-HR').trim() !== targetSound.toLocaleLowerCase('hr-HR')
-  ) {
-    addIssue(
-      issues,
-      'invalid-target-occurrence',
-      `${questionPath}.spokenText`,
-      `Vježba pojedinog glasa mora izgovarati samo glas ${targetSound}.`,
-    );
+  if (contentPackage.practiceMode === 'SOUND') {
+    const normalizedPrompt = spokenText.toLocaleUpperCase('hr-HR').trim();
+    const normalizedSound = targetSound.toLocaleUpperCase('hr-HR');
+    const vowel = normalizedPrompt.slice(normalizedSound.length);
+    if (
+      !normalizedPrompt.startsWith(normalizedSound) ||
+      normalizedPrompt !== `${normalizedSound}${vowel}` ||
+      !['A', 'E', 'I', 'O'].includes(vowel)
+    ) {
+      addIssue(
+        issues,
+        'invalid-target-occurrence',
+        `${questionPath}.spokenText`,
+        `Vježba pojedinog glasa mora koristiti slog ${targetSound} s vokalom A, E, I ili O.`,
+      );
+    }
   }
 
   if (contentPackage.practiceMode === 'WORD' && !containsSound(spokenText, targetSound)) {
