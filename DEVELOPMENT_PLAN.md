@@ -321,7 +321,7 @@ git diff --check
 ### Milestone 22 — Varied pronunciation rounds and proportional scoring
 
 - Branch: `codex/pronunciation-round-scoring`
-- Status: implemented and validated on the milestone branch; review is pending.
+- Status: merged through pull request #29.
 - Replace repeated isolated sounds with four syllables using A/E/I/O:
   - R: RA, RE, RI, RO;
   - L: LA, LE, LI, LO;
@@ -337,6 +337,7 @@ git diff --check
 ### Milestone 23 — Unique artwork and larger decorations
 
 - Branch: `codex/unique-game-artwork`
+- Status: implemented and validated on the milestone branch; review is pending.
 - Generate one distinct optimized WebP illustration for every game.
 - Assign artwork by package rather than sharing one image per theme.
 - Replace the pronunciation category symbol with an unmistakable code-native lips SVG.

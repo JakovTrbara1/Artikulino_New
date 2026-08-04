@@ -106,6 +106,28 @@ describe('content package validation', () => {
     );
   });
 
+  it('reports catalog illustrations reused by different games', () => {
+    const catalogImage = {
+      src: '/assets/games/catalog/shared.webp',
+      alt: 'Ilustracija za dvije igre',
+    };
+    const packages = [
+      createPackage({ catalogImage }),
+      createPackage({
+        id: 'package-2',
+        catalogImage,
+        questions: [createQuestion({ id: 'question-2' })],
+      }),
+    ];
+
+    expect(validateContentPackages(packages)).toContainEqual({
+      code: 'duplicate-catalog-image',
+      path: 'packages[1].catalogImage.src',
+      message:
+        'Ilustracija kataloga "/assets/games/catalog/shared.webp" već je povezana s drugom igrom.',
+    });
+  });
+
   it('reports missing text, questions, answers, correct answers and image metadata', () => {
     const incompleteQuestion = createQuestion({
       id: ' ',

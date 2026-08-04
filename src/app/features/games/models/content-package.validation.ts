@@ -26,6 +26,7 @@ export type ContentValidationIssueCode =
   | 'invalid-scoring'
   | 'missing-image-source'
   | 'missing-image-alt'
+  | 'duplicate-catalog-image'
   | 'invalid-target-occurrence'
   | 'missing-professional-review'
   | 'invalid-review-status'
@@ -46,6 +47,7 @@ export function validateContentPackages(
   const issues: ContentValidationIssue[] = [];
   const packageIds = new Set<string>();
   const questionIds = new Set<string>();
+  const catalogImageSources = new Set<string>();
 
   packages.forEach((contentPackage, packageIndex) => {
     const packagePath = `packages[${packageIndex}]`;
@@ -81,6 +83,18 @@ export function validateContentPackages(
         `${packagePath}.catalogImage`,
         'Ilustracija kataloga',
       );
+      const catalogImageSource = contentPackage.catalogImage.src?.trim();
+      if (catalogImageSource) {
+        if (catalogImageSources.has(catalogImageSource)) {
+          addIssue(
+            issues,
+            'duplicate-catalog-image',
+            `${packagePath}.catalogImage.src`,
+            `Ilustracija kataloga "${catalogImageSource}" već je povezana s drugom igrom.`,
+          );
+        }
+        catalogImageSources.add(catalogImageSource);
+      }
     }
 
     if (contentPackage.id.trim()) {

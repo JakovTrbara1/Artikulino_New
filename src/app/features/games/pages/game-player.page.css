@@ -1,5 +1,6 @@
 .player-shell {
   position: relative;
+  overflow-x: clip;
   padding-top: 1.25rem;
 }
 
@@ -9,17 +10,17 @@
 }
 
 .edge-decoration {
-  width: clamp(6rem, 10vw, 9rem);
+  width: clamp(9rem, 15vw, 13rem);
 }
 
 .edge-decoration--left {
   top: 12rem;
-  left: clamp(-7.5rem, -6vw, -4.5rem);
+  left: clamp(-9rem, -8vw, -7rem);
 }
 
 .edge-decoration--right {
   top: 7rem;
-  right: clamp(-7.5rem, -6vw, -4.5rem);
+  right: clamp(-9rem, -8vw, -7rem);
 }
 
 .game-surface,

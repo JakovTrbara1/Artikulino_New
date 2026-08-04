@@ -105,6 +105,17 @@
   stroke-width: 2.8;
 }
 
+.lips-icon .lip-shape {
+  fill: currentColor;
+  stroke: none;
+}
+
+.lips-icon .lip-seam {
+  fill: none;
+  stroke: var(--icon-background);
+  stroke-width: 2.4;
+}
+
 .type-copy {
   min-width: 0;
 }
