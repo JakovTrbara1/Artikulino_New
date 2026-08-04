@@ -626,6 +626,26 @@ export class PrototypeDatabase {
       { readonly storageName: string; readonly mimeType: string } | undefined;
   }
 
+  getRecordingAttemptForOwner(
+    ownerUserId: string,
+    attemptId: string,
+  ): PrototypeRecordingAttempt | undefined {
+    const row = this.sqlite
+      .prepare(
+        `SELECT recording_attempts.*,
+                therapist_reviews.status AS review_status,
+                therapist_reviews.comment AS review_comment,
+                therapist_reviews.reviewed_at
+         FROM recording_attempts
+         JOIN game_sessions ON game_sessions.id = recording_attempts.session_id
+         JOIN demo_children ON demo_children.id = game_sessions.child_id
+         LEFT JOIN therapist_reviews ON therapist_reviews.attempt_id = recording_attempts.id
+         WHERE recording_attempts.id = ? AND demo_children.owner_user_id = ?`,
+      )
+      .get(attemptId, ownerUserId) as RecordingAttemptDatabaseRow | undefined;
+    return row ? this.mapRecordingAttempt(row) : undefined;
+  }
+
   getAttemptStorageName(ownerUserId: string, attemptId: string): string | undefined {
     const row = this.sqlite
       .prepare(

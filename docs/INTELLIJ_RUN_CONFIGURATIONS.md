@@ -34,10 +34,12 @@ Create another **npm** configuration:
 - Name: `Artikulino - Express API`
 - `package.json`: the project-root `package.json`
 - Command: `run`
-- Scripts: `server:start`
+- Scripts: `server:dev`
 - Node interpreter: project default
 
-Expected health endpoint: `http://localhost:3000/api/health`.
+Expected health endpoint: `http://localhost:3000/api/health`. The development script watches
+`server/src/` and restarts Express after backend changes, so Angular cannot silently continue
+against an older API contract.
 
 ## 3. Croatian transcription worker
 

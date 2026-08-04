@@ -32,12 +32,14 @@ const SUPPORTED_MIME_TYPES = new Map([
   ['audio/wav', 'wav'],
   ['audio/x-wav', 'wav'],
 ]);
-const GAME_TYPES = new Set<PrototypeGameType>([
+export const PROTOTYPE_API_CONTRACT_VERSION = 2;
+export const SUPPORTED_GAME_TYPES: readonly PrototypeGameType[] = [
   'listen-and-decide',
   'catch-the-sound',
   'sound-position',
   'pronunciation-practice',
-]);
+];
+const GAME_TYPES = new Set<PrototypeGameType>(SUPPORTED_GAME_TYPES);
 const DIFFICULTIES = new Set<PrototypeDifficulty>(['EASY', 'MEDIUM', 'HARD']);
 const REVIEW_STATUSES = new Set<TherapistReviewStatus>([
   'NOT_REVIEWED',
@@ -184,6 +186,8 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
   app.get('/api/health', async (_request, response) => {
     response.json({
       status: 'ok',
+      apiContractVersion: PROTOTYPE_API_CONTRACT_VERSION,
+      supportedGameTypes: SUPPORTED_GAME_TYPES,
       mode: 'LOCAL_THESIS_PROTOTYPE',
       transcription: await transcriptionClient.health(),
     });
@@ -404,6 +408,18 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
     }
     response.type(recording.mimeType);
     response.sendFile(join(recordingsDirectory, recording.storageName));
+  });
+
+  app.get('/api/attempts/:attemptId', requireAuth, requireParent, (request, response) => {
+    const attempt = database.getRecordingAttemptForOwner(
+      currentUser(response).id,
+      routeParameter(request.params['attemptId']),
+    );
+    if (!attempt) {
+      response.status(404).json({ message: 'Pokušaj snimanja nije pronađen.' });
+      return;
+    }
+    response.json({ attempt });
   });
 
   app.put('/api/attempts/:attemptId/review', requireAuth, requireTherapist, (request, response) => {
