@@ -268,9 +268,10 @@ Globalni design tokeni, reset i zajednički stilovi nalaze se u `src/main.css`. 
   provjere nalaze se u `docs/CONTENT_PACKAGES.md`.
 - Speech Synthesis glas i MediaRecorder format ovise o pregledniku i operacijskom sustavu.
 - Zapakirani audiozapisi nisu dio MVP-a; govorni poticaji trenutačno koriste Speech Synthesis.
-- Sve kartice kataloga koriste optimizirane lokalne tematske ilustracije putem `catalogImage`.
-  Paket „Što jedemo?” dodatno koristi lokalne ilustracije pitanja putem `image.src`; ostali emoji
-  poticaji mogu se zamijeniti istim postupkom bez promjene logike igre.
+- Svaka od 34 kartice kataloga koristi vlastitu optimiziranu lokalnu WebP ilustraciju putem
+  `catalogImage`; nijedna putanja nije podijeljena između dvije igre. Paket „Što jedemo?” dodatno
+  koristi lokalne ilustracije pitanja putem `image.src`; ostali emoji poticaji mogu se zamijeniti
+  istim postupkom bez promjene logike igre.
 
 Vizualni koncept primarnog ekrana nalazi se u `docs/design/artikulino-game-concept.png`.
 
@@ -302,10 +303,12 @@ Odobrene vizualne reference nalaze se u `docs/design/`:
 - `gameplay-recording-desktop.png` i `gameplay-recording-mobile.png`;
 - `therapist-review-desktop.png`.
 
-Optimizirane transparentne soft-toy ilustracije za osam tema nalaze se u
-`public/assets/games/themes/`, a nenametljive rubne dekoracije u
-`public/assets/games/decorations/`. Katalog povezuje tematske ilustracije s karticama, boji ih prema
-vrsti igre i koristi četiri pristupačna preklopna gumba kao prvi filtar.
+Jedinstvene optimizirane transparentne soft-toy ilustracije za svih 34 igre nalaze se u
+`public/assets/games/catalog/`, a povećane rubne dekoracije u
+`public/assets/games/decorations/`. Katalog povezuje ilustracije s konkretnim igrama, boji kartice
+prema vrsti igre i koristi četiri pristupačna preklopna gumba kao prvi filtar. Naredba
+`npm run assets:check` provjerava da ilustracije postoje, da se njihove putanje i sadržaj ne
+ponavljaju te da ostaju unutar dogovorenih ograničenja veličine.
 
 Lokalni backend, testni računi, izmišljeni profili, sesije, višestruki pokušaji snimanja, lokalni
 hrvatski prijepis, četiri mentorom usklađene vrste igara, podijeljeni roditeljski pregled i

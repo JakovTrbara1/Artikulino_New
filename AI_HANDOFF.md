@@ -61,12 +61,12 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/pronunciation-round-scoring`
+- Current implementation branch: `codex/unique-game-artwork`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `7eeb096`.
-- Milestone 21 is merged through pull request #28.
-- Milestone 22 adds varied syllable prompts, bounded attempt polling, and proportional
-  best-attempt pronunciation scoring.
+- Base: `origin/main` at merge commit `ef2c2f7`.
+- Milestone 22 is merged through pull request #29.
+- Milestone 23 assigns a separately generated illustration to every game, clarifies the
+  pronunciation icon, and enlarges desktop edge decorations.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -112,8 +112,8 @@ npx prettier . --check
 - Explicit professional-review metadata; all current demo packages are marked `NOT_REVIEWED`.
 - Four optimized local food illustrations in the priority “Što jedemo?” package, with retained
   emoji fallbacks and documented provenance.
-- Eight optimized transparent soft-toy theme illustrations mapped to demo packages through
-  `catalogImage`, plus four restrained catalog/gameplay edge decorations.
+- Thirty-four optimized transparent soft-toy catalog illustrations mapped one-to-one to games
+  through `catalogImage`, plus four enlarged catalog/gameplay edge decorations.
 - Rounded game cards use consistent type colors, theme artwork, gentle hover/focus depth, and a
   separate accessible information popover.
 - Provider-neutral `SPEECH_TRANSCRIPTION` browser boundary with a default disabled adapter and no
@@ -182,6 +182,7 @@ npx prettier . --check
   database.
 - `docs/PROTOTYPE_BACKEND.md`: local service setup, API, storage, and security boundaries.
 - `public/assets/games/`: generated game assets.
+- `public/assets/games/catalog/`: 34 unique transparent catalog illustrations, one per game.
 - `public/assets/games/themes/`: transparent soft-toy artwork for all eight supported themes.
 - `public/assets/games/decorations/`: decorative catalog/gameplay edge artwork.
 - `docs/CONTENT_PACKAGES.md`: guide for adding new packages.
@@ -384,6 +385,26 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   deleted; no recordings or existing completed sessions were changed.
 - Real microphone capture and audible Croatian syllable quality remain target-device checks.
 
+## Milestone 23 Validation
+
+- `npm run assets:check` passed for 34 unique WebP paths and hashes, valid containers, referenced
+  files, and size limits. The optimized set totals 1.205 MB and its largest file is 74.5 KB.
+- `npm run prototype:check` passed: the Angular build, 20 frontend files/104 tests, three Express
+  files/25 tests, five Python tests, the asset gate, and repository-wide Prettier checks all pass.
+- The build reports only the previously documented progress-page and therapist-page CSS budget
+  warnings; the changed catalog and gameplay styles remain within their component budgets.
+- Reusable validation rejects a catalog image path shared by two games. Demo-content tests require
+  one meaningful alt description and one `/assets/games/catalog/` path for each of all 34 games.
+- Contact-sheet review confirmed distinct compositions for all listening, sound-recognition,
+  sound-position, isolated-sound, and whole-word games.
+- In-app Browser review at 1280 × 720 and responsive Chrome checks at 1440 × 1000 and 390 × 844
+  confirmed all 34 images load at their native 512 × 512 size, category toggles retain unique
+  artwork, the lips icon is clear, desktop decorations are enlarged, narrow-screen decorations are
+  hidden, and neither layout has horizontal overflow or console errors.
+- Gameplay checks confirmed the enlarged desktop decorations remain pointer-free at the content
+  edges and disappear at the mobile breakpoint. The temporary empty QA session was deleted by its
+  exact ID; existing runtime data was not reset or changed.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
@@ -393,8 +414,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   session creation. Development instructions use `server:dev`.
 - Isolated-sound pronunciation packages now use four different A/E/I/O syllables while whole-word
   packages remain unchanged.
-- Catalog cards currently reuse one image per theme. Milestone 23 assigns a distinct optimized
-  illustration to every package and enlarges edge decorations.
+- Catalog cards now use one separately generated image per game. The asset check prevents shared
+  paths, duplicate file bytes, missing references, invalid WebP containers, and size regressions.
 - Child pronunciation gameplay now shows bounded pending status and inline text-match points.
   Milestone 24 replaces the interim feedback with the approved accessible celebration modal.
 - No external ASR provider or automatic articulation error detection is implemented. The original
@@ -424,9 +445,9 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review and merge Milestone 22.
-2. Implement Milestone 23 on `codex/unique-game-artwork` after Milestone 22 is merged.
-3. Implement Milestones 24–25 sequentially only after each dependency is merged and validated.
+1. Review and merge Milestone 23.
+2. Implement Milestone 24 on `codex/pronunciation-celebration-ui` after Milestone 23 is merged.
+3. Implement Milestone 25 only after Milestone 24 is merged and validated.
 4. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
    screen-reader checks on the target device during Milestone 25.
 

@@ -89,6 +89,10 @@ svg {
   filter: drop-shadow(0 0.65rem 0.75rem rgb(13 49 95 / 12%));
 }
 
+.edge-decoration--foreground {
+  z-index: 2;
+}
+
 h1,
 h2,
 h3,

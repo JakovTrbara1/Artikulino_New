@@ -9,17 +9,17 @@
 }
 
 .edge-decoration {
-  width: clamp(5rem, 8vw, 7rem);
+  width: clamp(7.5rem, 12vw, 10.5rem);
 }
 
 .edge-decoration--left {
   top: 9rem;
-  left: clamp(-6rem, -5vw, -3.5rem);
+  left: clamp(-4rem, -3vw, -2.5rem);
 }
 
 .edge-decoration--right {
   top: 18rem;
-  right: clamp(-6rem, -5vw, -3.5rem);
+  right: clamp(-4rem, -3vw, -2.5rem);
 }
 
 .catalog-intro,

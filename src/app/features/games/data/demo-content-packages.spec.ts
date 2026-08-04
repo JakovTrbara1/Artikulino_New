@@ -129,22 +129,17 @@ describe('demonstration content packages', () => {
     ]);
   });
 
-  it('uses the optimized catalog illustration for every supported theme', () => {
-    const expectedSources = new Map([
-      ['hrana', '/assets/games/themes/food.webp'],
-      ['kuća', '/assets/games/themes/home.webp'],
-      ['priroda', '/assets/games/themes/nature.webp'],
-      ['životinje', '/assets/games/themes/animals.webp'],
-      ['prijevoz', '/assets/games/themes/transport.webp'],
-      ['odjeća', '/assets/games/themes/clothing.webp'],
-      ['škola', '/assets/games/themes/school.webp'],
-      ['igračke', '/assets/games/themes/toys.webp'],
-    ]);
+  it('uses one optimized catalog illustration with meaningful alt text per game', () => {
+    const sources = DEMO_CONTENT_PACKAGES.map((contentPackage) => contentPackage.catalogImage?.src);
 
-    for (const contentPackage of DEMO_CONTENT_PACKAGES) {
-      expect(contentPackage.catalogImage?.src).toBe(expectedSources.get(contentPackage.theme));
-      expect(contentPackage.catalogImage?.alt.trim()).toBeTruthy();
-    }
+    expect(DEMO_CONTENT_PACKAGES).toHaveLength(34);
+    expect(sources.every((source) => source?.startsWith('/assets/games/catalog/'))).toBe(true);
+    expect(new Set(sources).size).toBe(DEMO_CONTENT_PACKAGES.length);
+    expect(
+      DEMO_CONTENT_PACKAGES.every(
+        (contentPackage) => (contentPackage.catalogImage?.alt.trim().length ?? 0) >= 12,
+      ),
+    ).toBe(true);
   });
 
   it('uses optimized local images with emoji fallbacks for the priority food package', () => {

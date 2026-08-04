@@ -50,6 +50,35 @@ sadržaja, ali nije pravno mišljenje o licenciranju.
 | `public/assets/games/themes/school.webp`    | Škola     | Generirano za Artikulino alatom OpenAI imagegen |
 | `public/assets/games/themes/toys.webp`      | Igračke   | Generirano za Artikulino alatom OpenAI imagegen |
 
+- Ove prve tematske ilustracije ostaju evidentirane kao prethodna verzija asseta. Od Milestonea 23
+  kartice kataloga više ih ne dijele, nego svaka igra koristi vlastitu ilustraciju iz
+  `public/assets/games/catalog/`.
+
+## Jedinstvene ilustracije kataloga
+
+| Skup igara              | Broj | Datoteke                                      |
+| ----------------------- | ---: | --------------------------------------------- |
+| Slušaj i odluči         |    3 | `slusaj-*.webp`                               |
+| Uhvati glas             |    8 | `uhvati-*.webp`                               |
+| Gdje je glas?           |    5 | `pozicija-*.webp`                             |
+| Vježbaj izgovor — glas  |    9 | `izgovor-glas-{r,l,s,z,sh,zh,c,ch,cj}.webp`   |
+| Vježbaj izgovor — riječ |    9 | `izgovor-rijeci-{r,l,s,z,sh,zh,c,ch,cj}.webp` |
+
+- Datum izrade: 2026-08-04.
+- Svaka od 34 ilustracije generirana je zasebnim pozivom ugrađenom alatu OpenAI imagegen; nije
+  nastala kopiranjem, prebojavanjem ili izrezivanjem druge ilustracije iz skupa.
+- Svaka kompozicija prati konkretan naziv, glas, riječi i temu pripadajuće igre. Igre pojedinog
+  glasa koriste prepoznatljive usne i različite oblike strujanja ili vibracije, dok igre cijelih
+  riječi prikazuju četiri konkretna pojma iz svojih krugova.
+- Zajednički vizualni opis: kompaktna soft-toy 3D scena, zaobljeni oblici, meko raspršeno svjetlo,
+  čitljiva silueta u kartici, bez teksta, logotipa, sučelja i vodenog žiga.
+- Izvori su generirani na ravnoj chroma-key pozadini. Pozadina je uklonjena lokalnim
+  `remove_chroma_key.py` alatom uz soft matte i despill obradu.
+- Završne datoteke centrirane su na prozirno platno veličine 512 × 512 piksela i spremljene kao
+  WebP kvalitete 82. Ukupna veličina skupa je 1.205 MB; najveća pojedinačna datoteka ima 74,5 KB.
+- `npm run assets:check` provjerava 34 jedinstvene putanje i hash vrijednosti, postojanje svih
+  referenciranih datoteka, WebP zaglavlja te pojedinačni i ukupni limit veličine.
+
 ## Dekoracije rubova
 
 | Datoteka                                              | Namjena                | Podrijetlo                                      |

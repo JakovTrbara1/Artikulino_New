@@ -7,39 +7,148 @@ import {
   ScoringRules,
 } from '../models/content-package.model';
 
+const catalogImage = (filename: string, alt: string): ContentImage => ({
+  src: `/assets/games/catalog/${filename}.webp`,
+  alt,
+});
+
 const CATALOG_IMAGES: Readonly<Record<string, ContentImage>> = {
-  hrana: {
-    src: '/assets/games/themes/food.webp',
-    alt: 'Košara s voćem, povrćem i kruhom',
-  },
-  kuća: {
-    src: '/assets/games/themes/home.webp',
-    alt: 'Mekana igračka u obliku kuće',
-  },
-  priroda: {
-    src: '/assets/games/themes/nature.webp',
-    alt: 'Stablo, sunce, oblaci i cvijeće',
-  },
-  životinje: {
-    src: '/assets/games/themes/animals.webp',
-    alt: 'Lav, slon i zebra kao mekane igračke',
-  },
-  prijevoz: {
-    src: '/assets/games/themes/transport.webp',
-    alt: 'Automobil, avion i jedrilica kao igračke',
-  },
-  odjeća: {
-    src: '/assets/games/themes/clothing.webp',
-    alt: 'Džemper, kapa i čizme',
-  },
-  škola: {
-    src: '/assets/games/themes/school.webp',
-    alt: 'Školski ruksak, knjige i olovka',
-  },
-  igračke: {
-    src: '/assets/games/themes/toys.webp',
-    alt: 'Medvjedić, kocke i lopta',
-  },
+  'slusaj-hrana-s-lagano': catalogImage(
+    'slusaj-hrana-s-lagano',
+    'Košara uz jabuku, bananu, mrkvu i krumpir',
+  ),
+  'slusaj-kuca-lr-srednje': catalogImage(
+    'slusaj-kuca-lr-srednje',
+    'Kućica s prikazom kuhinje, kupaonice i spavaće sobe',
+  ),
+  'slusaj-priroda-zž-izazovno': catalogImage(
+    'slusaj-priroda-zz-izazovno',
+    'Riba u jezercu uz razigrani oblak i kamen',
+  ),
+  'uhvati-zivotinje-r-lagano': catalogImage(
+    'uhvati-zivotinje-r-lagano',
+    'Roda, rak, riba, pas i miš kao mekane igračke',
+  ),
+  'uhvati-kuca-l-srednje': catalogImage(
+    'uhvati-kuca-l-srednje',
+    'Lampa, stol, tepih i prozor u udobnoj sobi',
+  ),
+  'uhvati-prijevoz-sš-izazovno': catalogImage(
+    'uhvati-prijevoz-s-sh-izazovno',
+    'Skuter, autobus, semafor i željeznička pruga',
+  ),
+  'uhvati-hrana-zž-srednje': catalogImage(
+    'uhvati-hrana-z-zh-srednje',
+    'Zelje, žlica, grožđe i zdjelica žitarica',
+  ),
+  'uhvati-odjeca-c-lagano': catalogImage(
+    'uhvati-odjeca-c-lagano',
+    'Cipele, majica, kapa i rukavice u dječjem ormaru',
+  ),
+  'uhvati-skola-cč-izazovno': catalogImage(
+    'uhvati-skola-c-ch-izazovno',
+    'Bilježnice, knjiga, školska ploča i olovke',
+  ),
+  'uhvati-igracke-čć-izazovno': catalogImage(
+    'uhvati-igracke-ch-cj-izazovno',
+    'Čun, kuća za lutke, psić i mačka u kutiji s igračkama',
+  ),
+  'uhvati-skola-ć-srednje': catalogImage(
+    'uhvati-skola-cj-srednje',
+    'Zadaća, vrećica, ruksak i školska ploča',
+  ),
+  'pozicija-hrana-s-lagano': catalogImage(
+    'pozicija-hrana-s-lagano',
+    'Sir, sok, ananas i keks na tri označena mjesta',
+  ),
+  'pozicija-priroda-š-srednje': catalogImage(
+    'pozicija-priroda-sh-srednje',
+    'Kruška, šuma, miš i košara uz prirodnu stazu',
+  ),
+  'pozicija-kuca-z-izazovno': catalogImage(
+    'pozicija-kuca-z-izazovno',
+    'Zavjesa, prozor, ulaz i vaza u toplom domu',
+  ),
+  'pozicija-zivotinje-ž-srednje': catalogImage(
+    'pozicija-zivotinje-zh-srednje',
+    'Žaba, jež i puž uz mrežu na šumskoj stazi',
+  ),
+  'pozicija-prijevoz-lr-izazovno': catalogImage(
+    'pozicija-prijevoz-lr-izazovno',
+    'Lokomotiva, avion, bicikl i trolejbus na putu',
+  ),
+  'izgovor-glas-r': catalogImage(
+    'izgovor-glas-r',
+    'Razigrane usne uz bubanj i oblike koji prikazuju glas R',
+  ),
+  'izgovor-rijeci-r': catalogImage(
+    'izgovor-rijeci-r',
+    'Riba, rak, roda i tigar kao mekane igračke',
+  ),
+  'izgovor-glas-l': catalogImage(
+    'izgovor-glas-l',
+    'Razigrane usne i položaj jezika za vježbu glasa L',
+  ),
+  'izgovor-rijeci-l': catalogImage(
+    'izgovor-rijeci-l',
+    'Lopta, lutka, balon i vlak kao mekane igračke',
+  ),
+  'izgovor-glas-s': catalogImage(
+    'izgovor-glas-s',
+    'Razigrane usne koje nježno usmjeravaju zrak za glas S',
+  ),
+  'izgovor-rijeci-s': catalogImage(
+    'izgovor-rijeci-s',
+    'Sunce, rosa, list i snijeg na prirodnom brežuljku',
+  ),
+  'izgovor-glas-z': catalogImage(
+    'izgovor-glas-z',
+    'Razigrane usne okružene valovima za vježbu glasa Z',
+  ),
+  'izgovor-rijeci-z': catalogImage(
+    'izgovor-rijeci-z',
+    'Zec, koza, zebra i zmija kao mekane igračke',
+  ),
+  'izgovor-glas-sh': catalogImage(
+    'izgovor-glas-sh',
+    'Razigrane usne uz široki mlaz zraka za vježbu glasa Š',
+  ),
+  'izgovor-rijeci-sh': catalogImage(
+    'izgovor-rijeci-sh',
+    'Škola, škare, šestar i miš na radnom stolu',
+  ),
+  'izgovor-glas-zh': catalogImage(
+    'izgovor-glas-zh',
+    'Razigrane usne okružene toplim valovima za glas Ž',
+  ),
+  'izgovor-rijeci-zh': catalogImage(
+    'izgovor-rijeci-zh',
+    'Žaba, puž, jež i žirafa kao mekane igračke',
+  ),
+  'izgovor-glas-c': catalogImage(
+    'izgovor-glas-c',
+    'Razigrane usne uz kratke zvučne oblike za glas C',
+  ),
+  'izgovor-rijeci-c': catalogImage(
+    'izgovor-rijeci-c',
+    'Cipele, majica, rukavice i kapica kao mekane igračke',
+  ),
+  'izgovor-glas-ch': catalogImage(
+    'izgovor-glas-ch',
+    'Razigrane usne uz snažne mekane zvučne oblike za glas Č',
+  ),
+  'izgovor-rijeci-ch': catalogImage(
+    'izgovor-rijeci-ch',
+    'Čaj, kolač, naranča i čokolada na malom stolu',
+  ),
+  'izgovor-glas-cj': catalogImage(
+    'izgovor-glas-cj',
+    'Razigrane usne uz nježne zvučne oblike za glas Ć',
+  ),
+  'izgovor-rijeci-cj': catalogImage(
+    'izgovor-rijeci-cj',
+    'Kuća, svijeća, vreća i peć kao mekane igračke',
+  ),
 };
 
 const yesNo = (sound: string): readonly AnswerOption[] => [
@@ -735,6 +844,6 @@ const DEMO_CONTENT_PACKAGE_DEFINITIONS = [
 export const DEMO_CONTENT_PACKAGES: readonly ContentPackage[] =
   DEMO_CONTENT_PACKAGE_DEFINITIONS.map((contentPackage) => ({
     ...contentPackage,
-    catalogImage: CATALOG_IMAGES[contentPackage.theme],
+    catalogImage: CATALOG_IMAGES[contentPackage.id],
     professionalReview: { status: 'NOT_REVIEWED' },
   }));
