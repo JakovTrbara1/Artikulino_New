@@ -13,6 +13,8 @@ import { PrototypeAuthService } from './prototype-auth.service';
 
 const REQUIRED_API_CONTRACT_VERSION = 2;
 const API_START_COMMAND = 'npm run server:dev';
+const TRANSCRIPTION_POLL_INTERVAL_MS = 1_000;
+const TRANSCRIPTION_POLL_LIMIT = 30;
 
 @Injectable({ providedIn: 'root' })
 export class PrototypeSessionService {
@@ -90,6 +92,21 @@ export class PrototypeSessionService {
     return response.attempt;
   }
 
+  async waitForAttemptResult(
+    attemptId: string,
+    pollIntervalMs = TRANSCRIPTION_POLL_INTERVAL_MS,
+    pollLimit = TRANSCRIPTION_POLL_LIMIT,
+  ): Promise<PrototypeRecordingAttempt | undefined> {
+    for (let poll = 0; poll < pollLimit; poll += 1) {
+      await delay(pollIntervalMs);
+      const attempt = await this.getAttempt(attemptId);
+      if (attempt.transcriptionStatus !== 'PENDING') {
+        return attempt;
+      }
+    }
+    return undefined;
+  }
+
   async listForActiveChild(): Promise<readonly PrototypeGameSession[]> {
     const child = this.auth.activeChild();
     if (!child) {
@@ -152,4 +169,8 @@ function extension(mimeType: string): string {
     return 'wav';
   }
   return 'webm';
+}
+
+function delay(durationMs: number): Promise<void> {
+  return new Promise((resolve) => globalThis.setTimeout(resolve, durationMs));
 }

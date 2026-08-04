@@ -25,4 +25,9 @@ export class ScoringService {
   applyReplayPenalty(rules: ScoringRules, currentPoints: number): number {
     return Math.max(0, currentPoints - Math.max(0, rules.replayPenalty));
   }
+
+  calculatePracticePoints(rules: ScoringRules, textMatch: number): number {
+    const percentage = Math.min(100, Math.max(0, Math.round(textMatch)));
+    return Math.max(0, Math.round((rules.basePoints * percentage) / 100));
+  }
 }

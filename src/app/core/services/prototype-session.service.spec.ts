@@ -31,7 +31,10 @@ describe('PrototypeSessionService', () => {
     });
   });
 
-  afterEach(() => TestBed.resetTestingModule());
+  afterEach(() => {
+    vi.useRealTimers();
+    TestBed.resetTestingModule();
+  });
 
   it('creates a game session for the active fictional child', async () => {
     apiRequest
@@ -116,5 +119,40 @@ describe('PrototypeSessionService', () => {
 
     await expect(service.getAttempt('attempt/1')).resolves.toBe(attempt);
     expect(apiRequest).toHaveBeenCalledWith('/api/attempts/attempt%2F1');
+  });
+
+  it('polls once per interval until transcription completes', async () => {
+    vi.useFakeTimers();
+    apiRequest
+      .mockResolvedValueOnce({
+        attempt: { id: 'attempt-1', transcriptionStatus: 'PENDING' },
+      })
+      .mockResolvedValueOnce({
+        attempt: { id: 'attempt-1', transcriptionStatus: 'COMPLETED', textMatch: 83 },
+      });
+    const service = TestBed.inject(PrototypeSessionService);
+
+    const resultPromise = service.waitForAttemptResult('attempt-1', 1_000, 3);
+    await vi.advanceTimersByTimeAsync(2_000);
+
+    await expect(resultPromise).resolves.toMatchObject({
+      transcriptionStatus: 'COMPLETED',
+      textMatch: 83,
+    });
+    expect(apiRequest).toHaveBeenCalledTimes(2);
+  });
+
+  it('returns no result after the configured polling limit', async () => {
+    vi.useFakeTimers();
+    apiRequest.mockResolvedValue({
+      attempt: { id: 'attempt-1', transcriptionStatus: 'PENDING' },
+    });
+    const service = TestBed.inject(PrototypeSessionService);
+
+    const resultPromise = service.waitForAttemptResult('attempt-1', 1_000, 2);
+    await vi.advanceTimersByTimeAsync(2_000);
+
+    await expect(resultPromise).resolves.toBeUndefined();
+    expect(apiRequest).toHaveBeenCalledTimes(2);
   });
 });

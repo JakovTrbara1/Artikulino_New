@@ -61,12 +61,12 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/persistence-contract-guard`
+- Current implementation branch: `codex/pronunciation-round-scoring`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `19bf891`.
-- Milestone 20 is merged through pull request #27.
-- Milestone 21 adds API compatibility detection, parent-owned attempt polling, and a watch-mode
-  development workflow without resetting runtime data.
+- Base: `origin/main` at merge commit `7eeb096`.
+- Milestone 21 is merged through pull request #28.
+- Milestone 22 adds varied syllable prompts, bounded attempt polling, and proportional
+  best-attempt pronunciation scoring.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -86,8 +86,8 @@ npx prettier . --check
   - `listen-and-decide`: category decision from heard word/sentence.
   - `catch-the-sound`: detect whether a word contains a target sound.
   - `sound-position`: identify beginning, middle, or end of a word using a train UI.
-  - `pronunciation-practice`: listen, record, replay, retry, and continue through isolated-sound or
-    whole-word rounds without child-facing automated scores.
+  - `pronunciation-practice`: listen, record, replay, retry, and continue through syllable or
+    whole-word rounds with non-clinical text-match points.
 - Pronunciation content includes `SOUND` and `WORD` packages for R, L, S, Z, Š, Ž, C, Č, and Ć.
 - `catch-the-sound` packages explicitly declare `DETECT` or `DISCRIMINATE`; listening packages no
   longer claim a target sound that they do not practise.
@@ -116,8 +116,8 @@ npx prettier . --check
   `catalogImage`, plus four restrained catalog/gameplay edge decorations.
 - Rounded game cards use consistent type colors, theme artwork, gentle hover/focus depth, and a
   separate accessible information popover.
-- Provider-neutral `SPEECH_TRANSCRIPTION` boundary with a default disabled adapter, no network
-  transfer, and no pronunciation scoring.
+- Provider-neutral `SPEECH_TRANSCRIPTION` browser boundary with a default disabled adapter and no
+  network transfer; the approved scoring path uses only the localhost Express/FastAPI pipeline.
 - Local Express/SQLite prototype foundation with hashed demo passwords, hashed eight-hour bearer
   sessions, parent/therapist roles, and fictional display-name-only child profiles.
 - Backend game sessions are stored under the active demo child. Multiple multipart recording
@@ -134,10 +134,11 @@ npx prettier . --check
 - The worker lazily loads `faster-whisper` `small` by default with Croatian language, CPU, and
   `int8`; `ARTIKULINO_WHISPER_MODEL` can select a lighter local development model.
 - Transcript matching lowercases, removes punctuation, collapses whitespace, preserves Croatian
-  diacritics, and uses normalized Levenshtein similarity. It never affects points or appears as a
-  pronunciation or clinical score.
-- Recording upload failures retain the browser-local recording for retry or deletion. Uploading
-  never changes points or blocks question progression.
+  diacritics, and uses normalized Levenshtein similarity. It affects only proportional
+  pronunciation-game points and never appears as a pronunciation or clinical score.
+- Recording upload failures retain the browser-local recording for retry or deletion. A completed
+  local transcription awards proportional points; failure or timeout permits continuation with
+  zero new points.
 - Parent session, attempt, and profile deletion cascades through SQLite and physical audio files.
   Progress provides confirmed session deletion and confirmed active-profile/data deletion; both
   also clear the legacy browser key. The reset command removes runtime recordings before reseeding.
@@ -238,8 +239,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   faster-whisper worker may process fictional/adult-generated recordings on localhost.
 - Label normalized expected-text versus transcript similarity only as `Podudarnost teksta`. It must
   not be presented as pronunciation quality, an error score, or a clinical result. The current
-  implementation does not award points for it; the approved Milestone 22 change may use it only for
-  proportional pronunciation-game points.
+  implementation uses it only for proportional pronunciation-game points, with the best attempt
+  counted once per question.
 - The thesis prototype may use predefined demo parent/therapist credentials and fictional child
   display names. It must not claim production security or accept real children’s data.
 - Demo passwords are hashed with scrypt. Random bearer tokens last eight hours, are hashed in
@@ -367,6 +368,22 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   path, completed the session, and appeared in the parent session list. Its session and copied
   recording were then deleted, returning every runtime count to the original value.
 
+## Milestone 22 Validation
+
+- `npm run prototype:check` passed: 20 frontend files / 103 tests, 3 server files / 25 tests, and
+  5 Python worker tests (133 tests total), plus the production builds and Prettier.
+- `git diff --check` passed.
+- Content tests verify four unique A/E/I/O syllables for every supported target sound and confirm
+  that whole-word prompts remain unchanged.
+- Polling tests cover one-second intervals, completion, and the configured timeout. Session tests
+  cover proportional points, lower and higher retries, best-attempt-only totals, and unavailable
+  transcription.
+- Rendered Browser QA verified the `LA` first round, points/recordings toolbar, listen-to-record
+  transition, non-clinical text-match copy, and a clear browser console.
+- The two empty unfinished sessions created by Browser reloads were identified by exact ID and
+  deleted; no recordings or existing completed sessions were changed.
+- Real microphone capture and audible Croatian syllable quality remain target-device checks.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
@@ -374,13 +391,12 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - The stale non-watch Express process that rejected new pronunciation sessions was replaced without
   data loss. Contract-version and supported-game-type checks now identify this mismatch before
   session creation. Development instructions use `server:dev`.
-- Isolated-sound pronunciation packages currently repeat the same sound in all four rounds.
-  Milestone 22 replaces them with A/E/I/O syllables while leaving whole-word packages unchanged.
+- Isolated-sound pronunciation packages now use four different A/E/I/O syllables while whole-word
+  packages remain unchanged.
 - Catalog cards currently reuse one image per theme. Milestone 23 assigns a distinct optimized
   illustration to every package and enlarges edge decorations.
-- Child pronunciation gameplay currently shows neither transcription status, text-match points,
-  nor a result modal. Milestone 24 implements the approved non-clinical reward flow after the
-  persistence and scoring contracts are merged.
+- Child pronunciation gameplay now shows bounded pending status and inline text-match points.
+  Milestone 24 replaces the interim feedback with the approved accessible celebration modal.
 - No external ASR provider or automatic articulation error detection is implemented. The original
   browser transcription port remains disabled; Express alone calls the localhost worker.
 - No approved controller, legal basis, guardian verification, ASR provider, exact provider
@@ -408,9 +424,9 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review and merge Milestone 21.
-2. Implement Milestone 22 on `codex/pronunciation-round-scoring` after Milestone 21 is merged.
-3. Implement Milestones 23–25 sequentially only after each dependency is merged and validated.
+1. Review and merge Milestone 22.
+2. Implement Milestone 23 on `codex/unique-game-artwork` after Milestone 22 is merged.
+3. Implement Milestones 24–25 sequentially only after each dependency is merged and validated.
 4. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
    screen-reader checks on the target device during Milestone 25.
 

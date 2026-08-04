@@ -76,23 +76,17 @@
             <strong>{{ session.currentIndex() + 1 }} od {{ package.questions.length }}</strong>
           </div>
           <div>
-            <span>{{ package.gameType === 'pronunciation-practice' ? 'Snimke' : 'Bodovi' }}</span>
-            <strong>
-              {{
-                package.gameType === 'pronunciation-practice'
-                  ? session.attempts()
-                  : session.totalPoints()
-              }}
-            </strong>
+            <span>Bodovi</span>
+            <strong>{{ session.totalPoints() }}</strong>
           </div>
           <div>
             <span>
-              {{ package.gameType === 'pronunciation-practice' ? 'Slušanja' : 'Niz' }}
+              {{ package.gameType === 'pronunciation-practice' ? 'Snimke' : 'Niz' }}
             </span>
             <strong>
               {{
                 package.gameType === 'pronunciation-practice'
-                  ? session.replays()
+                  ? session.attempts()
                   : session.currentStreak()
               }}
             </strong>
@@ -144,7 +138,7 @@
                 recordingPanel
                 [questionId]="question.id"
                 [required]="true"
-                [disabled]="!hasListened()"
+                [disabled]="!hasListened() || practiceResultPending()"
                 [promptKind]="package.practiceMode === 'SOUND' ? 'sound' : 'word'"
                 [saveAttempt]="saveRecordedAttempt"
                 [deleteSavedAttempt]="deleteRecordedAttempt"
@@ -221,6 +215,15 @@
           </div>
         }
 
+        @if (practiceResultPending()) {
+          <div class="feedback retry" role="status" aria-live="polite">
+            <div>
+              <strong>Provjeravamo podudarnost teksta…</strong>
+              <p>Snimka je spremljena. Rezultat može potrajati do 30 sekundi.</p>
+            </div>
+          </div>
+        }
+
         @if (session.feedback(); as feedback) {
           <div
             class="feedback"
@@ -249,7 +252,7 @@
                   : 'Prikaži rezultat'
                 : package.gameType === 'pronunciation-practice'
                   ? package.practiceMode === 'SOUND'
-                    ? 'Sljedeći glas'
+                    ? 'Sljedeći slog'
                     : 'Sljedeća riječ'
                   : 'Sljedeće pitanje'
             }}

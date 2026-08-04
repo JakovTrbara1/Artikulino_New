@@ -117,6 +117,8 @@ interface PronunciationSoundSet {
   readonly words: readonly PronunciationWordPrompt[];
 }
 
+const PRONUNCIATION_VOWELS = ['A', 'E', 'I', 'O'] as const;
+
 const PRONUNCIATION_SOUND_SETS: readonly PronunciationSoundSet[] = [
   {
     sound: 'R',
@@ -232,20 +234,23 @@ const pronunciationPackages = PRONUNCIATION_SOUND_SETS.flatMap(({ sound, slug, t
     theme: 'igračke',
     difficulty: 'EASY',
     scoring: rules('EASY'),
-    questions: Array.from({ length: 4 }, (_, index): ContentQuestion => ({
-      id: `izgovor-${slug}-glas-${index + 1}`,
-      taskText: 'Poslušaj i izgovori glas.',
-      spokenText: sound,
-      displayText: sound,
-      targetSound: sound,
-      image: {
-        emoji: '🗣️',
-        alt: `Vježba izgovora glasa ${sound}`,
-      },
-      answers: [],
-      correctAnswerIds: [],
-      explanation: `Snimka glasa ${sound} spremna je za slušanje i samostalnu usporedbu.`,
-    })),
+    questions: PRONUNCIATION_VOWELS.map((vowel): ContentQuestion => {
+      const syllable = `${sound}${vowel}`;
+      return {
+        id: `izgovor-${slug}-slog-${vowel.toLowerCase()}`,
+        taskText: 'Poslušaj i izgovori glas.',
+        spokenText: syllable,
+        displayText: syllable,
+        targetSound: sound,
+        image: {
+          emoji: '🗣️',
+          alt: `Vježba izgovora sloga ${syllable}`,
+        },
+        answers: [],
+        correctAnswerIds: [],
+        explanation: `Snimka sloga ${syllable} spremljena je za tekstualno prepoznavanje.`,
+      };
+    }),
   },
   {
     schemaVersion: 1,

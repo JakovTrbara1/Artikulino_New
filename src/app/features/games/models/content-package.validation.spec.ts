@@ -318,11 +318,32 @@ describe('content package validation', () => {
         gameType: 'pronunciation-practice',
         recognitionMode: undefined,
         practiceMode: 'SOUND',
-        questions: [{ ...pronunciationQuestion, id: 'question-2', spokenText: 'S' }],
+        questions: [{ ...pronunciationQuestion, id: 'question-2', spokenText: 'SA' }],
       }),
     ];
 
     expect(validateContentPackages(packages)).toEqual([]);
+  });
+
+  it('rejects an isolated-sound prompt that is not an A/E/I/O syllable', () => {
+    const pronunciationQuestion = createQuestion({
+      spokenText: 'SU',
+      answers: [],
+      correctAnswerIds: [],
+    });
+    const contentPackage = createPackage({
+      gameType: 'pronunciation-practice',
+      recognitionMode: undefined,
+      practiceMode: 'SOUND',
+      questions: [pronunciationQuestion],
+    });
+
+    expect(validateContentPackages([contentPackage])).toContainEqual(
+      expect.objectContaining({
+        code: 'invalid-target-occurrence',
+        path: 'packages[0].questions[0].spokenText',
+      }),
+    );
   });
 
   it('reports every invalid scoring field', () => {

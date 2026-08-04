@@ -14,7 +14,10 @@ describe('GamePlayerPage accessibility', () => {
   const prototypeSessions = {
     create: vi.fn().mockResolvedValue({ id: 'prototype-session-1' }),
     complete: vi.fn().mockResolvedValue({ id: 'prototype-session-1' }),
-    uploadAttempt: vi.fn().mockResolvedValue({ id: 'attempt-1' }),
+    uploadAttempt: vi.fn().mockResolvedValue({ id: 'attempt-1', transcriptionStatus: 'PENDING' }),
+    waitForAttemptResult: vi
+      .fn()
+      .mockResolvedValue({ id: 'attempt-1', transcriptionStatus: 'COMPLETED', textMatch: 80 }),
     deleteAttempt: vi.fn().mockResolvedValue(undefined),
   };
 
@@ -78,7 +81,7 @@ describe('GamePlayerPage accessibility', () => {
     }
   });
 
-  it('requires listening and one recording in a pronunciation round without answer controls', async () => {
+  it('requires listening and waits for a scored pronunciation result without answer controls', async () => {
     routeParams.next(convertToParamMap({ packageId: 'izgovor-rijeci-s' }));
     fixture.detectChanges();
     await fixture.whenStable();
@@ -106,13 +109,31 @@ describe('GamePlayerPage accessibility', () => {
       (fixture.nativeElement.querySelector('.microphone-button') as HTMLButtonElement).disabled,
     ).toBe(false);
 
-    session.registerPracticeAttempt();
-    session.completePracticeRound();
+    const page = fixture.componentInstance as unknown as {
+      receiveRecordedAttempt(): void;
+      saveRecordedAttempt(attempt: {
+        blob: Blob;
+        mimeType: string;
+        durationMs: number;
+        questionId: string;
+        attemptNumber: number;
+      }): Promise<{ readonly id: string }>;
+    };
+    page.receiveRecordedAttempt();
+    await page.saveRecordedAttempt({
+      blob: new Blob(['fictional adult recording'], { type: 'audio/webm' }),
+      mimeType: 'audio/webm',
+      durationMs: 1_500,
+      questionId: 'izgovor-s-sunce',
+      attemptNumber: 1,
+    });
+    await vi.waitFor(() => expect(session.isAnswered()).toBe(true));
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelector('.next-button')).not.toBeNull();
-    expect(session.totalPoints()).toBe(0);
+    expect(session.totalPoints()).toBe(12);
     expect(session.correctAnswers()).toBe(0);
+    expect(fixture.nativeElement.textContent).toContain('Podudarnost teksta: 80%');
   });
 
   it('moves focus to the next question heading after advancing', async () => {

@@ -57,6 +57,7 @@ export class GamePlayerPage implements OnDestroy {
   private readonly resultTitle = viewChild<ElementRef<HTMLHeadingElement>>('resultTitle');
   private initializedPackageId?: string;
   private prototypeSessionPromise?: Promise<PrototypeGameSession>;
+  private practicePollingSequence = 0;
 
   protected readonly difficultyLabels = DIFFICULTY_LABELS;
   protected readonly gameTypeLabels = GAME_TYPE_LABELS;
@@ -65,6 +66,7 @@ export class GamePlayerPage implements OnDestroy {
   protected readonly selectedAnswer = signal<string | null>(null);
   protected readonly audioMessage = signal('');
   protected readonly persistenceMessage = signal('');
+  protected readonly practiceResultPending = signal(false);
   protected readonly listenLabel = computed(() =>
     this.hasListened() ? 'Poslušaj ponovno' : 'Poslušaj',
   );
@@ -93,13 +95,28 @@ export class GamePlayerPage implements OnDestroy {
   protected readonly saveRecordedAttempt = async (
     attempt: RecordedAttempt,
   ): Promise<{ readonly id: string }> => {
+    this.practiceResultPending.set(true);
     const contentPackage = this.contentPackage();
     const question = this.session.currentQuestion();
     if (!contentPackage || !question) {
+      this.practiceResultPending.set(false);
       throw new Error('Pitanje za snimanje nije dostupno.');
     }
-    const prototypeSession = await this.ensurePrototypeSession(contentPackage);
-    return this.prototypeSessions.uploadAttempt(prototypeSession.id, attempt, question.spokenText);
+    try {
+      const prototypeSession = await this.ensurePrototypeSession(contentPackage);
+      const savedAttempt = await this.prototypeSessions.uploadAttempt(
+        prototypeSession.id,
+        attempt,
+        question.spokenText,
+      );
+      const pollingSequence = this.practicePollingSequence;
+      this.session.markPracticeAttemptPending(savedAttempt.id, question.id);
+      void this.resolvePracticeAttempt(savedAttempt.id, question.id, pollingSequence);
+      return savedAttempt;
+    } catch (error) {
+      this.practiceResultPending.set(false);
+      throw error;
+    }
   };
 
   protected readonly deleteRecordedAttempt = async (attemptId: string): Promise<void> => {
@@ -124,6 +141,7 @@ export class GamePlayerPage implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.practicePollingSequence += 1;
     this.audio.stop();
   }
 
@@ -154,18 +172,23 @@ export class GamePlayerPage implements OnDestroy {
   }
 
   protected receiveRecordedAttempt(): void {
+    this.practicePollingSequence += 1;
+    this.practiceResultPending.set(true);
     this.session.registerPracticeAttempt();
-    this.session.completePracticeRound();
   }
 
   protected clearRecordedAttempt(remainingAttempts: number): void {
     if (remainingAttempts === 0) {
+      this.practicePollingSequence += 1;
+      this.practiceResultPending.set(false);
       this.session.reopenPracticeRound();
     }
   }
 
   protected skipPronunciationRecording(): void {
-    this.session.completePracticeRound(true);
+    this.practicePollingSequence += 1;
+    this.practiceResultPending.set(false);
+    this.session.skipPracticeRound();
   }
 
   protected nextQuestion(): void {
@@ -191,6 +214,8 @@ export class GamePlayerPage implements OnDestroy {
   }
 
   private resetQuestionUi(): void {
+    this.practicePollingSequence += 1;
+    this.practiceResultPending.set(false);
     this.audio.stop();
     this.hasListened.set(false);
     this.selectedAnswer.set(null);
@@ -233,6 +258,41 @@ export class GamePlayerPage implements OnDestroy {
       this.persistenceMessage.set('Rezultat je spremljen u napredak demo profila.');
     } catch {
       // The game result remains visible and playable even when local persistence is unavailable.
+    }
+  }
+
+  private async resolvePracticeAttempt(
+    attemptId: string,
+    questionId: string,
+    pollingSequence: number,
+  ): Promise<void> {
+    try {
+      const attempt = await this.prototypeSessions.waitForAttemptResult(attemptId);
+      if (
+        pollingSequence !== this.practicePollingSequence ||
+        this.session.currentQuestion()?.id !== questionId
+      ) {
+        return;
+      }
+
+      this.practiceResultPending.set(false);
+      if (!attempt) {
+        this.session.resolvePracticeAttempt(attemptId, questionId, 'TIMED_OUT');
+        return;
+      }
+      if (attempt.transcriptionStatus === 'COMPLETED') {
+        this.session.resolvePracticeAttempt(attemptId, questionId, 'COMPLETED', attempt.textMatch);
+        return;
+      }
+      this.session.resolvePracticeAttempt(attemptId, questionId, 'FAILED');
+    } catch {
+      if (
+        pollingSequence === this.practicePollingSequence &&
+        this.session.currentQuestion()?.id === questionId
+      ) {
+        this.practiceResultPending.set(false);
+        this.session.resolvePracticeAttempt(attemptId, questionId, 'FAILED');
+      }
     }
   }
 
