@@ -7,6 +7,12 @@ import {
 export type TranscriptionStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 export type TherapistReviewStatus = 'NOT_REVIEWED' | 'LOOKS_GOOD' | 'PRACTICE_AGAIN';
 
+export interface PrototypeApiHealth {
+  readonly status: 'ok';
+  readonly apiContractVersion: number;
+  readonly supportedGameTypes: readonly GameType[];
+}
+
 export interface TherapistReview {
   readonly status: TherapistReviewStatus;
   readonly comment: string;

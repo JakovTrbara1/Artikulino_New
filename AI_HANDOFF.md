@@ -31,7 +31,7 @@ npm --prefix server install
 py -3.11 -m venv transcription/.venv
 .\transcription\.venv\Scripts\python.exe -m pip install -r transcription/requirements-dev.txt
 npm run transcription:start
-npm run server:start
+npm run server:dev
 npm start
 npm run build
 npm test
@@ -61,12 +61,12 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/observation-improvement-roadmap`
+- Current implementation branch: `codex/persistence-contract-guard`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `08fc3ba`.
-- Milestone 19 is merged through pull request #26.
-- Milestone 20 is documentation-only and locks the approved roadmap for persistence recovery,
-  varied pronunciation rounds, proportional text-match points, unique artwork, and celebration UX.
+- Base: `origin/main` at merge commit `19bf891`.
+- Milestone 20 is merged through pull request #27.
+- Milestone 21 adds API compatibility detection, parent-owned attempt polling, and a watch-mode
+  development workflow without resetting runtime data.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -126,6 +126,11 @@ npx prettier . --check
 - Express queues stored recording attempts one at a time for the localhost FastAPI worker. Attempts
   retain `PENDING`, `COMPLETED`, or `FAILED` state plus an optional transcript and integer
   `Podudarnost teksta`.
+- `GET /api/health` exposes API contract version 2 and all supported game types. Angular checks
+  those capabilities before session creation and gives an explicit `npm run server:dev` restart
+  instruction when an old or unavailable API process is detected.
+- Parents can poll one owned recording through `GET /api/attempts/:attemptId`; the response exposes
+  transcription metadata but never a storage name or physical path.
 - The worker lazily loads `faster-whisper` `small` by default with Croatian language, CPU, and
   `int8`; `ARTIKULINO_WHISPER_MODEL` can select a lighter local development model.
 - Transcript matching lowercases, removes punctuation, collapses whitespace, preserves Croatian
@@ -348,15 +353,27 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Full evidence and the remaining real-device checks are documented in
   `docs/THESIS_PROTOTYPE_QA.md`.
 
+## Milestone 21 Validation
+
+- `npm --prefix server run check` passed: TypeScript build and 25 API/database tests.
+- `npm run test:ci` passed: 20 frontend files and 96 tests.
+- The API was changed from the non-watch process started on 28 July to `npm run server:dev` without
+  resetting runtime data.
+- Counts before and after restart and verification were unchanged: 2 users, 2 profiles, 19 game
+  sessions, 21 recording attempts, 10 therapist reviews, and 21 recording files totalling 841,110
+  bytes.
+- A disposable live pronunciation flow created a `pronunciation-practice` session, uploaded an
+  existing fictional/adult test recording, reached `COMPLETED`, returned status without a storage
+  path, completed the session, and appeared in the parent session list. Its session and copied
+  recording were then deleted, returning every runtime count to the original value.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
   and integrated cross-service/failure-path QA are implemented.
-- The process observed during roadmap planning had Angular and Express running since 28 July while
-  newer pronunciation code was present in the repository. A stale non-watch Express process can
-  reject `pronunciation-practice` session creation with an invalid-game-data response even though
-  the current server source accepts that type. Milestone 21 must restart Express without resetting
-  runtime data, verify persistence, and add an API contract-version guard.
+- The stale non-watch Express process that rejected new pronunciation sessions was replaced without
+  data loss. Contract-version and supported-game-type checks now identify this mismatch before
+  session creation. Development instructions use `server:dev`.
 - Isolated-sound pronunciation packages currently repeat the same sound in all four rounds.
   Milestone 22 replaces them with A/E/I/O syllables while leaving whole-word packages unchanged.
 - Catalog cards currently reuse one image per theme. Milestone 23 assigns a distinct optimized
@@ -391,10 +408,9 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Merge Milestone 20 after its documentation and approved-design PR passes review.
-2. Implement Milestone 21 on `codex/persistence-contract-guard`: restart Express in watch mode,
-   preserve runtime data, verify pronunciation persistence, and add health/attempt APIs.
-3. Implement Milestones 22–25 sequentially only after each dependency is merged and validated.
+1. Review and merge Milestone 21.
+2. Implement Milestone 22 on `codex/pronunciation-round-scoring` after Milestone 21 is merged.
+3. Implement Milestones 23–25 sequentially only after each dependency is merged and validated.
 4. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
    screen-reader checks on the target device during Milestone 25.
 

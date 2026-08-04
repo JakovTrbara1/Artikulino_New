@@ -4,8 +4,15 @@ import {
   GameSessionResult,
 } from '../../features/games/models/content-package.model';
 import { RecordedAttempt } from '../../shared/models/recorded-attempt.model';
-import { PrototypeGameSession, PrototypeRecordingAttempt } from '../models/prototype-session.model';
+import {
+  PrototypeApiHealth,
+  PrototypeGameSession,
+  PrototypeRecordingAttempt,
+} from '../models/prototype-session.model';
 import { PrototypeAuthService } from './prototype-auth.service';
+
+const REQUIRED_API_CONTRACT_VERSION = 2;
+const API_START_COMMAND = 'npm run server:dev';
 
 @Injectable({ providedIn: 'root' })
 export class PrototypeSessionService {
@@ -16,6 +23,7 @@ export class PrototypeSessionService {
     if (!child) {
       throw new Error('Odaberite demo profil prije početka igre.');
     }
+    await this.ensureCompatibleApi(contentPackage.gameType);
     const response = await this.auth.apiRequest<{ session: PrototypeGameSession }>(
       '/api/sessions',
       {
@@ -75,6 +83,13 @@ export class PrototypeSessionService {
     return response.attempt;
   }
 
+  async getAttempt(attemptId: string): Promise<PrototypeRecordingAttempt> {
+    const response = await this.auth.apiRequest<{ attempt: PrototypeRecordingAttempt }>(
+      `/api/attempts/${encodeURIComponent(attemptId)}`,
+    );
+    return response.attempt;
+  }
+
   async listForActiveChild(): Promise<readonly PrototypeGameSession[]> {
     const child = this.auth.activeChild();
     if (!child) {
@@ -100,6 +115,28 @@ export class PrototypeSessionService {
 
   async loadAttemptAudio(attemptId: string): Promise<Blob> {
     return this.auth.apiBlobRequest(`/api/attempts/${encodeURIComponent(attemptId)}/audio`);
+  }
+
+  private async ensureCompatibleApi(gameType: ContentPackage['gameType']): Promise<void> {
+    let health: PrototypeApiHealth;
+    try {
+      health = await this.auth.apiRequest<PrototypeApiHealth>('/api/health', {}, false);
+    } catch {
+      throw new Error(
+        `Lokalni API nije dostupan. Pokrenite ga naredbom "${API_START_COMMAND}" i pokušajte ponovno.`,
+      );
+    }
+
+    if (
+      !Number.isInteger(health.apiContractVersion) ||
+      health.apiContractVersion < REQUIRED_API_CONTRACT_VERSION ||
+      !Array.isArray(health.supportedGameTypes) ||
+      !health.supportedGameTypes.includes(gameType)
+    ) {
+      throw new Error(
+        `Lokalni API nije usklađen s ovom verzijom aplikacije. Ponovno ga pokrenite naredbom "${API_START_COMMAND}" i pokušajte ponovno.`,
+      );
+    }
   }
 }
 

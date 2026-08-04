@@ -307,6 +307,7 @@ git diff --check
 ### Milestone 21 — Persistence recovery and API compatibility
 
 - Branch: `codex/persistence-contract-guard`
+- Status: implemented and validated on the milestone branch; review is pending.
 - Restart Express in watch mode without resetting or deleting runtime data.
 - Add an API contract version and supported game types to `GET /api/health`.
 - Add parent-owned `GET /api/attempts/:id` status polling without exposing storage paths.

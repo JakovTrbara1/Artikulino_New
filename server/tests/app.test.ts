@@ -123,6 +123,13 @@ describe('prototype API', () => {
     const response = await request(app).get('/api/health').expect(200);
     expect(response.body).toEqual({
       status: 'ok',
+      apiContractVersion: 2,
+      supportedGameTypes: [
+        'listen-and-decide',
+        'catch-the-sound',
+        'sound-position',
+        'pronunciation-practice',
+      ],
       mode: 'LOCAL_THESIS_PROTOTYPE',
       transcription: {
         status: 'AVAILABLE',
@@ -483,6 +490,34 @@ describe('prototype API', () => {
       .set('Authorization', `Bearer ${therapistToken}`)
       .expect(200);
     expect(response.headers['content-type']).toContain('audio/webm');
+  });
+
+  it('lets only the owning parent poll one recording attempt without exposing storage details', async () => {
+    const authorization = await parentAuthorization();
+    const sessionId = (await createGameSession(authorization)).body.session.id as string;
+    const uploaded = await uploadAttempt(authorization, sessionId).expect(201);
+    const attemptId = uploaded.body.attempt.id as string;
+    await transcriptionQueue.waitForIdle();
+
+    const response = await request(app)
+      .get(`/api/attempts/${attemptId}`)
+      .set(authorization)
+      .expect(200);
+    expect(response.body.attempt).toMatchObject({
+      id: attemptId,
+      transcriptionStatus: 'COMPLETED',
+      transcript: 'kruška',
+      textMatch: 100,
+    });
+    expect(response.body.attempt).not.toHaveProperty('storageName');
+    expect(response.body.attempt).not.toHaveProperty('path');
+
+    await request(app).get(`/api/attempts/${attemptId}`).expect(401);
+    await request(app)
+      .get(`/api/attempts/${attemptId}`)
+      .set(await therapistAuthorization())
+      .expect(403);
+    await request(app).get('/api/attempts/missing').set(authorization).expect(404);
   });
 
   it('stores Croatian transcripts and text match after queued processing', async () => {

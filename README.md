@@ -17,14 +17,15 @@ Pokreni lokalni prijepis, API i Angular u tri terminala:
 
 ```bash
 npm run transcription:start
-npm run server:start
+npm run server:dev
 npm start
 ```
 
 Aplikacija je zatim dostupna na `http://localhost:4200`, a lokalni API na
 `http://localhost:3000`. Lokalni FastAPI worker sluša na `http://127.0.0.1:8000`. Angular razvojni
 poslužitelj prosljeđuje `/api` pozive kroz `proxy.conf.json`; preglednik nikada ne poziva Python
-worker izravno.
+worker izravno. Razvojna naredba `server:dev` ponovno učitava Express nakon promjene izvornog koda
+i sprječava da Angular koristi zastarjeli API proces.
 
 Provjere kvalitete:
 

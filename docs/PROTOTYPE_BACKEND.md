@@ -22,13 +22,18 @@ Run the transcription worker, API, and Angular app in three separate terminals:
 
 ```bash
 npm run transcription:start
-npm run server:start
+npm run server:dev
 npm start
 ```
 
 The API listens on `http://localhost:3000`. Angular listens on `http://localhost:4200` and proxies
 `/api` requests through `proxy.conf.json`. The FastAPI worker listens only on
 `http://127.0.0.1:8000`; the browser never calls it directly.
+
+Use `server:dev` during development so Express restarts after source changes. The Angular client
+checks the API contract version and supported game types before creating a game session. If an old
+non-watch API process is still running, the child flow shows an explicit restart instruction
+instead of a generic invalid-game-data error.
 
 ## Demo credentials
 
@@ -68,7 +73,8 @@ points.
 
 ## API
 
-- `GET /api/health` (includes local transcription-worker availability and model configuration)
+- `GET /api/health` (includes API contract version, supported game types, and local
+  transcription-worker availability)
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 - `POST /api/auth/logout`
@@ -80,6 +86,7 @@ points.
 - `POST /api/sessions/:sessionId/complete` (own parent session only)
 - `DELETE /api/sessions/:sessionId` (own parent session only)
 - `POST /api/sessions/:sessionId/attempts` (multipart, own parent session only)
+- `GET /api/attempts/:attemptId` (own parent attempt status; used for local transcription polling)
 - `GET /api/attempts/:attemptId/audio` (authenticated owner or therapist)
 - `DELETE /api/attempts/:attemptId` (own parent attempt only)
 - `GET /api/therapist/sessions` (therapist only; completed demo sessions)
