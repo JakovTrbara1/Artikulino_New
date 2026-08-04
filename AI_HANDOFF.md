@@ -61,12 +61,12 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/pronunciation-celebration-ui`
+- Current implementation branch: `codex/observation-improvement-qa`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `7049f20`.
-- Milestone 23 is merged through pull request #30.
-- Milestone 24 adds accessible pronunciation-result dialogs, a child-friendly completion screen,
-  best-match summaries, recognition-only accuracy, and cleaner visible terminology.
+- Base: `origin/main` at merge commit `b796c14`.
+- Milestone 24 is merged through pull request #31.
+- Milestone 25 documents the final observation-driven regression, persistence, service-restart,
+  responsive, microphone, parent, and therapist QA.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -423,6 +423,28 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - The two temporary sessions created for rendered QA were deleted individually. Runtime returned to
   19 sessions and 21 recording attempts; no reset or existing recording deletion occurred.
 
+## Milestone 25 Validation
+
+- `npm run prototype:check` passed: the Angular production build, 22 frontend files/110 tests,
+  three Express files/25 tests, five Python tests, 34-asset validation, and Prettier all pass.
+- Live parent QA covered sign-in, fictional-profile selection, listen-first pronunciation,
+  microphone start/stop, upload, pending/completed result feedback, service-restart persistence,
+  parent progress, authenticated playback, and deletion.
+- The exact new pronunciation session and recording remained after restarting Angular, Express in
+  watch mode, and FastAPI without running the reset command. They were then deleted through the
+  parent UI; session, attempt, review, audio-file, and login-session counts returned to their
+  pre-test baselines.
+- Live therapist QA covered role protection, completed-session selection, authenticated playback,
+  saving `PRACTICE_AGAIN` with a full comment, and parent visibility of that saved feedback.
+- Stopping FastAPI changed `/api/health` transcription status to `UNAVAILABLE`; restarting it
+  restored `AVAILABLE`. Automated tests continue to cover failed transcription, incompatible API,
+  expired login, denied microphone, invalid audio, retry scoring, and cascade deletion.
+- Responsive checks at 1440 × 1000 and a 390 × 844 viewport override covered the catalog, parent
+  progress, and therapist review without horizontal overflow, framework overlays, or console
+  warnings/errors.
+- A physical microphone-permission denial, audible Croatian voice/playback assessment, and a full
+  physical keyboard/screen-reader pass remain target-device checks.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
@@ -443,9 +465,10 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 - Demo content is explicitly marked `NOT_REVIEWED` and has not been professionally reviewed by a
   Croatian speech therapist.
 - Speech Synthesis voice quality varies by browser and OS.
-- The MVP readiness pass found no confirmed technical blocker. Real keyboard activation,
-  microphone permission/recording, Croatian voice quality, and screen-reader behavior still need
-  human verification on target devices.
+- The MVP readiness pass found no confirmed technical blocker. The allowed microphone path and
+  local recording lifecycle passed live QA. Permission denial, audible Croatian voice/playback,
+  physical keyboard navigation, and screen-reader behavior still need human verification on the
+  target device.
 - The experimental `codex/priority-food-audio` branch contains unreviewed Windows OneCore-generated
   WAV files and must not be merged. Packaged audio is deferred and does not block the MVP.
 - MediaRecorder availability and output format vary by browser. Permission and recording still
@@ -463,10 +486,10 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review and merge Milestone 24.
-2. Implement Milestone 25 only after Milestone 24 is merged and validated.
-3. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
-   screen-reader checks on the target device during Milestone 25.
+1. Review and merge Milestone 25.
+2. Perform the remaining permission-denial, audible playback, Croatian voice, physical keyboard,
+   and screen-reader checks on the target device.
+3. Do not begin another development phase until a new roadmap is approved.
 
 ## Do Not Change Without Asking
 
