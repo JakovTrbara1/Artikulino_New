@@ -146,6 +146,37 @@ describe('ProgressPage', () => {
     expect(text).toContain('Nije ocjena izgovora ni klinički rezultat.');
   });
 
+  it('keeps pronunciation results out of recognition accuracy and shows best text match', async () => {
+    const pronunciationSession: PrototypeGameSession = {
+      ...SESSION,
+      id: 'session-pronunciation',
+      packageName: 'Izgovori riječ',
+      gameType: 'pronunciation-practice',
+      correctAnswers: 4,
+      recordingAttempts: [
+        {
+          ...SESSION.recordingAttempts[0],
+          id: 'attempt-pronunciation-first',
+          questionId: 'pronunciation-question',
+          textMatch: 70,
+        },
+        {
+          ...SESSION.recordingAttempts[0],
+          id: 'attempt-pronunciation-best',
+          questionId: 'pronunciation-question',
+          attemptNumber: 2,
+          textMatch: 90,
+        },
+      ],
+    };
+
+    await createPage([SESSION, pronunciationSession]);
+    const text = fixture.nativeElement.textContent.replace(/\s+/g, ' ');
+
+    expect(text).toMatch(/Točnost igara prepoznavanja\s*75%/);
+    expect(text).toMatch(/Podudarnost\s*90%/);
+  });
+
   it('splits parent progress into accessible child-progress and therapist-feedback tabs', async () => {
     await createPage();
     const childTab = fixture.nativeElement.querySelector(
@@ -245,9 +276,7 @@ describe('ProgressPage', () => {
     button.click();
     await fixture.whenStable();
 
-    expect(confirm).toHaveBeenCalledWith(
-      expect.stringContaining('sve sesije, prijepise i testne audiosnimke'),
-    );
+    expect(confirm).toHaveBeenCalledWith(expect.stringContaining('sve sesije, prijepise i snimke'));
     expect(deleteChild).toHaveBeenCalledWith('child-1');
     expect(clearLegacyProgress).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/profili']);
@@ -263,6 +292,6 @@ describe('ProgressPage', () => {
     await createPage([], new Error('Poslužitelj nije dostupan.'));
 
     expect(fixture.nativeElement.textContent).toContain('Poslužitelj nije dostupan.');
-    expect(fixture.nativeElement.textContent).toContain('Lokalna pohrana testnih podataka');
+    expect(fixture.nativeElement.textContent).toContain('Lokalna pohrana i brisanje');
   });
 });

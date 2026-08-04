@@ -1,0 +1,65 @@
+<div class="dialog-backdrop">
+  <section
+    #dialog
+    class="result-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="practice-result-title"
+    aria-describedby="practice-result-description"
+    tabindex="-1"
+  >
+    @if (pending()) {
+      <div class="pending-orbit" aria-hidden="true">
+        <span></span>
+      </div>
+      <p class="eyebrow">Snimka je spremljena</p>
+      <h2 id="practice-result-title">Provjeravamo podudarnost teksta…</h2>
+      <p id="practice-result-description">
+        Rezultat može potrajati do 30 sekundi. Pričekaj još samo malo.
+      </p>
+    } @else if (isCompleted() && result(); as completedResult) {
+      <div class="confetti" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+      <img
+        class="result-character"
+        src="/assets/games/themes/animals.webp"
+        alt=""
+        aria-hidden="true"
+      />
+      <div class="score-ring">
+        <strong>{{ completedResult.percentage }}%</strong>
+        <span>Podudarnost teksta</span>
+      </div>
+      <p class="points">
+        <span aria-hidden="true">★</span> Najbolji rezultat: {{ completedResult.bestPoints }} bodova
+      </p>
+      <h2 id="practice-result-title">{{ title() }}</h2>
+      <p id="practice-result-description">{{ encouragement() }}</p>
+      <div class="dialog-actions">
+        <button class="button button--secondary" type="button" (click)="retryRequested.emit()">
+          Pokušaj ponovno
+        </button>
+        <button class="button button--primary" type="button" (click)="continueRequested.emit()">
+          Nastavi
+        </button>
+      </div>
+      <p class="non-clinical-note">Postotak uspoređuje prepoznati i očekivani tekst.</p>
+    } @else {
+      <div class="unavailable-icon" aria-hidden="true">↻</div>
+      <p class="eyebrow">Snimka je sačuvana</p>
+      <h2 id="practice-result-title">Rezultat trenutačno nije dostupan</h2>
+      <p id="practice-result-description">
+        Možeš pokušati ponovno ili nastaviti bez bodova za ovaj krug.
+      </p>
+      <div class="dialog-actions">
+        <button class="button button--secondary" type="button" (click)="retryRequested.emit()">
+          Pokušaj ponovno
+        </button>
+        <button class="button button--primary" type="button" (click)="continueRequested.emit()">
+          Nastavi
+        </button>
+      </div>
+    }
+  </section>
+</div>

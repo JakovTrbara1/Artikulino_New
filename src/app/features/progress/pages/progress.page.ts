@@ -66,15 +66,12 @@ export class ProgressPage implements OnInit, OnDestroy {
   protected readonly totalPoints = computed(() =>
     this.completedSessions().reduce((sum, session) => sum + session.totalPoints, 0),
   );
-  protected readonly accuracy = computed(() => {
-    const questions = this.completedSessions().reduce(
-      (sum, session) => sum + session.questionCount,
-      0,
+  protected readonly recognitionAccuracy = computed(() => {
+    const recognitionSessions = this.completedSessions().filter(
+      (session) => session.gameType !== 'pronunciation-practice',
     );
-    const correct = this.completedSessions().reduce(
-      (sum, session) => sum + session.correctAnswers,
-      0,
-    );
+    const questions = recognitionSessions.reduce((sum, session) => sum + session.questionCount, 0);
+    const correct = recognitionSessions.reduce((sum, session) => sum + session.correctAnswers, 0);
     return questions ? Math.round((correct / questions) * 100) : 0;
   });
   protected readonly minutes = computed(() =>
@@ -171,7 +168,7 @@ export class ProgressPage implements OnInit, OnDestroy {
   }
 
   protected async deleteSession(session: PrototypeGameSession): Promise<void> {
-    if (!confirm(`Izbrisati sesiju „${session.packageName}” i sve povezane testne audiosnimke?`)) {
+    if (!confirm(`Izbrisati sesiju „${session.packageName}” i sve povezane snimke?`)) {
       return;
     }
     this.deletingId.set(session.id);
@@ -192,9 +189,7 @@ export class ProgressPage implements OnInit, OnDestroy {
     const child = this.auth.activeChild();
     if (
       !child ||
-      !confirm(
-        `Trajno izbrisati demo profil „${child.displayName}”, sve sesije, prijepise i testne audiosnimke?`,
-      )
+      !confirm(`Trajno izbrisati profil „${child.displayName}”, sve sesije, prijepise i snimke?`)
     ) {
       return;
     }
@@ -215,6 +210,22 @@ export class ProgressPage implements OnInit, OnDestroy {
 
   protected formatDuration(durationMs: number): string {
     return `${Math.max(0.1, Math.round(durationMs / 100) / 10)} s`;
+  }
+
+  protected sessionTextMatch(session: PrototypeGameSession): number | null {
+    const bestByQuestion = new Map<string, number>();
+    for (const attempt of session.recordingAttempts) {
+      if (attempt.transcriptionStatus === 'COMPLETED' && attempt.textMatch !== undefined) {
+        bestByQuestion.set(
+          attempt.questionId,
+          Math.max(bestByQuestion.get(attempt.questionId) ?? 0, attempt.textMatch),
+        );
+      }
+    }
+    const values = [...bestByQuestion.values()];
+    return values.length
+      ? Math.round(values.reduce((total, percentage) => total + percentage, 0) / values.length)
+      : null;
   }
 
   private async loadSessions(): Promise<void> {

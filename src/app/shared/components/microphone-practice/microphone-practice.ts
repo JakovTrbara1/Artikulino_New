@@ -24,6 +24,7 @@ type RetryAction = 'save' | 'delete';
 })
 export class MicrophonePractice implements OnDestroy {
   readonly questionId = input.required<string>();
+  readonly resetId = input(0);
   readonly required = input(false);
   readonly promptKind = input<'sound' | 'word'>('word');
   readonly disabled = input(false);
@@ -36,6 +37,7 @@ export class MicrophonePractice implements OnDestroy {
   protected readonly recorder: MicrophoneRecorderService;
   protected readonly deliveryStatus = signal<AttemptDeliveryStatus>('idle');
   private currentQuestionId?: string;
+  private currentResetId?: number;
   private attemptNumber = 0;
   private handledRecording?: Blob;
   private latestAttempt?: RecordedAttempt;
@@ -49,9 +51,14 @@ export class MicrophonePractice implements OnDestroy {
 
     effect(() => {
       const questionId = this.questionId();
+      const resetId = this.resetId();
       if (this.currentQuestionId !== questionId) {
         this.currentQuestionId = questionId;
+        this.currentResetId = resetId;
         this.resetForQuestion();
+      } else if (this.currentResetId !== resetId) {
+        this.currentResetId = resetId;
+        this.resetForRetry();
       }
     });
 
@@ -177,9 +184,17 @@ export class MicrophonePractice implements OnDestroy {
   }
 
   private resetForQuestion(): void {
+    this.resetRecordingState();
+    this.attemptNumber = 0;
+  }
+
+  private resetForRetry(): void {
+    this.resetRecordingState();
+  }
+
+  private resetRecordingState(): void {
     this.recorder.clearRecording();
     this.deliveryStatus.set('idle');
-    this.attemptNumber = 0;
     this.handledRecording = undefined;
     this.latestAttempt = undefined;
     this.savedAttemptId = undefined;

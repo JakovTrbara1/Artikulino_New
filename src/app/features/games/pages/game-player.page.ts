@@ -20,7 +20,9 @@ import { MicrophonePractice } from '../../../shared/components/microphone-practi
 import { RecordedAttempt } from '../../../shared/models/recorded-attempt.model';
 import { AudioPlaybackService } from '../../../shared/services/audio-playback.service';
 import { CatchSoundBoard } from '../components/catch-sound-board/catch-sound-board';
+import { GameCompletion } from '../components/game-completion/game-completion';
 import { ListenDecideBoard } from '../components/listen-decide-board/listen-decide-board';
+import { PracticeResultDialog } from '../components/practice-result-dialog/practice-result-dialog';
 import { PronunciationPracticeBoard } from '../components/pronunciation-practice-board/pronunciation-practice-board';
 import { SoundPositionBoard } from '../components/sound-position-board/sound-position-board';
 import {
@@ -40,6 +42,8 @@ import { GameSessionService } from '../services/game-session.service';
     SoundPositionBoard,
     PronunciationPracticeBoard,
     MicrophonePractice,
+    PracticeResultDialog,
+    GameCompletion,
   ],
   templateUrl: './game-player.page.html',
   styleUrl: './game-player.page.css',
@@ -54,7 +58,6 @@ export class GamePlayerPage implements OnDestroy {
     { initialValue: null },
   );
   private readonly gameTitle = viewChild<ElementRef<HTMLHeadingElement>>('gameTitle');
-  private readonly resultTitle = viewChild<ElementRef<HTMLHeadingElement>>('resultTitle');
   private initializedPackageId?: string;
   private prototypeSessionPromise?: Promise<PrototypeGameSession>;
   private practicePollingSequence = 0;
@@ -67,6 +70,10 @@ export class GamePlayerPage implements OnDestroy {
   protected readonly audioMessage = signal('');
   protected readonly persistenceMessage = signal('');
   protected readonly practiceResultPending = signal(false);
+  protected readonly practiceResetId = signal(0);
+  protected readonly showPracticeResultModal = computed(
+    () => this.practiceResultPending() || this.session.practiceRoundResult() !== null,
+  );
   protected readonly listenLabel = computed(() =>
     this.hasListened() ? 'Poslušaj ponovno' : 'Poslušaj',
   );
@@ -191,15 +198,25 @@ export class GamePlayerPage implements OnDestroy {
     this.session.skipPracticeRound();
   }
 
+  protected retryPracticeRound(): void {
+    this.practicePollingSequence += 1;
+    this.practiceResultPending.set(false);
+    this.practiceResetId.update((resetId) => resetId + 1);
+    this.session.reopenPracticeRound();
+  }
+
+  protected continuePracticeRound(): void {
+    this.nextQuestion();
+  }
+
   protected nextQuestion(): void {
     this.audio.stop();
     this.session.next();
     if (this.session.isComplete()) {
       void this.completePrototypeSession();
-      this.focusHeadingAfterRender('result');
     } else {
       this.resetQuestionUi();
-      this.focusHeadingAfterRender('game');
+      this.focusHeadingAfterRender();
     }
   }
 
@@ -209,7 +226,7 @@ export class GamePlayerPage implements OnDestroy {
       this.session.start(contentPackage);
       this.resetQuestionUi();
       this.startPrototypeSession(contentPackage);
-      this.focusHeadingAfterRender('game');
+      this.focusHeadingAfterRender();
     }
   }
 
@@ -220,6 +237,7 @@ export class GamePlayerPage implements OnDestroy {
     this.hasListened.set(false);
     this.selectedAnswer.set(null);
     this.audioMessage.set('');
+    this.practiceResetId.update((resetId) => resetId + 1);
   }
 
   private startPrototypeSession(contentPackage: ContentPackage): void {
@@ -255,7 +273,7 @@ export class GamePlayerPage implements OnDestroy {
     try {
       const prototypeSession = await this.ensurePrototypeSession(contentPackage);
       await this.prototypeSessions.complete(prototypeSession.id, result);
-      this.persistenceMessage.set('Rezultat je spremljen u napredak demo profila.');
+      this.persistenceMessage.set('Rezultat je spremljen u napredak profila.');
     } catch {
       // The game result remains visible and playable even when local persistence is unavailable.
     }
@@ -296,12 +314,11 @@ export class GamePlayerPage implements OnDestroy {
     }
   }
 
-  private focusHeadingAfterRender(target: 'game' | 'result'): void {
+  private focusHeadingAfterRender(): void {
     afterNextRender(
       {
         write: () => {
-          const heading = target === 'result' ? this.resultTitle() : this.gameTitle();
-          heading?.nativeElement.focus();
+          this.gameTitle()?.nativeElement.focus();
         },
       },
       { injector: this.injector },

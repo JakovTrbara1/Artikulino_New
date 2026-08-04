@@ -1,13 +1,6 @@
 <div class="page-shell therapist-shell">
   <header class="review-heading">
     <h1>Pregled snimki</h1>
-    <p>
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
-        <path d="M12 10v6m0-9h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      </svg>
-      Prototip za diplomski rad · Nije klinički sustav
-    </p>
   </header>
 
   @if (errorMessage()) {
@@ -16,13 +9,13 @@
 
   @if (loading()) {
     <section class="surface loading-state" aria-live="polite">
-      <h2>Učitavanje testnih snimki…</h2>
+      <h2>Učitavanje snimki…</h2>
     </section>
   } @else {
     <div class="review-layout">
-      <aside class="surface review-master" aria-label="Odabir demo profila i sesije">
+      <aside class="surface review-master" aria-label="Odabir profila i sesije">
         <section aria-labelledby="children-title">
-          <h2 id="children-title">Djeca (demo)</h2>
+          <h2 id="children-title">Profili</h2>
           <div class="master-list">
             @for (child of children(); track child.id) {
               <button
@@ -48,7 +41,7 @@
                 </svg>
               </button>
             } @empty {
-              <p>Nema izmišljenih demo profila.</p>
+              <p>Nema profila.</p>
             }
           </div>
         </section>
@@ -82,7 +75,7 @@
                 </svg>
               </button>
             } @empty {
-              <p>Ovaj demo profil još nema dovršenih igara.</p>
+              <p>Ovaj profil još nema dovršenih igara.</p>
             }
           </div>
         </section>
@@ -102,7 +95,7 @@
             }
           </div>
           @if (selectedSession(); as session) {
-            <span>{{ session.recordingAttempts.length }} testnih snimki</span>
+            <span>{{ session.recordingAttempts.length }} snimki</span>
           }
         </div>
 
@@ -218,7 +211,7 @@
                   @if (expandedAttemptId() === attempt.id) {
                     <section class="review-editor" aria-label="Uređivanje osvrta terapeuta">
                       <div class="editor-playback">
-                        <strong>Testna snimka</strong>
+                        <strong>Snimka</strong>
                         @if (audioUrls()[attempt.id]; as audioUrl) {
                           <audio controls preload="metadata" [src]="audioUrl">
                             Vaš preglednik ne podržava reprodukciju zvuka.
@@ -315,10 +308,10 @@
               kvalitetu izgovora niti daje klinički zaključak.
             </p>
           } @else {
-            <div class="detail-state">Ova dovršena sesija nema spremljenih testnih snimki.</div>
+            <div class="detail-state">Ova dovršena sesija nema spremljenih snimki.</div>
           }
         } @else {
-          <div class="detail-state">Odaberite dovršenu igru za pregled testnih snimki.</div>
+          <div class="detail-state">Odaberite dovršenu igru za pregled snimki.</div>
         }
       </main>
     </div>

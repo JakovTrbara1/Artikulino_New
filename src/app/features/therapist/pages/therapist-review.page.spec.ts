@@ -153,7 +153,7 @@ describe('TherapistReviewPage', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the selected demo child, completed session, and all attempt states', async () => {
+  it('renders the selected profile, completed session, and all attempt states', async () => {
     await createPage();
     const text = fixture.nativeElement.textContent;
 
@@ -164,7 +164,7 @@ describe('TherapistReviewPage', () => {
     expect(text).toContain('100%');
     expect(text).toContain('Prijepis u tijeku');
     expect(text).toContain('Prijepis nije uspio');
-    expect(text).toContain('Nije klinički sustav');
+    expect(text).toContain('Ne procjenjuje kvalitetu izgovora niti daje klinički zaključak.');
   });
 
   it('loads authenticated audio on demand and revokes the object URL on destroy', async () => {
@@ -224,11 +224,9 @@ describe('TherapistReviewPage', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
+    expect(fixture.nativeElement.textContent).toContain('Ovaj profil još nema dovršenih igara.');
     expect(fixture.nativeElement.textContent).toContain(
-      'Ovaj demo profil još nema dovršenih igara.',
-    );
-    expect(fixture.nativeElement.textContent).toContain(
-      'Odaberite dovršenu igru za pregled testnih snimki.',
+      'Odaberite dovršenu igru za pregled snimki.',
     );
   });
 

@@ -337,7 +337,7 @@ git diff --check
 ### Milestone 23 — Unique artwork and larger decorations
 
 - Branch: `codex/unique-game-artwork`
-- Status: implemented and validated on the milestone branch; review is pending.
+- Status: complete and merged through pull request #30.
 - Generate one distinct optimized WebP illustration for every game.
 - Assign artwork by package rather than sharing one image per theme.
 - Replace the pronunciation category symbol with an unmistakable code-native lips SVG.
@@ -350,6 +350,7 @@ git diff --check
 ### Milestone 24 — Pronunciation celebration and completion UX
 
 - Branch: `codex/pronunciation-celebration-ui`
+- Status: implemented and validated on the milestone branch; review is pending.
 - Show an accessible centered modal while transcription is pending and after every result.
 - Show `Podudarnost teksta`, percentage, best round points, encouraging copy, retry, and continue.
 - Preserve recordings and allow continuation when the result is unavailable.

@@ -43,7 +43,7 @@
       }
       @if (auth.isParent()) {
         <a routerLink="/profili" routerLinkActive="active" (click)="closeMenu()">
-          {{ auth.activeChild()?.displayName || 'Demo profili' }}
+          {{ auth.activeChild()?.displayName || 'Profili' }}
         </a>
       } @else if (auth.isTherapist()) {
         <a routerLink="/pregled-terapeuta" routerLinkActive="active" (click)="closeMenu()">
@@ -53,7 +53,7 @@
       @if (auth.isAuthenticated()) {
         <button class="logout-button" type="button" (click)="logout()">Odjava</button>
       } @else {
-        <a routerLink="/prijava" routerLinkActive="active" (click)="closeMenu()">Demo prijava</a>
+        <a routerLink="/prijava" routerLinkActive="active" (click)="closeMenu()">Prijava</a>
       }
     </nav>
   </div>

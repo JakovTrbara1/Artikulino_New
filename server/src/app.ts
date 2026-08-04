@@ -125,7 +125,7 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
 
   const requireParent = (_request: Request, response: Response, next: NextFunction): void => {
     if (currentUser(response).role !== 'PARENT') {
-      response.status(403).json({ message: 'Ova radnja dostupna je samo demo roditelju.' });
+      response.status(403).json({ message: 'Ova radnja dostupna je samo roditelju.' });
       return;
     }
     next();
@@ -133,7 +133,7 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
 
   const requireTherapist = (_request: Request, response: Response, next: NextFunction): void => {
     if (currentUser(response).role !== 'THERAPIST') {
-      response.status(403).json({ message: 'Ova radnja dostupna je samo demo terapeutu.' });
+      response.status(403).json({ message: 'Ova radnja dostupna je samo terapeutu.' });
       return;
     }
     next();
@@ -244,7 +244,7 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
     const childId = routeParameter(request.params['childId']);
     const storageNames = database.listChildStorageNames(user.id, childId);
     if (!storageNames) {
-      response.status(404).json({ message: 'Demo profil nije pronađen.' });
+      response.status(404).json({ message: 'Profil nije pronađen.' });
       return;
     }
     await removeStoredRecordings(storageNames);
@@ -255,12 +255,12 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
   app.get('/api/sessions', requireAuth, requireParent, (request, response) => {
     const childId = textField(request.query['childId'], 100);
     if (!childId) {
-      response.status(400).json({ message: 'Odaberite demo profil.' });
+      response.status(400).json({ message: 'Odaberite profil.' });
       return;
     }
     const sessions = database.listGameSessions(currentUser(response).id, childId);
     if (!sessions) {
-      response.status(404).json({ message: 'Demo profil nije pronađen.' });
+      response.status(404).json({ message: 'Profil nije pronađen.' });
       return;
     }
     response.json({ sessions });
@@ -292,7 +292,7 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
     }
     const session = database.createGameSession(currentUser(response).id, input);
     if (!session) {
-      response.status(404).json({ message: 'Demo profil nije pronađen.' });
+      response.status(404).json({ message: 'Profil nije pronađen.' });
       return;
     }
     response.status(201).json({ session });
@@ -468,7 +468,7 @@ export function createPrototypeApp(options: PrototypeAppOptions = {}) {
       return;
     }
     console.error('Prototype server error', error);
-    response.status(500).json({ message: 'Lokalni prototip trenutačno nije dostupan.' });
+    response.status(500).json({ message: 'Lokalni poslužitelj trenutačno nije dostupan.' });
   });
 
   return { app, database, transcriptionQueue };

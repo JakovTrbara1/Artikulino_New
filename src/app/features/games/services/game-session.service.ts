@@ -30,6 +30,7 @@ export class GameSessionService {
   private readonly completeState = signal(false);
   private readonly completedResultState = signal<GameSessionResult | null>(null);
   private readonly bestPracticePoints = new Map<string, number>();
+  private readonly bestPracticePercentages = new Map<string, number>();
   private startedAt = Date.now();
 
   readonly contentPackage = this.packageState.asReadonly();
@@ -55,6 +56,17 @@ export class GameSessionService {
       ? ((this.indexState() + (this.completeState() ? 1 : 0)) / packageValue.questions.length) * 100
       : 0;
   });
+  readonly averagePracticeMatch = computed(() => {
+    this.practiceRoundResultState();
+    this.completeState();
+    const percentages = [...this.bestPracticePercentages.values()];
+    if (percentages.length === 0) {
+      return 0;
+    }
+    return Math.round(
+      percentages.reduce((total, percentage) => total + percentage, 0) / percentages.length,
+    );
+  });
 
   constructor(private readonly scoring: ScoringService) {}
 
@@ -74,6 +86,7 @@ export class GameSessionService {
     this.completeState.set(false);
     this.completedResultState.set(null);
     this.bestPracticePoints.clear();
+    this.bestPracticePercentages.clear();
     this.startedAt = Date.now();
   }
 
@@ -210,6 +223,10 @@ export class GameSessionService {
     const bestPoints = Math.max(previousBest, roundPoints);
     const addedPoints = bestPoints - previousBest;
     this.bestPracticePoints.set(questionId, bestPoints);
+    this.bestPracticePercentages.set(
+      questionId,
+      Math.max(this.bestPracticePercentages.get(questionId) ?? 0, normalizedPercentage),
+    );
     this.pointsState.update((points) => points + addedPoints);
 
     const completedResult: PracticeRoundResult = {

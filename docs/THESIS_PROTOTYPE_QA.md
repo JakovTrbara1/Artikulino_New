@@ -57,7 +57,7 @@ therapist review, exposes it to the parent, and verifies cascade deletion of met
 | Expired login and parent/therapist role restrictions   | API, auth-service, route-guard, and live role checks |
 | Session/profile deletion and physical-file cleanup     | API and integrated workflow tests                    |
 | Upgrade of pre-pronunciation SQLite data               | Server migration test                                |
-| Text matching does not affect points                   | Session and content tests                            |
+| Text matching affects only pronunciation-game points   | Session and proportional-scoring tests               |
 
 ## Live browser verification
 
@@ -75,9 +75,9 @@ Verified interactions:
   artwork.
 - Recognition gameplay: `Uhvati glas R` renders only `Čujem glas R` and `Ne čujem glas R`, enables
   them after `Poslušaj`, and renders no recording control.
-- Pronunciation gameplay: recording is disabled until the example is played, no answer controls or
-  points are shown, and no transcript, text-match percentage, or automatic pronunciation rating is
-  shown to the child.
+- Pronunciation gameplay: recording is disabled until the example is played; the question screen
+  has no answer controls, transcript, or percentage; after a recording, the accessible result
+  dialog labels the percentage only as `Podudarnost teksta` and never as pronunciation quality.
 - `/napredak`: `Napredak djeteta` is the default section; `Feedback terapeuta` shows only saved
   therapist reviews while historical attempts remain in child progress.
 - `/pregled-terapeuta`: therapist login, demo-child switching, completed sessions, all attempts,
@@ -102,8 +102,23 @@ Intentional differences from generated concepts:
 
 - production copy and demo data remain code-native Croatian rather than image-rendered sample text;
 - navigation and decoration remain restrained for accessibility and responsive space;
-- the child pronunciation screen does not show a transcript, percentage, `Odlično!`, or any other
-  automated quality conclusion; text matching remains adult-facing and explicitly non-clinical.
+- the child question screen does not show a transcript or percentage; the separate result dialog
+  uses encouraging copy with explicit text-match terminology and no automated pronunciation
+  conclusion.
+
+## Milestone 24 result and completion QA
+
+- Component tests cover pending, completed, unavailable, retry, continuation, dialog focus,
+  completion focus, result metrics, and the three completion actions.
+- Session tests confirm average best text match and verify that a lower retry cannot reduce a
+  previous best percentage or points.
+- Parent progress calculates recognition accuracy without pronunciation sessions and summarizes
+  pronunciation sessions using the best completed text match per question.
+- Rendered QA at 1440 × 1000 and 390 × 844 confirmed a centered celebration-style completion,
+  responsive metric/action stacking, no horizontal overflow, and a clear console.
+- The global warning banner and visible `demo`, `prototip`, `paket`, and `testne snimke` product
+  wording were removed. One concise adult-facing local-storage and deletion notice remains on the
+  parent progress page.
 
 ## Remaining human-device checks
 

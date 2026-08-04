@@ -61,12 +61,12 @@ npx prettier . --check
 
 ## Current Repository State
 
-- Current implementation branch: `codex/unique-game-artwork`
+- Current implementation branch: `codex/pronunciation-celebration-ui`
 - Remote: `origin` -> `https://github.com/JakovTrbara1/Artikulino_New.git`
-- Base: `origin/main` at merge commit `ef2c2f7`.
-- Milestone 22 is merged through pull request #29.
-- Milestone 23 assigns a separately generated illustration to every game, clarifies the
-  pronunciation icon, and enlarges desktop edge decorations.
+- Base: `origin/main` at merge commit `7049f20`.
+- Milestone 23 is merged through pull request #30.
+- Milestone 24 adds accessible pronunciation-result dialogs, a child-friendly completion screen,
+  best-match summaries, recognition-only accuracy, and cleaner visible terminology.
 - No `.env` or example environment config files were present.
 
 ## Main Implemented Features
@@ -405,6 +405,24 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   edges and disappear at the mobile breakpoint. The temporary empty QA session was deleted by its
   exact ID; existing runtime data was not reset or changed.
 
+## Milestone 24 Validation
+
+- `npm run prototype:check` passed after formatting: the Angular build, 22 frontend files/110
+  tests, three Express files/25 tests, five Python tests, the asset gate, and repository-wide
+  Prettier checks all pass.
+- Focused tests cover pending, completed, failed, retry, focus, reduced-state, completion-summary,
+  best-per-question percentage, and microphone retry-numbering behavior.
+- The centered result dialog keeps the game surface inert, labels the value only as
+  `Podudarnost teksta`, shows best points, and offers retry or continuation without a hard failure
+  threshold.
+- The finish screen uses `Bravo, završio/la si vježbu!`, three result metrics, and the existing
+  replay/catalog/progress actions. Pronunciation summaries show average best text match, while
+  parent accuracy excludes pronunciation sessions.
+- In-app Browser checks at 1440 × 1000 and 390 × 844 confirmed the completion hierarchy, responsive
+  stacking, focused result heading, no horizontal overflow, and no console warning/error.
+- The two temporary sessions created for rendered QA were deleted individually. Runtime returned to
+  19 sessions and 21 recording attempts; no reset or existing recording deletion occurred.
+
 ## Known Bugs, Risks, and Unfinished Work
 
 - Local recording persistence, Croatian transcription, expanded parent progress, therapist review,
@@ -416,8 +434,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
   packages remain unchanged.
 - Catalog cards now use one separately generated image per game. The asset check prevents shared
   paths, duplicate file bytes, missing references, invalid WebP containers, and size regressions.
-- Child pronunciation gameplay now shows bounded pending status and inline text-match points.
-  Milestone 24 replaces the interim feedback with the approved accessible celebration modal.
+- Child pronunciation gameplay shows bounded pending and completed states in an accessible
+  celebration dialog. The main question screen remains free of transcripts and percentages.
 - No external ASR provider or automatic articulation error detection is implemented. The original
   browser transcription port remains disabled; Express alone calls the localhost worker.
 - No approved controller, legal basis, guardian verification, ASR provider, exact provider
@@ -445,10 +463,9 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 
 ## Exact Next Recommended Tasks
 
-1. Review and merge Milestone 23.
-2. Implement Milestone 24 on `codex/pronunciation-celebration-ui` after Milestone 23 is merged.
-3. Implement Milestone 25 only after Milestone 24 is merged and validated.
-4. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
+1. Review and merge Milestone 24.
+2. Implement Milestone 25 only after Milestone 24 is merged and validated.
+3. Perform the remaining human microphone, audible playback, Croatian voice, keyboard, and
    screen-reader checks on the target device during Milestone 25.
 
 ## Do Not Change Without Asking
@@ -467,7 +484,8 @@ Pages are standalone and lazy-loaded. Component-specific visual rules stay with 
 ## Assumptions to Preserve
 
 - Target users are preschool and school-age children, with parents and speech therapists as supporting adult users.
-- MVP uses microphone recording only for replay/self-monitoring.
+- Recognition games never use recording. Pronunciation games use recording for replay and
+  non-clinical proportional text-match points.
 - Adding a new sound, sound pair, theme, level, audio file, image, or question should be possible by adding or editing content packages.
 - Scoring must remain configurable and never produce negative points.
 - Pronunciation text-match scoring must use the package base points, count only the best attempt per

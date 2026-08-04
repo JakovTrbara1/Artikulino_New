@@ -155,7 +155,7 @@ describe('GameCatalogPage', () => {
 
     expect(query<HTMLElement>('.package-grid')).toBeNull();
     expect(requireElement<HTMLElement>('.empty-results').textContent).toContain(
-      'Nema paketa s tim odabirom.',
+      'Nema igara s tim odabirom.',
     );
 
     requireElement<HTMLButtonElement>('.empty-results button').click();

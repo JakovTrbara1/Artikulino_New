@@ -110,7 +110,7 @@ export class PrototypeAuthService {
     if (authenticated) {
       const token = this.tokenState();
       if (!token) {
-        throw new Error('Za nastavak je potrebna demo prijava.');
+        throw new Error('Za nastavak je potrebna prijava.');
       }
       headers.set('Authorization', `Bearer ${token}`);
     }
@@ -121,7 +121,7 @@ export class PrototypeAuthService {
         this.clearSession();
       }
       const body = (await response.json().catch(() => ({}))) as ApiMessage;
-      throw new Error(body.message || 'Lokalni prototip trenutačno nije dostupan.');
+      throw new Error(body.message || 'Lokalni poslužitelj trenutačno nije dostupan.');
     }
     return response;
   }

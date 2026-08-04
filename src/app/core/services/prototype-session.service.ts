@@ -23,7 +23,7 @@ export class PrototypeSessionService {
   async create(contentPackage: ContentPackage): Promise<PrototypeGameSession> {
     const child = this.auth.activeChild();
     if (!child) {
-      throw new Error('Odaberite demo profil prije početka igre.');
+      throw new Error('Odaberite profil prije početka igre.');
     }
     await this.ensureCompatibleApi(contentPackage.gameType);
     const response = await this.auth.apiRequest<{ session: PrototypeGameSession }>(
@@ -110,7 +110,7 @@ export class PrototypeSessionService {
   async listForActiveChild(): Promise<readonly PrototypeGameSession[]> {
     const child = this.auth.activeChild();
     if (!child) {
-      throw new Error('Odaberite demo profil za pregled napretka.');
+      throw new Error('Odaberite profil za pregled napretka.');
     }
     const response = await this.auth.apiRequest<{
       sessions: readonly PrototypeGameSession[];
