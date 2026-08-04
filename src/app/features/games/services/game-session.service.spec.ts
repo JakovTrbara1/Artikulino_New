@@ -81,6 +81,7 @@ describe('GameSessionService', () => {
     expect(service.attempts()).toBe(2);
     expect(service.totalPoints()).toBe(12);
     expect(lowerRetry).toMatchObject({ roundPoints: 9, bestPoints: 12 });
+    expect(service.averagePracticeMatch()).toBe(80);
 
     service.registerPracticeAttempt();
     service.markPracticeAttemptPending('attempt-3', 'izgovor-s-sunce');
@@ -94,6 +95,7 @@ describe('GameSessionService', () => {
     expect(service.attempts()).toBe(3);
     expect(service.totalPoints()).toBe(15);
     expect(betterRetry).toMatchObject({ roundPoints: 15, bestPoints: 15 });
+    expect(service.averagePracticeMatch()).toBe(100);
   });
 
   it('allows continuation with zero new points when transcription fails', () => {

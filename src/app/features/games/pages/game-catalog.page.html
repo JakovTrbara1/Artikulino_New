@@ -23,11 +23,7 @@
     <h2 id="packages-title" class="sr-only">Dostupne igre</h2>
 
     <div class="browser-tools">
-      <div
-        class="filters"
-        aria-label="Filtriraj sadržajne pakete"
-        [attr.data-count]="activeFilterCount()"
-      >
+      <div class="filters" aria-label="Filtriraj igre" [attr.data-count]="activeFilterCount()">
         @if (gameType() !== 'listen-and-decide') {
           <label>
             <span>Glas</span>
@@ -88,7 +84,7 @@
           </select>
         </label>
       </div>
-      <p class="result-count" aria-live="polite">{{ packages().length }} dostupnih paketa</p>
+      <p class="result-count" aria-live="polite">{{ packages().length }} dostupnih igara</p>
     </div>
 
     @if (packages().length) {
@@ -103,7 +99,7 @@
       </div>
     } @else {
       <div class="empty-results">
-        <h3>Nema paketa s tim odabirom.</h3>
+        <h3>Nema igara s tim odabirom.</h3>
         <p>Promijeni jedan od filtara i pokušaj ponovno.</p>
         <button class="button button--secondary" type="button" (click)="resetFilters()">
           Očisti filtre

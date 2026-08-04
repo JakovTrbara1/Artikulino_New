@@ -14,62 +14,23 @@
 
   @if (contentPackage(); as package) {
     @if (session.isComplete()) {
-      <section class="surface result-screen" aria-labelledby="result-title">
-        <div class="result-star" aria-hidden="true">★</div>
-        <p class="eyebrow">Vježba je završena</p>
-        <h1 #resultTitle id="result-title" tabindex="-1">Bravo, stigao/la si do cilja!</h1>
-        <p>Rezultat za paket {{ package.name }} spreman je za demo profil.</p>
-        @if (persistenceMessage()) {
-          <p class="audio-notice" role="status">{{ persistenceMessage() }}</p>
-        }
-
-        <dl
-          class="result-stats"
-          [class.is-pronunciation]="package.gameType === 'pronunciation-practice'"
-        >
-          @if (package.gameType === 'pronunciation-practice') {
-            <div>
-              <dt>Krugovi</dt>
-              <dd>{{ package.questions.length }}</dd>
-            </div>
-            <div>
-              <dt>Snimljeni pokušaji</dt>
-              <dd>{{ session.attempts() }}</dd>
-            </div>
-            <div>
-              <dt>Ponovna slušanja</dt>
-              <dd>{{ session.replays() }}</dd>
-            </div>
-          } @else {
-            <div>
-              <dt>Točno</dt>
-              <dd>{{ session.correctAnswers() }} / {{ package.questions.length }}</dd>
-            </div>
-            <div>
-              <dt>Bodovi</dt>
-              <dd>{{ session.totalPoints() }}</dd>
-            </div>
-            <div>
-              <dt>Najdulji niz</dt>
-              <dd>{{ session.longestStreak() }}</dd>
-            </div>
-            <div>
-              <dt>Ponovna slušanja</dt>
-              <dd>{{ session.replays() }}</dd>
-            </div>
-          }
-        </dl>
-
-        <div class="result-actions">
-          <button class="button button--primary" type="button" (click)="restart()">
-            Igraj ponovno
-          </button>
-          <a class="button button--secondary" routerLink="/igre">Odaberi drugu igru</a>
-          <a class="button button--quiet" routerLink="/napredak">Pogledaj napredak</a>
-        </div>
-      </section>
+      <app-game-completion
+        [contentPackage]="package"
+        [totalPoints]="session.totalPoints()"
+        [averageTextMatch]="session.averagePracticeMatch()"
+        [recordingCount]="session.attempts()"
+        [correctAnswers]="session.correctAnswers()"
+        [longestStreak]="session.longestStreak()"
+        [persistenceMessage]="persistenceMessage()"
+        (restartRequested)="restart()"
+      />
     } @else if (session.currentQuestion(); as question) {
-      <section class="surface game-surface" aria-labelledby="game-title">
+      <section
+        class="surface game-surface"
+        aria-labelledby="game-title"
+        [attr.inert]="showPracticeResultModal() ? '' : null"
+        [attr.aria-hidden]="showPracticeResultModal() ? 'true' : null"
+      >
         <div class="game-toolbar">
           <div>
             <span>Pitanje</span>
@@ -137,6 +98,7 @@
               <app-microphone-practice
                 recordingPanel
                 [questionId]="question.id"
+                [resetId]="practiceResetId()"
                 [required]="true"
                 [disabled]="!hasListened() || practiceResultPending()"
                 [promptKind]="package.practiceMode === 'SOUND' ? 'sound' : 'word'"
@@ -215,16 +177,12 @@
           </div>
         }
 
-        @if (practiceResultPending()) {
-          <div class="feedback retry" role="status" aria-live="polite">
-            <div>
-              <strong>Provjeravamo podudarnost teksta…</strong>
-              <p>Snimka je spremljena. Rezultat može potrajati do 30 sekundi.</p>
-            </div>
-          </div>
-        }
-
-        @if (session.feedback(); as feedback) {
+        @if (
+          (package.gameType !== 'pronunciation-practice' ||
+            session.practiceRoundResult() === null) &&
+            session.feedback();
+          as feedback
+        ) {
           <div
             class="feedback"
             [class]="'feedback ' + feedback.kind"
@@ -243,7 +201,10 @@
           </div>
         }
 
-        @if (session.isAnswered()) {
+        @if (
+          session.isAnswered() &&
+          (package.gameType !== 'pronunciation-practice' || session.practiceRoundResult() === null)
+        ) {
           <button class="button button--primary next-button" type="button" (click)="nextQuestion()">
             {{
               session.currentIndex() === package.questions.length - 1
@@ -260,10 +221,18 @@
           </button>
         }
       </section>
+      @if (showPracticeResultModal()) {
+        <app-practice-result-dialog
+          [pending]="practiceResultPending()"
+          [result]="session.practiceRoundResult()"
+          (retryRequested)="retryPracticeRound()"
+          (continueRequested)="continuePracticeRound()"
+        />
+      }
     }
   } @else {
     <section class="surface not-found">
-      <h1>Ovaj sadržajni paket ne postoji.</h1>
+      <h1>Ova igra ne postoji.</h1>
       <p>Možda je uklonjen ili je poveznica nepotpuna.</p>
       <a class="button button--primary" routerLink="/igre">Povratak na igre</a>
     </section>

@@ -75,8 +75,7 @@ export class TherapistReviewPage implements OnInit, OnDestroy {
   );
   protected readonly selectedChildName = computed(
     () =>
-      this.children().find((child) => child.id === this.selectedChildId())?.displayName ??
-      'Demo profil',
+      this.children().find((child) => child.id === this.selectedChildId())?.displayName ?? 'Profil',
   );
 
   async ngOnInit(): Promise<void> {

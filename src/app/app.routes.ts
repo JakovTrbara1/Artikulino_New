@@ -18,12 +18,12 @@ export const routes: Routes = [
   },
   {
     path: 'prijava',
-    title: 'Demo prijava | Artikulino',
+    title: 'Prijava | Artikulino',
     loadComponent: () => import('./features/auth/pages/login.page').then((m) => m.LoginPage),
   },
   {
     path: 'profili',
-    title: 'Demo profili | Artikulino',
+    title: 'Profili | Artikulino',
     canActivate: [authenticatedGuard],
     loadComponent: () =>
       import('./features/profiles/pages/profiles.page').then((m) => m.ProfilesPage),

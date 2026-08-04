@@ -130,10 +130,30 @@ describe('GamePlayerPage accessibility', () => {
     await vi.waitFor(() => expect(session.isAnswered()).toBe(true));
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.next-button')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.next-button')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[role="dialog"]')).not.toBeNull();
     expect(session.totalPoints()).toBe(12);
     expect(session.correctAnswers()).toBe(0);
-    expect(fixture.nativeElement.textContent).toContain('Podudarnost teksta: 80%');
+    expect(fixture.nativeElement.textContent).toContain('Podudarnost teksta');
+    expect(fixture.nativeElement.textContent).toContain('80%');
+    expect(fixture.nativeElement.textContent).toContain('12 bodova');
+    expect(fixture.nativeElement.textContent).toContain('Pokušaj ponovno');
+    expect(fixture.nativeElement.textContent).toContain('Nastavi');
+    const gameSurface = fixture.nativeElement.querySelector('.game-surface') as HTMLElement;
+    expect(gameSurface.hasAttribute('inert')).toBe(true);
+    expect(gameSurface.getAttribute('aria-hidden')).toBe('true');
+
+    (
+      fixture.nativeElement.querySelector(
+        'app-practice-result-dialog .button--secondary',
+      ) as HTMLButtonElement
+    ).click();
+    fixture.detectChanges();
+
+    expect(session.attempts()).toBe(1);
+    expect(session.isAnswered()).toBe(false);
+    expect(fixture.nativeElement.querySelector('[role="dialog"]')).toBeNull();
+    expect(gameSurface.hasAttribute('inert')).toBe(false);
   });
 
   it('moves focus to the next question heading after advancing', async () => {
@@ -158,7 +178,7 @@ describe('GamePlayerPage accessibility', () => {
 
     const resultTitle = fixture.nativeElement.querySelector('#result-title') as HTMLHeadingElement;
     expect(document.activeElement).toBe(resultTitle);
-    expect(resultTitle.textContent?.trim()).toBe('Bravo, stigao/la si do cilja!');
+    expect(resultTitle.textContent?.trim()).toBe('Bravo, završio/la si vježbu!');
     await fixture.whenStable();
     expect(prototypeSessions.complete).toHaveBeenCalledOnce();
   });

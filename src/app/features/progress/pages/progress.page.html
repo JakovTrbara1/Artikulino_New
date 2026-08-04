@@ -6,9 +6,8 @@
     </div>
     <div class="header-context">
       <p>
-        Pregled aktivnosti demo profila
-        <strong>{{ auth.activeChild()?.displayName }}</strong> na lokalnom demonstracijskom
-        poslužitelju.
+        Pregled aktivnosti profila
+        <strong>{{ auth.activeChild()?.displayName }}</strong> na lokalnom poslužitelju.
       </p>
       <button
         class="refresh-button"
@@ -74,7 +73,7 @@
             <span>Ukupni bodovi</span><strong>{{ totalPoints() }}</strong>
           </article>
           <article>
-            <span>Točnost igre</span><strong>{{ accuracy() }}%</strong>
+            <span>Točnost igara prepoznavanja</span><strong>{{ recognitionAccuracy() }}%</strong>
           </article>
           <article>
             <span>Vrijeme vježbe</span><strong>{{ minutes() }} min</strong>
@@ -85,8 +84,8 @@
           <section class="activity" aria-labelledby="activity-title">
             <div class="section-title">
               <div>
-                <p class="eyebrow">Aktivnosti i testne snimke</p>
-                <h2 id="activity-title">Sesije demo profila</h2>
+                <p class="eyebrow">Aktivnosti i snimke</p>
+                <h2 id="activity-title">Sesije profila</h2>
               </div>
               <span>{{ sessions().length }} zapisa</span>
             </div>
@@ -114,11 +113,22 @@
                       </time>
                     </span>
                     <span class="session-stats" aria-label="Sažetak sesije">
-                      <span
-                        ><small>Točno</small>{{ session.correctAnswers }}/{{
-                          session.questionCount
-                        }}</span
-                      >
+                      @if (session.gameType === 'pronunciation-practice') {
+                        <span>
+                          <small>Podudarnost</small>
+                          {{
+                            sessionTextMatch(session) === null
+                              ? '—'
+                              : sessionTextMatch(session) + '%'
+                          }}
+                        </span>
+                      } @else {
+                        <span>
+                          <small>Točno</small>{{ session.correctAnswers }}/{{
+                            session.questionCount
+                          }}
+                        </span>
+                      }
                       <span><small>Bodovi</small>{{ session.totalPoints }}</span>
                       <span><small>Snimke</small>{{ session.recordingAttempts.length }}</span>
                     </span>
@@ -206,7 +216,7 @@
                                 {{
                                   loadingAudioId() === attempt.id
                                     ? 'Učitavanje snimke…'
-                                    : 'Poslušaj testnu snimku'
+                                    : 'Poslušaj snimku'
                                 }}
                               </button>
                               <span>{{ formatDuration(attempt.durationMs) }}</span>
@@ -228,12 +238,12 @@
                             @if (attempt.therapistReview.comment) {
                               <p>{{ attempt.therapistReview.comment }}</p>
                             } @else {
-                              <p>Za ovu testnu snimku još nema komentara.</p>
+                              <p>Za ovu snimku još nema komentara.</p>
                             }
                           </section>
                         </article>
                       } @empty {
-                        <p class="no-attempts">U ovoj sesiji nema spremljenih testnih snimki.</p>
+                        <p class="no-attempts">U ovoj sesiji nema spremljenih snimki.</p>
                       }
                     </div>
 
@@ -256,7 +266,7 @@
               <p class="eyebrow">Sljedeći korak</p>
               <h2>Nastavite kratko i redovito</h2>
               <p>
-                Odaberite novu temu s poznatim glasom ili ponovite paket u kojem je bilo više
+                Odaberite novu temu s poznatim glasom ili ponovite vježbu u kojoj je bilo više
                 pokušaja.
               </p>
               <a class="button button--primary" routerLink="/igre">Odaberi vježbu</a>
@@ -264,7 +274,7 @@
             <section class="clinical-note">
               <strong>Informativni podaci</strong>
               <p>
-                Rezultati i prijepisi prate korištenje prototipa. Ne predstavljaju dijagnozu ni
+                Rezultati i prijepisi služe praćenju vježbanja. Ne predstavljaju dijagnozu ni
                 stručnu procjenu izgovora.
               </p>
             </section>
@@ -274,7 +284,7 @@
         <section class="surface empty-progress">
           <div aria-hidden="true">☆</div>
           <h2>Prvi rezultat tek čeka</h2>
-          <p>Završite jednu kratku igru i ovdje će se prikazati aktivnost demo profila.</p>
+          <p>Završite jednu kratku igru i ovdje će se prikazati aktivnost profila.</p>
           <a class="button button--primary" routerLink="/igre/slusaj-hrana-s-lagano">
             Započni prvu igru
           </a>
@@ -292,10 +302,7 @@
         <div>
           <p class="eyebrow">Stručni osvrt</p>
           <h2>Feedback terapeuta</h2>
-          <p>
-            Ovdje se prikazuju samo spremljeni osvrti terapeuta na testne snimke iz završenih
-            sesija.
-          </p>
+          <p>Ovdje se prikazuju samo spremljeni osvrti terapeuta na snimke iz završenih sesija.</p>
         </div>
         <span>
           {{ reviewedAttemptCount() }}
@@ -418,8 +425,8 @@
               <div>
                 <h2>Kako čitati feedback?</h2>
                 <p>
-                  Komentar se odnosi na konkretnu testnu snimku. Za sljedeću vježbu slijedite
-                  sačuvanu preporuku terapeuta.
+                  Komentar se odnosi na konkretnu snimku. Za sljedeću vježbu slijedite sačuvanu
+                  preporuku terapeuta.
                 </p>
               </div>
             </section>
@@ -437,8 +444,7 @@
           <div aria-hidden="true">💬</div>
           <h2>Još nema feedbacka terapeuta</h2>
           <p>
-            Nakon što terapeut pregleda testnu snimku i spremi osvrt, on će se pojaviti u ovom
-            odjeljku.
+            Nakon što terapeut pregleda snimku i spremi osvrt, on će se pojaviti u ovom odjeljku.
           </p>
         </section>
       }
@@ -447,11 +453,10 @@
 
   <section class="privacy-strip" aria-labelledby="privacy-title">
     <div>
-      <strong id="privacy-title">Lokalna pohrana testnih podataka</strong>
+      <strong id="privacy-title">Lokalna pohrana i brisanje</strong>
       <p>
-        Rezultati, prijepisi i snimke pohranjuju se na lokalnom demonstracijskom poslužitelju.
-        Koristite samo izmišljene profile i testne podatke. Sve podatke aktivnog profila možete
-        trajno izbrisati.
+        Rezultati, prijepisi i snimke pohranjuju se na ovom lokalnom poslužitelju. Snimke i sve
+        povezane podatke aktivnog profila možete trajno izbrisati.
       </p>
     </div>
     <button

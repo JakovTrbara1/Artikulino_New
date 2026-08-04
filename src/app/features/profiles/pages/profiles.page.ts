@@ -58,7 +58,7 @@ export class ProfilesPage implements OnInit {
   }
 
   protected async deleteChild(child: DemoChildProfile): Promise<void> {
-    if (!confirm(`Izbrisati demo profil „${child.displayName}”?`)) {
+    if (!confirm(`Izbrisati profil „${child.displayName}”?`)) {
       return;
     }
     this.errorMessage.set('');

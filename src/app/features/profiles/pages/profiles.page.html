@@ -1,9 +1,9 @@
 <div class="page-shell profiles-shell">
   <header>
     <p class="eyebrow">
-      {{ auth.isTherapist() ? 'Pregled testnih podataka' : 'Odabir za vježbu' }}
+      {{ auth.isTherapist() ? 'Pregled profila' : 'Odabir za vježbu' }}
     </p>
-    <h1>{{ auth.isTherapist() ? 'Demo profili' : 'Tko danas vježba?' }}</h1>
+    <h1>{{ auth.isTherapist() ? 'Profili' : 'Tko danas vježba?' }}</h1>
     <p>
       Profili sadrže samo izmišljeno prikazno ime. Nemoj unositi dob, zdravstvene podatke ni stvarni
       identitet djeteta.
@@ -15,9 +15,9 @@
   }
 
   @if (loading()) {
-    <p role="status">Učitavanje demo profila…</p>
+    <p role="status">Učitavanje profila…</p>
   } @else {
-    <section class="profile-grid" aria-label="Demo profili">
+    <section class="profile-grid" aria-label="Profili">
       @for (child of children(); track child.id) {
         <article class="profile-card" [class.selected]="auth.activeChild()?.id === child.id">
           <span class="avatar" aria-hidden="true">{{ child.displayName.slice(0, 1) }}</span>
@@ -30,11 +30,11 @@
               Izbriši profil
             </button>
           } @else {
-            <p>Izmišljeni testni profil</p>
+            <p>Izmišljeni profil</p>
           }
         </article>
       } @empty {
-        <p>Nema demo profila.</p>
+        <p>Nema profila.</p>
       }
     </section>
   }

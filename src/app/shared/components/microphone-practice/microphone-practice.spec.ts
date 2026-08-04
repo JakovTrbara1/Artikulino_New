@@ -126,6 +126,26 @@ describe('MicrophonePractice', () => {
     });
   });
 
+  it('clears the current recording for a retry without resetting attempt numbering', async () => {
+    const emitted: RecordedAttempt[] = [];
+    fixture.componentInstance.recordedAttempt.subscribe((attempt) => emitted.push(attempt));
+
+    await recordAttempt(2_000);
+    expect(emitted[0].attemptNumber).toBe(1);
+
+    fixture.componentRef.setInput('resetId', 1);
+    fixture.detectChanges();
+
+    expect(recorder.status()).toBe('idle');
+    expect(recorder.recording()).toBeNull();
+
+    await recordAttempt(4_000);
+    expect(emitted[1]).toMatchObject({
+      questionId: 'question-1',
+      attemptNumber: 2,
+    });
+  });
+
   it('keeps denied microphone access optional and offers a retry action', async () => {
     getUserMedia.mockRejectedValueOnce(new DOMException('Denied', 'NotAllowedError'));
 

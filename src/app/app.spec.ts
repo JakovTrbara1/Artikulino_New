@@ -23,8 +23,6 @@ describe('App', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.brand')?.textContent).toContain('Artikulino');
     expect(compiled.querySelectorAll('nav a')).toHaveLength(4);
-    expect(compiled.querySelector('app-prototype-notice')?.textContent).toContain(
-      'Diplomski prototip',
-    );
+    expect(compiled.querySelector('app-prototype-notice')).toBeNull();
   });
 });
