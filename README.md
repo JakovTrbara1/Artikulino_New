@@ -316,3 +316,8 @@ terapeutski pregled sada su implementirani. Završna mentor-feedback provjera pr
 implementirana i dokumentirana u
 [`docs/THESIS_PROTOTYPE_QA.md`](docs/THESIS_PROTOTYPE_QA.md). Detaljne upute za Python worker nalaze se u
 [`transcription/README.md`](transcription/README.md).
+
+Integrirana provjera od 4. kolovoza 2026. potvrdila je čuvanje nove sesije i snimke nakon ponovnog
+pokretanja sva tri servisa, roditeljski i terapeutski tijek, privremenu nedostupnost transkripcijskog
+workera te responzivni prikaz. Provjera nije pokretala reset baze, a svi privremeni QA zapisi i
+snimke izbrisani su nakon provjere.

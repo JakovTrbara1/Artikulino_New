@@ -350,7 +350,7 @@ git diff --check
 ### Milestone 24 — Pronunciation celebration and completion UX
 
 - Branch: `codex/pronunciation-celebration-ui`
-- Status: implemented and validated on the milestone branch; review is pending.
+- Status: complete and merged through pull request #31.
 - Show an accessible centered modal while transcription is pending and after every result.
 - Show `Podudarnost teksta`, percentage, best round points, encouraging copy, retry, and continue.
 - Preserve recordings and allow continuation when the result is unavailable.
@@ -368,6 +368,7 @@ git diff --check
 ### Milestone 25 — Observation-driven integrated QA
 
 - Branch: `codex/observation-improvement-qa`
+- Status: implemented and validated on the milestone branch; review is pending.
 - Verify login → child → pronunciation → retry → score → completion → progress.
 - Confirm new sessions and recordings remain after service restarts without resetting runtime data.
 - Recheck therapist playback and review, stale API detection, unavailable/failed transcription,
