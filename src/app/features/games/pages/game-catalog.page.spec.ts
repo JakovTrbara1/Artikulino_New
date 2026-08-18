@@ -144,6 +144,23 @@ describe('GameCatalogPage', () => {
     expect(queryAll<HTMLElement>('.package-card')).toHaveLength(content.packages().length);
   });
 
+  it('uses standalone decoration assets and reduces their count for short result sets', () => {
+    const decorationLayer = requireElement<HTMLElement>('.catalog-decoration-layer');
+    const decorationSources = queryAll<HTMLImageElement>('.catalog-decoration').map((image) =>
+      image.getAttribute('src'),
+    );
+
+    expect(decorationSources).toHaveLength(6);
+    expect(new Set(decorationSources).size).toBe(6);
+    expect(decorationLayer.getAttribute('data-decoration-count')).toBe('6');
+
+    requireElement<HTMLButtonElement>('button[data-type="listen-and-decide"]').click();
+    fixture.detectChanges();
+
+    expect(queryAll<HTMLElement>('.package-card')).toHaveLength(3);
+    expect(decorationLayer.getAttribute('data-decoration-count')).toBe('2');
+  });
+
   it('shows an empty state for incompatible filters and can clear every filter', () => {
     requireElement<HTMLButtonElement>('button[data-type="listen-and-decide"]').click();
     fixture.detectChanges();
