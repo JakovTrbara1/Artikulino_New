@@ -40,6 +40,15 @@ export class GameCatalogPage {
       practiceMode: this.practiceMode() || undefined,
     }),
   );
+  protected readonly decorationCount = computed<2 | 4 | 6>(() => {
+    const packageCount = this.packages().length;
+
+    if (packageCount > 12) {
+      return 6;
+    }
+
+    return packageCount > 3 ? 4 : 2;
+  });
 
   constructor(protected readonly content: ContentPackagesService) {}
 

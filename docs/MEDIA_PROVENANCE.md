@@ -81,12 +81,14 @@ sadržaja, ali nije pravno mišljenje o licenciranju.
 
 ## Dekoracije rubova
 
-| Datoteka                                              | Namjena                | Podrijetlo                                      |
-| ----------------------------------------------------- | ---------------------- | ----------------------------------------------- |
-| `public/assets/games/decorations/catalog-left.webp`   | Lijevi rub kataloga    | Generirano za Artikulino alatom OpenAI imagegen |
-| `public/assets/games/decorations/catalog-right.webp`  | Desni rub kataloga     | Generirano za Artikulino alatom OpenAI imagegen |
-| `public/assets/games/decorations/gameplay-left.webp`  | Lijevi rub ekrana igre | Generirano za Artikulino alatom OpenAI imagegen |
-| `public/assets/games/decorations/gameplay-right.webp` | Desni rub ekrana igre  | Generirano za Artikulino alatom OpenAI imagegen |
+| Datoteka                                                               | Namjena                            | Podrijetlo                                                |
+| ---------------------------------------------------------------------- | ---------------------------------- | --------------------------------------------------------- |
+| `public/assets/games/decorations/catalog-left.webp`                    | Lijevi rub kataloga                | Generirano za Artikulino alatom OpenAI imagegen           |
+| `public/assets/games/decorations/catalog-right.webp`                   | Desni rub kataloga                 | Generirano za Artikulino alatom OpenAI imagegen           |
+| `public/assets/games/decorations/catalog-{carrot,apple,broccoli}.webp` | Pojedinačni lijevi ukrasi kataloga | Izvedeno iz `catalog-left.webp` bez generativnih izmjena  |
+| `public/assets/games/decorations/catalog-{plane,books,teddy}.webp`     | Pojedinačni desni ukrasi kataloga  | Izvedeno iz `catalog-right.webp` bez generativnih izmjena |
+| `public/assets/games/decorations/gameplay-left.webp`                   | Lijevi rub ekrana igre             | Generirano za Artikulino alatom OpenAI imagegen           |
+| `public/assets/games/decorations/gameplay-right.webp`                  | Desni rub ekrana igre              | Generirano za Artikulino alatom OpenAI imagegen           |
 
 - Datum izrade: 2026-07-25.
 - Svaka je ilustracija generirana zasebnim pozivom ugrađenom alatu OpenAI imagegen. Odobreni
