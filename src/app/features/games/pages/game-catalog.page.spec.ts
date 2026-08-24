@@ -152,6 +152,8 @@ describe('GameCatalogPage', () => {
 
     expect(decorationSources).toHaveLength(6);
     expect(new Set(decorationSources).size).toBe(6);
+    expect(decorationLayer.classList.contains('background-decoration-layer')).toBe(true);
+    expect(queryAll<HTMLElement>('.background-decoration')).toHaveLength(6);
     expect(decorationLayer.getAttribute('data-decoration-count')).toBe('6');
 
     requireElement<HTMLButtonElement>('button[data-type="listen-and-decide"]').click();
