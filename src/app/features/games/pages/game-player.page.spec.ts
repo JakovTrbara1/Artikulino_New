@@ -65,6 +65,11 @@ describe('GamePlayerPage accessibility', () => {
     expect(progress.getAttribute('aria-valuetext')).toBe('Pitanje 1 od 4');
   });
 
+  it('does not render the clipped left gameplay decoration', () => {
+    expect(fixture.nativeElement.querySelector('.edge-decoration--left')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.edge-decoration--right')).not.toBeNull();
+  });
+
   it('does not render recording controls in any recognition game category', async () => {
     for (const packageId of [
       'slusaj-hrana-s-lagano',

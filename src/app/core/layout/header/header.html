@@ -30,30 +30,65 @@
 
     <nav id="main-navigation" aria-label="Glavna navigacija" [class.is-open]="menuOpen()">
       <a
+        data-nav="home"
         routerLink="/"
         routerLinkActive="active"
+        ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
         (click)="closeMenu()"
       >
         Naslovnica
       </a>
-      <a routerLink="/igre" routerLinkActive="active" (click)="closeMenu()">Igre</a>
+      <a
+        data-nav="games"
+        routerLink="/igre"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        (click)="closeMenu()"
+        >Igre</a
+      >
       @if (!auth.isTherapist()) {
-        <a routerLink="/napredak" routerLinkActive="active" (click)="closeMenu()">Napredak</a>
+        <a
+          data-nav="progress"
+          routerLink="/napredak"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          >Napredak</a
+        >
       }
       @if (auth.isParent()) {
-        <a routerLink="/profili" routerLinkActive="active" (click)="closeMenu()">
+        <a
+          data-nav="profiles"
+          routerLink="/profili"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+        >
           {{ auth.activeChild()?.displayName || 'Profili' }}
         </a>
       } @else if (auth.isTherapist()) {
-        <a routerLink="/pregled-terapeuta" routerLinkActive="active" (click)="closeMenu()">
+        <a
+          data-nav="therapist"
+          routerLink="/pregled-terapeuta"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+        >
           Pregled terapeuta
         </a>
       }
       @if (auth.isAuthenticated()) {
         <button class="logout-button" type="button" (click)="logout()">Odjava</button>
       } @else {
-        <a routerLink="/prijava" routerLinkActive="active" (click)="closeMenu()">Prijava</a>
+        <a
+          data-nav="login"
+          routerLink="/prijava"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          (click)="closeMenu()"
+          >Prijava</a
+        >
       }
     </nav>
   </div>
