@@ -1,16 +1,24 @@
 :host {
-  position: fixed;
+  position: fixed !important;
   z-index: 100;
   inset: 0;
 }
 
 .dialog-backdrop {
   display: grid;
-  min-height: 100%;
-  padding: 1rem;
+  min-height: 100dvh;
+  overflow-y: auto;
+  padding: clamp(1rem, 4vw, 3rem);
   place-items: center;
-  background: rgb(7 39 79 / 58%);
-  backdrop-filter: blur(3px);
+  background:
+    radial-gradient(circle at 12% 18%, rgb(255 189 46 / 44%) 0 4rem, transparent 4.1rem),
+    radial-gradient(circle at 88% 20%, rgb(85 200 167 / 38%) 0 5.5rem, transparent 5.6rem),
+    radial-gradient(circle at 8% 82%, rgb(244 95 87 / 32%) 0 6rem, transparent 6.1rem),
+    radial-gradient(circle at 90% 84%, rgb(155 107 227 / 36%) 0 7rem, transparent 7.1rem),
+    linear-gradient(145deg, rgb(20 74 126 / 82%), rgb(46 74 128 / 78%));
+  background-size: 115% 115%;
+  backdrop-filter: blur(6px) saturate(1.12);
+  animation: backdrop-drift 12s ease-in-out infinite alternate;
 }
 
 .result-dialog {
@@ -199,7 +207,32 @@ p {
   }
 }
 
+@keyframes backdrop-drift {
+  from {
+    background-position:
+      0 0,
+      0 0,
+      0 0,
+      0 0,
+      0 0;
+  }
+
+  to {
+    background-position:
+      1.5rem 1rem,
+      -1.25rem 1.5rem,
+      1rem -1.25rem,
+      -1.5rem -1rem,
+      0 0;
+  }
+}
+
 @media (max-width: 520px) {
+  .dialog-backdrop {
+    padding: 0.85rem;
+    background-size: 145% 145%;
+  }
+
   .dialog-actions {
     flex-direction: column-reverse;
   }
@@ -210,6 +243,7 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .dialog-backdrop,
   .pending-orbit,
   .confetti i {
     animation: none;

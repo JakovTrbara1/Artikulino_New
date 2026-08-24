@@ -4,6 +4,8 @@
   preload="metadata"
   (ended)="replayEnded()"
   (pause)="replayEnded()"
+  (playing)="replayStarted()"
+  (error)="replayFailed()"
 ></audio>
 
 <div class="recording-preview">
@@ -42,3 +44,7 @@
     Izbriši
   </button>
 </div>
+
+@if (playbackMessage()) {
+  <p class="playback-message" role="status">{{ playbackMessage() }}</p>
+}

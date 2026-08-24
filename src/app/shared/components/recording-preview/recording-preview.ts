@@ -21,6 +21,7 @@ export class RecordingPreview implements OnDestroy {
   readonly deleteRequested = output<void>();
 
   protected readonly isReplaying = signal(false);
+  protected readonly playbackMessage = signal('');
   private readonly audio = viewChild<ElementRef<HTMLAudioElement>>('audio');
 
   ngOnDestroy(): void {
@@ -35,10 +36,17 @@ export class RecordingPreview implements OnDestroy {
 
     if (audio.paused) {
       try {
+        this.playbackMessage.set('');
+        if (
+          audio.ended ||
+          (Number.isFinite(audio.duration) && audio.currentTime >= audio.duration)
+        ) {
+          audio.currentTime = 0;
+        }
         await audio.play();
         this.isReplaying.set(true);
       } catch {
-        this.isReplaying.set(false);
+        this.replayFailed();
       }
     } else {
       audio.pause();
@@ -48,6 +56,16 @@ export class RecordingPreview implements OnDestroy {
 
   protected replayEnded(): void {
     this.isReplaying.set(false);
+  }
+
+  protected replayStarted(): void {
+    this.playbackMessage.set('');
+    this.isReplaying.set(true);
+  }
+
+  protected replayFailed(): void {
+    this.isReplaying.set(false);
+    this.playbackMessage.set('Snimku trenutačno nije moguće reproducirati. Pokušaj ponovno.');
   }
 
   protected formatDuration(durationMs: number): string {
