@@ -130,16 +130,25 @@ describe('GamePlayerPage accessibility', () => {
     await vi.waitFor(() => expect(session.isAnswered()).toBe(true));
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.next-button')).toBeNull();
-    expect(fixture.nativeElement.querySelector('[role="dialog"]')).not.toBeNull();
+    const showResultButton = fixture.nativeElement.querySelector(
+      '.next-button',
+    ) as HTMLButtonElement;
+    expect(showResultButton.textContent).toContain('Prikaži rezultat');
+    expect(fixture.nativeElement.querySelector('[role="dialog"]')).toBeNull();
     expect(session.totalPoints()).toBe(12);
     expect(session.correctAnswers()).toBe(0);
+
+    const gameSurface = fixture.nativeElement.querySelector('.game-surface') as HTMLElement;
+    expect(gameSurface.hasAttribute('inert')).toBe(false);
+    showResultButton.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('[role="dialog"]')).not.toBeNull();
     expect(fixture.nativeElement.textContent).toContain('Podudarnost teksta');
     expect(fixture.nativeElement.textContent).toContain('80%');
     expect(fixture.nativeElement.textContent).toContain('12 bodova');
     expect(fixture.nativeElement.textContent).toContain('Pokušaj ponovno');
     expect(fixture.nativeElement.textContent).toContain('Nastavi');
-    const gameSurface = fixture.nativeElement.querySelector('.game-surface') as HTMLElement;
     expect(gameSurface.hasAttribute('inert')).toBe(true);
     expect(gameSurface.getAttribute('aria-hidden')).toBe('true');
 

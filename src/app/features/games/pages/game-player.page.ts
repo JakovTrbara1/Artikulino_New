@@ -71,8 +71,11 @@ export class GamePlayerPage implements OnDestroy {
   protected readonly persistenceMessage = signal('');
   protected readonly practiceResultPending = signal(false);
   protected readonly practiceResetId = signal(0);
+  protected readonly practiceResultDialogVisible = signal(false);
   protected readonly showPracticeResultModal = computed(
-    () => this.practiceResultPending() || this.session.practiceRoundResult() !== null,
+    () =>
+      this.practiceResultDialogVisible() &&
+      (this.practiceResultPending() || this.session.practiceRoundResult() !== null),
   );
   protected readonly listenLabel = computed(() =>
     this.hasListened() ? 'Poslušaj ponovno' : 'Poslušaj',
@@ -180,6 +183,7 @@ export class GamePlayerPage implements OnDestroy {
 
   protected receiveRecordedAttempt(): void {
     this.practicePollingSequence += 1;
+    this.practiceResultDialogVisible.set(false);
     this.practiceResultPending.set(true);
     this.session.registerPracticeAttempt();
   }
@@ -187,6 +191,7 @@ export class GamePlayerPage implements OnDestroy {
   protected clearRecordedAttempt(remainingAttempts: number): void {
     if (remainingAttempts === 0) {
       this.practicePollingSequence += 1;
+      this.practiceResultDialogVisible.set(false);
       this.practiceResultPending.set(false);
       this.session.reopenPracticeRound();
     }
@@ -194,18 +199,27 @@ export class GamePlayerPage implements OnDestroy {
 
   protected skipPronunciationRecording(): void {
     this.practicePollingSequence += 1;
+    this.practiceResultDialogVisible.set(false);
     this.practiceResultPending.set(false);
     this.session.skipPracticeRound();
   }
 
+  protected openPracticeResult(): void {
+    if (this.session.practiceRoundResult() !== null) {
+      this.practiceResultDialogVisible.set(true);
+    }
+  }
+
   protected retryPracticeRound(): void {
     this.practicePollingSequence += 1;
+    this.practiceResultDialogVisible.set(false);
     this.practiceResultPending.set(false);
     this.practiceResetId.update((resetId) => resetId + 1);
     this.session.reopenPracticeRound();
   }
 
   protected continuePracticeRound(): void {
+    this.practiceResultDialogVisible.set(false);
     this.nextQuestion();
   }
 
@@ -232,6 +246,7 @@ export class GamePlayerPage implements OnDestroy {
 
   private resetQuestionUi(): void {
     this.practicePollingSequence += 1;
+    this.practiceResultDialogVisible.set(false);
     this.practiceResultPending.set(false);
     this.audio.stop();
     this.hasListened.set(false);

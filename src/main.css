@@ -79,6 +79,16 @@ button {
   color: inherit;
 }
 
+.practice-processing {
+  max-width: 48rem;
+  margin: 1rem auto 0;
+  border-radius: var(--radius-sm);
+  background: #e4f6ff;
+  padding: 0.8rem 1rem;
+  color: var(--color-navy-700);
+  text-align: center;
+}
+
 a {
   color: inherit;
 }

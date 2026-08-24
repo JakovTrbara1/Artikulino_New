@@ -110,6 +110,11 @@
               />
             </app-pronunciation-practice-board>
           </div>
+          @if (practiceResultPending()) {
+            <p class="practice-processing" role="status">
+              Provjeravamo podudarnost teksta. Dok čekaš, možeš poslušati svoju snimku.
+            </p>
+          }
         } @else {
           <button
             class="listen-button"
@@ -218,6 +223,19 @@
                   : 'Sljedeće pitanje'
             }}
             <span aria-hidden="true">→</span>
+          </button>
+        }
+        @if (
+          package.gameType === 'pronunciation-practice' &&
+          session.practiceRoundResult() !== null &&
+          !showPracticeResultModal()
+        ) {
+          <button
+            class="button button--primary next-button"
+            type="button"
+            (click)="openPracticeResult()"
+          >
+            Prikaži rezultat <span aria-hidden="true">→</span>
           </button>
         }
       </section>
