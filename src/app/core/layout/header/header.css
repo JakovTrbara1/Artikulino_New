@@ -55,10 +55,38 @@ nav a {
 }
 
 nav a:hover,
-nav a.active,
 .logout-button:hover {
   background: var(--color-sky-100);
   color: var(--color-navy-900);
+}
+
+nav a.active[data-nav='home'] {
+  background: var(--color-sky-200);
+}
+
+nav a.active[data-nav='games'] {
+  background: #fff1bd;
+  color: #744800;
+}
+
+nav a.active[data-nav='progress'] {
+  background: #dff7ed;
+  color: var(--color-mint-dark);
+}
+
+nav a.active[data-nav='profiles'] {
+  background: #eee5ff;
+  color: #6f3ca0;
+}
+
+nav a.active[data-nav='therapist'] {
+  background: #e4f6ff;
+  color: #17618f;
+}
+
+nav a.active[data-nav='login'] {
+  background: #ffe3df;
+  color: var(--color-coral-dark);
 }
 
 .logout-button {

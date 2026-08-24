@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { App } from './app';
 import { routes } from './app.routes';
 
@@ -24,5 +24,18 @@ describe('App', () => {
     expect(compiled.querySelector('.brand')?.textContent).toContain('Artikulino');
     expect(compiled.querySelectorAll('nav a')).toHaveLength(4);
     expect(compiled.querySelector('app-prototype-notice')).toBeNull();
+  });
+
+  it('marks the current navigation destination with its own palette hook', async () => {
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+
+    await router.navigateByUrl('/igre');
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const activeLink = fixture.nativeElement.querySelector('nav a.active') as HTMLAnchorElement;
+    expect(activeLink.dataset['nav']).toBe('games');
+    expect(activeLink.getAttribute('aria-current')).toBe('page');
   });
 });

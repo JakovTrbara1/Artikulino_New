@@ -13,11 +13,6 @@
   width: clamp(9rem, 15vw, 13rem);
 }
 
-.edge-decoration--left {
-  top: 12rem;
-  left: clamp(-9rem, -8vw, -7rem);
-}
-
 .edge-decoration--right {
   top: 7rem;
   right: clamp(-9rem, -8vw, -7rem);
