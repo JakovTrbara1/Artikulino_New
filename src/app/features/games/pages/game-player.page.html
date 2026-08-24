@@ -1,16 +1,20 @@
 <div class="page-shell player-shell">
-  <img
-    class="edge-decoration edge-decoration--left"
-    src="/assets/games/decorations/gameplay-left.webp"
-    alt=""
-    aria-hidden="true"
-  />
-  <img
-    class="edge-decoration edge-decoration--right"
-    src="/assets/games/decorations/gameplay-right.webp"
-    alt=""
-    aria-hidden="true"
-  />
+  <div class="background-decoration-layer game-decoration-layer" aria-hidden="true">
+    <img
+      class="background-decoration background-decoration--left game-decoration"
+      src="/assets/games/decorations/gameplay-left.webp"
+      alt=""
+      width="512"
+      height="512"
+    />
+    <img
+      class="background-decoration background-decoration--right game-decoration"
+      src="/assets/games/decorations/gameplay-right.webp"
+      alt=""
+      width="512"
+      height="512"
+    />
+  </div>
 
   @if (contentPackage(); as package) {
     @if (session.isComplete()) {

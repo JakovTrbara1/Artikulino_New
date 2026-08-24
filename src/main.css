@@ -111,6 +111,57 @@ svg {
   z-index: 2;
 }
 
+.background-decoration-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  pointer-events: none;
+}
+
+.background-decoration {
+  width: 18rem;
+  max-width: 20vw;
+  max-height: calc(100% - 6rem);
+  object-fit: contain;
+  opacity: 0.42;
+  filter: drop-shadow(0 1.4rem 2rem rgb(13 49 95 / 14%)) saturate(1.04);
+}
+
+.background-decoration--left {
+  grid-column: 1;
+  justify-self: start;
+  margin-left: clamp(0.5rem, 1.25vw, 1.5rem);
+}
+
+.background-decoration--right {
+  grid-column: 2;
+  justify-self: end;
+  margin-right: clamp(0.5rem, 1.25vw, 1.5rem);
+}
+
+@supports (animation-timeline: scroll()) {
+  .background-decoration {
+    animation: background-decoration-drift linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  .background-decoration--right {
+    animation-direction: reverse;
+  }
+}
+
+@keyframes background-decoration-drift {
+  from {
+    transform: translate3d(0, 2rem, 0) rotate(-3deg);
+  }
+
+  to {
+    transform: translate3d(0, -3rem, 0) rotate(2deg);
+  }
+}
+
 h1,
 h2,
 h3,
@@ -264,7 +315,33 @@ p {
   }
 }
 
+@media (max-width: 75rem) {
+  .background-decoration {
+    max-width: 18vw;
+    opacity: 0.28;
+  }
+
+  .background-decoration--left {
+    margin-left: 1rem;
+  }
+
+  .background-decoration--right {
+    margin-right: 1rem;
+  }
+}
+
+@media (max-width: 64rem) {
+  .background-decoration-layer {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .background-decoration {
+    animation: none;
+    transform: none;
+  }
+
   *,
   *::before,
   *::after {
