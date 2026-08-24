@@ -129,6 +129,10 @@
   gap: 1rem;
 }
 
+.side-column {
+  align-self: start;
+}
+
 .session-card {
   overflow: hidden;
   border: 1px solid var(--color-border);

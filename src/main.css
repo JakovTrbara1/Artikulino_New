@@ -52,8 +52,16 @@ body {
   margin: 0;
   background:
     radial-gradient(circle at 8% 18%, rgb(255 255 255 / 72%) 0 4rem, transparent 4.1rem),
+    radial-gradient(circle at 88% 34%, rgb(85 200 167 / 12%) 0 10rem, transparent 18rem),
+    radial-gradient(circle at 16% 78%, rgb(255 189 46 / 10%) 0 9rem, transparent 17rem),
     linear-gradient(180deg, var(--color-sky-100), var(--color-sky-50));
   color: var(--color-navy-900);
+}
+
+@media (min-width: 58rem) and (prefers-reduced-motion: no-preference) {
+  body {
+    background-attachment: fixed, fixed, fixed, scroll;
+  }
 }
 
 button,
