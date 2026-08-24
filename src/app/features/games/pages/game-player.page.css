@@ -1,5 +1,8 @@
 .player-shell {
+  --game-decoration-size: clamp(4rem, calc((100vw - var(--content-width)) / 2 - 1rem), 9rem);
+
   position: relative;
+  width: min(calc(100% - 2rem), 94rem);
   overflow-x: clip;
   padding-top: 1.25rem;
 }
@@ -10,18 +13,32 @@
 }
 
 .edge-decoration {
-  width: clamp(9rem, 15vw, 13rem);
+  width: var(--game-decoration-size);
+  object-fit: contain;
+}
+
+.edge-decoration--left {
+  top: clamp(7rem, 10vw, 9rem);
+  left: 0;
 }
 
 .edge-decoration--right {
-  top: 7rem;
-  right: clamp(-9rem, -8vw, -7rem);
+  top: clamp(4.5rem, 7vw, 7rem);
+  right: 0;
 }
 
 .game-surface,
 .result-screen,
 .not-found {
+  width: min(100%, var(--content-width));
+  margin-inline: auto;
   padding: clamp(1rem, 3vw, 2.5rem);
+}
+
+@media (max-width: 85.99rem) {
+  .player-shell .edge-decoration {
+    display: none;
+  }
 }
 
 .game-toolbar {
