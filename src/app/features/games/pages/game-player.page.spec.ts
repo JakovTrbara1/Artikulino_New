@@ -65,9 +65,18 @@ describe('GamePlayerPage accessibility', () => {
     expect(progress.getAttribute('aria-valuetext')).toBe('Pitanje 1 od 4');
   });
 
-  it('does not render the clipped left gameplay decoration', () => {
-    expect(fixture.nativeElement.querySelector('.edge-decoration--left')).toBeNull();
-    expect(fixture.nativeElement.querySelector('.edge-decoration--right')).not.toBeNull();
+  it('renders both gameplay decorations without foreground overlap', () => {
+    const leftDecoration = fixture.nativeElement.querySelector(
+      '.edge-decoration--left',
+    ) as HTMLImageElement;
+    const rightDecoration = fixture.nativeElement.querySelector(
+      '.edge-decoration--right',
+    ) as HTMLImageElement;
+
+    expect(leftDecoration.src).toContain('/assets/games/decorations/gameplay-left.webp');
+    expect(rightDecoration.src).toContain('/assets/games/decorations/gameplay-right.webp');
+    expect(leftDecoration.classList.contains('edge-decoration--foreground')).toBe(false);
+    expect(rightDecoration.classList.contains('edge-decoration--foreground')).toBe(false);
   });
 
   it('does not render recording controls in any recognition game category', async () => {
